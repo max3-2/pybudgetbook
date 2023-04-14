@@ -38,6 +38,18 @@ mpl.rcParams.update({
 
 _TARGET_DPI = 600
 _tess_options = r'--psm 6'
+_lang = 'deu'
+
+# Maps receipt types to pattern types
+_receipt_types = {
+    'Aldi': 'gen',
+    'Nahkauf': 'gen',
+    'DM Drogerie': 'gen',
+    'Unverpackt': 'unverpackt',
+}
+
+# Maps pattern with lang to set of regexp
+
 
 
 # TODO Rotation is the most important factor to get a good ocr!
