@@ -7,6 +7,8 @@ Prototyping the receipt recognition
 from pathlib import Path
 import pytesseract as ocr
 from PIL import Image
+import imghdr
+import pypdfium2 as pdfium
 
 from skimage.color import rgb2gray
 from skimage import io as skio
@@ -39,16 +41,24 @@ mpl.rcParams.update({
 _TARGET_DPI = 600
 _tess_options = r'--psm 6'
 _lang = 'deu'
+# TODO move re to dicts with lang spec. names and load single one in config
+# Search aliases for receipts
+_receipt_aliases = {
+    'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
+    'Edeka': ['lieben[ _]lebensmittel'],
+}
 
 # Maps receipt types to pattern types
 _receipt_types = {
     'Aldi': 'gen',
+    'Edeka': 'gen',
     'Nahkauf': 'gen',
-    'DM Drogerie': 'gen',
+    'DM Drogerie': 'dm',
     'Unverpackt': 'unverpackt',
 }
 
-# Maps pattern with lang to set of regexp
+# Maps pattern with lang to set of regexp, general is alwazs used and the
+# rest is updated on top!
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3},\d{2})'),
                 'price_with_class': re.compile(r'(\d{1,3},\d{2}_[AB12])'),
@@ -64,8 +74,13 @@ _patterns = {
                     r'((?<=betrag.)\d{1,3}_*?,_*?\d{2})|'
                     r'((?<=summe.)\d{1,3}_*?,_*?\d{2})',
                     re.IGNORECASE)
-                }
+                },
+    'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2},\d{1,3})'),
+               'valid_article_pattern_mult': re.compile(
+                   r'(?=_[a-zA-Z]).*?(?=_\d{1,2},\d{1,3})')
+               }
 }
+
 
 # cid = fig.canvas.mpl_connect(
 #     'key_press_event', lambda event: rot_event(ax[1], event))
@@ -84,8 +99,86 @@ def rot_event(act_ax, event):
             return
 
 
+def get_vendor(raw_text):
+    for rec_t in _receipt_types.keys():
+        check_strings = [rec_t] + _receipt_aliases.get(rec_t, [])
+        this_check = any([re.search(rf'(\b{cs:s}|{cs:s}\b)', raw_text, re.IGNORECASE) is not None
+                          for cs in check_strings])
+
+        if this_check:
+            patterns = _receipt_types[rec_t]
+            print('Vendor found: ', rec_t)
+            return rec_t, patterns
+
+    print('No vendor found, using general')
+    return None, 'gen'
+
+
+def get_patterns(pattern, lang):
+    pats = _patterns['gen' + '_' + _lang]
+    pats.update(_patterns[pattern + '_' + _lang])
+    return pats
+
+
+def extract_image_text(bin_img):
+    tess_in = Image.fromarray(bin_img)
+    tess_in.format = 'TIFF'
+    data = ocr.image_to_data(tess_in, lang='deu', output_type='data.frame',
+                             config=_tess_options).dropna(
+        subset=['text']).reset_index()
+
+    data['height_plus_top'] = data['height'] + data['top']
+    data['width_plus_left'] = data['width'] + data['left']
+
+    # Collapse into single lines
+    data_by_line = data.groupby('line_num')
+    data_combined = pd.concat((
+        data_by_line['text'].apply('_'.join),
+        data_by_line['top'].min(),
+        data_by_line['left'].min(),
+        data_by_line['height_plus_top'].max(),
+        data_by_line['width_plus_left'].max()),
+        axis=1).reset_index()
+
+    # Re-Get raw text instead of tesseract twice
+    raw_text = '\n'.join(data_combined.text)
+    for _, grp in data.groupby('line_num'):
+        raw_text += ' '.join(grp.text.ravel()) + '\n'
+
+    return data_combined, raw_text
+
+
+def extract_pdf_data(file, page=0):
+    # Split line-wise
+    pdf = pdfium.PdfDocument(file)
+    pagedata = pdf.get_page(page)
+    txt = pagedata.get_textpage().get_text_range().split('\n')
+
+    txt = [line.strip() for line in txt if line.strip()]
+    # txt_depr = [line.strip() for line in extract_text(file).split('\n') if line.strip()]
+
+    # Remove  many spaces, dont need the layout
+    txt = [' '.join(line.split()) for line in txt]
+    # Spaces to underscore, better visible
+    txt = [line.replace(' ', '_') for line in txt]
+
+    # Create raw and parse the rest into the DataFrame format which is used
+    # in the main text parser
+    raw_text = '\n'.join(txt)
+
+    data = pd.DataFrame(columns=['line_num', 'text'])
+    data['text'] = txt
+    data['line_num'] = [i + 1 for i in range(len(txt))]
+
+    ref_img = rgb2gray(pagedata.render(scale=10).to_numpy())
+    scale = _TARGET_DPI / ref_img.shape[1] * (80 / 25.4)
+    ref_img = rescale(ref_img, scale)
+
+    return data, raw_text, ref_img
+
+
 def preprocess_image(imgpath, otsu='global',
-                     rescale_image=True, unsharp_ma=True, final_er_dil=True,
+                     rescale_image=True, unsharp_ma=True, final_er_dil=1,
                      remove_border_art=True, receipt_width=80, show=False):
     """
     Assumes portrait mode. Filter factors are designed after scaling!
@@ -93,7 +186,6 @@ def preprocess_image(imgpath, otsu='global',
     width in mm
     """
     proc_img = rgb2gray(skio.imread(rec))
-    # TODO  remove AA, final Gauss
     if rescale_image:
         scale = _TARGET_DPI / proc_img.shape[1] * (80 / 25.4)
         proc_img = rescale(proc_img, scale)
@@ -113,8 +205,9 @@ def preprocess_image(imgpath, otsu='global',
     bin_img = proc_img >= threshold
 
     # If final filters are set, do the best to get strong black letters
-    if final_er_dil:
-        bin_img = binary_erosion(bin_img, diamond(1))
+    if final_er_dil >= 1:
+        for i in range(final_er_dil):
+            bin_img = binary_erosion(bin_img, diamond(1))
         # bin_img = gaussian(bin_img, sigma=1) > threshold
 
     if remove_border_art:
@@ -134,57 +227,44 @@ def preprocess_image(imgpath, otsu='global',
     return proc_img, bin_img, fig
 
 
-# TODO Add compile for regexp in loops!
-# TODO move re to dicts with lang spec. names and load single one in config
-
 receipts = [Path(f) for f in [
     r'examples/IMG_5991.JPG',
-    r'examples/IMG_6005.JPG',
+    r'examples/IMG_6005.JPG',  # meh
     r'examples/IMG_6006.JPG',
 ]]
 
+pdfs = [Path(f) for f in [
+    r'examples/dm-eBon_2023-04-06_09-32-32.pdf.pdf',
+    r'examples/dm-eBon_2023-04-12_09-08-06.pdf.pdf'
+]]
+
 # for rec in receipts:
-rec = receipts[1]
+rec = receipts[2]
 
-proc_img, bin_img, fig = preprocess_image(rec, show=True)
+if imghdr.what(rec) is not None:
+    proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
+    data, raw_text = extract_image_text(bin_img)
 
-tess_in = Image.fromarray(bin_img)
-tess_in.format = 'TIFF'
-data = ocr.image_to_data(tess_in, lang='deu', output_type='data.frame', config=_tess_options).dropna(
-    subset=['text']).reset_index()
 
-# Re-Get raw text instead of tesseract twice
-raw_text = ''
-for _, grp in data.groupby('line_num'):
-    raw_text += ' '.join(grp.text.ravel()) + '\n'
-
-# Analyze vendor
-# TODO force this before running into the analysis!
-has_vendor = np.argmax(
-    [re.search(rf'(\b{sh:s}|{sh:s}\b)', raw_text, re.IGNORECASE) is not None
-     for sh in _receipt_types.keys()])
-if has_vendor.any():
-    vendor = list(_receipt_types.keys())[has_vendor]
-    pats = _patterns[_receipt_types[vendor] + '_' + _lang]
-    print("Vendor found: ", vendor)
 else:
-    print('No vendor found, using general')
-    pats = _patterns['gen_' + _lang]
+    if rec.suffix == '.pdf':
+        data, raw_text, proc_img = extract_pdf_data(rec)
+        f, ax = plt.subplots(1, 2)
+        ax[0].imshow(proc_img)
+    else:
+        raise IOError('Only image files and pdf are supported!')
 
 
-# Get patterns by language and receipt
-# ToDo T/EXC in final code
-
+# Analyze vendor and get pattern
+vendor, pattern = get_vendor(raw_text)
+pats = get_patterns(pattern, _lang)
 
 # First item is usually first price, if not let it 0 so get everything
-# Move tis to beginning of line so to catch all on this line if price
-# is not the first item
 first_item = 0
 first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
-first_item = data.loc[(data['block_num'] == data.loc[first_item, 'block_num']) & (
-    data['line_num'] == data.loc[first_item, 'line_num'])].first_valid_index()
 
 # Initialize variables
+# TODO replace by mandatory cols from config
 retrieved_data = pd.DataFrame(
     columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
 this_row_exists = False
@@ -192,11 +272,9 @@ total_price = 0
 unused_lines = []
 
 # Parse line by line and see what can be classified
-for line, group in data.loc[first_item:, :].groupby('line_num'):
+for _, group in data.loc[first_item:, :].iterrows():
     has_price, has_weight, has_mult = False, False, False
-
-    # Smash the line and regexp to victory
-    this_line = '_'.join(group.text.str.strip())
+    this_line = group['text']
     print('Analyzing: ', this_line)
 
     # Is there a price with tax class?
@@ -224,12 +302,21 @@ for line, group in data.loc[first_item:, :].groupby('line_num'):
         has_weight = True
         print('Found weight: ', amount, price_per_unit)
 
-    # If no weight, is there a multiplier
+    # If no weight, is there a multiplier?
     elif (re_res := pats['mult_pattern'].search(this_line)) is not None:
-        try:
-            price_per_unit = float(re_res.group(0).replace(',', '.'))
-        except ValueError:
-            price_per_unit = 0
+        if pattern == 'dm':
+            re_res = pats['mult_pattern'].findall(this_line)
+            try:
+                amount = float(re_res[0][0].replace(',', '.'))
+                price_per_unit = float(re_res[1][1].replace(',', '.').replace('_', ''))
+            except ValueError:
+                amount = 0
+                price_per_unit = 0
+        else:
+            try:
+                price_per_unit = float(re_res.group(0).replace(',', '.'))
+            except ValueError:
+                price_per_unit = 0
         has_mult = True
         print('Found mult: ', price_per_unit)
 
@@ -268,6 +355,21 @@ for line, group in data.loc[first_item:, :].groupby('line_num'):
             }, index=[0])],
             ignore_index=True)
 
+    # Price and mult in a singleline: DM
+    if has_price and has_mult:
+        article_data = pats['valid_article_pattern_mult'].search(this_line).group(0).split('_')
+        article_name = ' '.join([art for art in article_data if art])
+        retrieved_data = pd.concat(
+            [retrieved_data, pd.DataFrame({
+                'ArtNr': -1,
+                'Name': article_name,
+                'Price': price,
+                'TaxClass': tax_class,
+                'Units': amount,
+                'PricePerUnit': price_per_unit
+            }, index=[0])],
+            ignore_index=True)
+
     # If this has a price and nothing else, then try to extract the name,
     # a possible article id and with that creating a new item
     if has_price and not (has_mult or has_weight):
@@ -298,10 +400,10 @@ for line, group in data.loc[first_item:, :].groupby('line_num'):
 
     # Heavy lifting done, phew! Now just plot if this was valid
     # Plot box if this line is a valid price around the full line
-    if has_price:
-        box_xy = (group['left'].min(), group['top'].min())
-        box_height = (group['height'] + group['top']).max() - box_xy[1]
-        box_width = (group['width'] + group['left']).max() - box_xy[0]
+    if has_price and 'left' in group:
+        box_xy = group['left'], group['top']
+        box_height = group['height_plus_top'] - box_xy[1]
+        box_width = group['width_plus_left'] - box_xy[0]
         text_rec = Rectangle(box_xy, box_width, box_height,
                              ec='green', fc='none', lw=0.3)
 
@@ -318,13 +420,17 @@ for line, group in data.loc[first_item:, :].groupby('line_num'):
 
     print(20 * '-')
 
-# Post process
+# Post process, DM with weight info in text
+if vendor == 'DM Drogerie':
+    ...
+
+# Post process, general
 units_nan = retrieved_data['Units'].isna()
 retrieved_data.loc[units_nan, 'Units'] = (retrieved_data.loc[units_nan, 'Price'] /
                                           retrieved_data.loc[units_nan, 'PricePerUnit'])
 
+retrieved_data['Units'] = retrieved_data['Units'].fillna(1)
+
 ppu_nan = retrieved_data['PricePerUnit'].isna()
 retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
                                                retrieved_data.loc[ppu_nan, 'Units'])
-
-retrieved_data['Units'] = retrieved_data['Units'].fillna(1)
