@@ -41,7 +41,7 @@ mpl.rcParams.update({
 _TARGET_DPI = 600
 _tess_options = r'--psm 6'
 _lang = 'deu'
-# TODO move re to dicts with lang spec. names and load single one in config
+
 # Search aliases for receipts
 _receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
@@ -77,7 +77,11 @@ _patterns = {
                 },
     'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2},\d{1,3})'),
                'valid_article_pattern_mult': re.compile(
-                   r'(?=_[a-zA-Z]).*?(?=_\d{1,2},\d{1,3})')
+                   r'(?=_[a-zA-Z]).*?(?=_\d{1,2},\d{1,3})'),
+               'negative_price': re.compile(r'-\d{1,3},\d{1,2}'),
+               'total_sum_pattern': re.compile(
+                   r'((?<=\bsumme_eur.)\d{1,3}_*?,_*?\d{2})',
+                   re.IGNORECASE)
                },
     'unverpackt_deu': {'article_number': re.compile(r'\d{1,}'),
                        'mult_pattern': re.compile(r'\d{1,2},\d{1,3}')},
@@ -86,7 +90,8 @@ _patterns = {
 
 # cid = fig.canvas.mpl_connect(
 #     'key_press_event', lambda event: rot_event(ax[1], event))
-# TODO Rotation is the most important factor to get a good ocr!
+# TODO Rotation is the most important factor to get a good ocr! Build a UI
+# tool with a small delay before re-filtering
 def rot_event(act_ax, event):
     if event.inaxes is act_ax:
         if event.key == 'right':
@@ -315,7 +320,6 @@ def parse_unverpackt(data, pats, retrieved_data, fig=None):
 
     return retrieved_data, total_price
 
-# TODO DM negative prices
 
 # %% Main process
 receipts = [Path(f) for f in [
@@ -353,7 +357,6 @@ vendor, pattern = get_vendor(raw_text)
 pats = get_patterns(pattern, _lang)
 
 # Initialize, general
-# TODO replace by mandatory cols from config
 retrieved_data = pd.DataFrame(
     columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
 
@@ -367,13 +370,44 @@ if vendor == 'Unverpackt':
 first_item = 0
 first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
 
+# Find the last row, before so this can be better applied with different
+# vendors. Extract Final price. DM is very annoying with different rebate types
+# and totals.
+total_price = 0
+if vendor == 'DM Drogerie':
+    # Are there mult. rebates:
+    last_line = data['text'].str.extract(r'(zu.*?zahlender.*?betrag)', re.IGNORECASE).first_valid_index()
+    if last_line is not None:
+        last_line = last_line - 1
+        matcher = re.compile(r'\d{1,3},\d{2,3}', re.IGNORECASE)
+    else:
+        last_line = data['text'].str.extract(pats['total_sum_pattern']).first_valid_index() - 1
+        matcher = pats['total_sum_pattern']
+
+    try:
+        total_price = float(
+            matcher.search(data.loc[last_line + 1, 'text']).group(0).replace(',', '.').replace('_', ''))
+        print('Found total price: ', total_price)
+    except ValueError:
+        print('No total price')
+
+else:
+    last_line = data['text'].str.extract(pats['total_sum_pattern']).first_valid_index() - 1
+    try:
+        total_price = float(
+            pats['total_sum_pattern'].search(data.loc[last_line + 1, 'text']
+                                             ).group(0).replace(',', '.').replace('_', ''))
+        print('Found total price: ', total_price)
+    except ValueError:
+        print('No total price')
+
 # Initialize variables, special
 this_row_exists = False
 bonus = 0
 unused_lines = []
-total_price = 0
+
 # Parse line by line and see what can be classified
-for _, group in data.loc[first_item:, :].iterrows():
+for _, group in data.loc[first_item:last_line, :].iterrows():
     has_price, has_weight, has_mult = False, False, False
     this_line = group['text']
     print('Analyzing: ', this_line)
@@ -407,19 +441,25 @@ for _, group in data.loc[first_item:, :].iterrows():
     elif (re_res := pats['mult_pattern'].search(this_line)) is not None:
         if pattern == 'dm':
             re_res = pats['mult_pattern'].findall(this_line)
-            try:
-                amount = float(re_res[0][0].replace(',', '.'))
-                price_per_unit = float(re_res[1][1].replace(',', '.').replace('_', ''))
-            except ValueError:
-                amount = 0
-                price_per_unit = 0
+            if len(re_res) > 1:  # This catches stupid lines with e.g. .4x in text
+                try:
+                    amount = float(re_res[0][0].replace(',', '.'))
+                    price_per_unit = float(re_res[1][1].replace(',', '.').replace('_', ''))
+                except ValueError:
+                    amount = 0
+                    price_per_unit = 0
+
+                has_mult = True
+                print('Found mult: ', price_per_unit)
+
         else:
             try:
                 price_per_unit = float(re_res.group(0).replace(',', '.'))
             except ValueError:
                 price_per_unit = 0
-        has_mult = True
-        print('Found mult: ', price_per_unit)
+
+            has_mult = True
+            print('Found mult: ', price_per_unit)
 
     if pattern == 'dm':
         # TODO parse negative values into bonus
@@ -511,17 +551,6 @@ for _, group in data.loc[first_item:, :].iterrows():
 
         fig.axes[0].add_patch(text_rec)
 
-    # Finally, is there a final price? If so break the loop
-    elif (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
-        try:
-            total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
-            print('Found total price: ', total_price)
-            break
-        except ValueError:
-            ...
-
-    print(20 * '-')
-
 # TODO Post process, DM with weight info in text
 if vendor == 'DM Drogerie':
     ...
@@ -543,3 +572,5 @@ retrieved_data['Category'] = 'Supermarket'
 retrieved_data['Group'] = 'na'
 retrieved_data['Vendor'] = vendor
 retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
+
+# TODO sort by mandatory and append any that is not mandatory at the end
