@@ -335,7 +335,7 @@ pdfs = [Path(f) for f in [
 ]]
 
 # for rec in receipts:
-rec = pdfs[0]
+rec = pdfs[1]
 # rec = receipts[2]
 
 if imghdr.what(rec) is not None:
@@ -371,11 +371,11 @@ first_item = 0
 first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
 
 # Find the last row, before so this can be better applied with different
-# vendors. Extract Final price. DM is very annoying with different rebate types
+# vendors. Extract Final price. DM is very annoying with different discount types
 # and totals.
 total_price = 0
 if vendor == 'DM Drogerie':
-    # Are there mult. rebates:
+    # Are there mult. discounts:
     last_line = data['text'].str.extract(r'(zu.*?zahlender.*?betrag)', re.IGNORECASE).first_valid_index()
     if last_line is not None:
         last_line = last_line - 1
@@ -403,7 +403,7 @@ else:
 
 # Initialize variables, special
 this_row_exists = False
-bonus = 0
+discount = 0
 unused_lines = []
 
 # Parse line by line and see what can be classified
@@ -463,7 +463,12 @@ for _, group in data.loc[first_item:last_line, :].iterrows():
 
     if pattern == 'dm':
         # TODO parse negative values into bonus
-        ...
+        if (re_res := pats['negative_price'].search(this_line)) is not None:
+            try:
+                discount += float(re_res.group(0).replace(',', '.'))
+            except ValueError:
+                print('Cant convert discount')
+            continue
 
     # Analysis done, now extract and sort the data, this is the most
     # critical part and, as the search above, vendor specific!
@@ -551,6 +556,7 @@ for _, group in data.loc[first_item:last_line, :].iterrows():
 
         fig.axes[0].add_patch(text_rec)
 
+print('Discount: ', discount)
 # TODO Post process, DM with weight info in text
 if vendor == 'DM Drogerie':
     ...
