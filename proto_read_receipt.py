@@ -61,7 +61,7 @@ _receipt_types = {
 # rest is updated on top!
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3},\d{2})'),
-                'price_with_class': re.compile(r'(\d{1,3},\d{2}_[AB12])'),
+                'price_with_class': re.compile(r'(\d{1,3},\d{2,3}_[AB12])'),
                 'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3},\d{2})'),
                 'weight_pattern': re.compile(r'(\d{1,3},\d{1,3}(?=_EUR\/kg))'),
                 'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3},\d{2})))'),
@@ -142,6 +142,11 @@ def extract_image_text(bin_img):
         data_by_line['width_plus_left'].max()),
         axis=1).reset_index()
 
+    # Make BBox format for MPL
+    data_combined['width'] = data_combined['width_plus_left'] - data_combined['left']
+    data_combined['height'] = data_combined['height_plus_top'] - data_combined['top']
+    data_combined.drop(['height_plus_top', 'width_plus_left'], axis=1)
+
     # Re-Get raw text instead of tesseract twice
     raw_text = '\n'.join(data_combined.text)
     for _, grp in data.groupby('line_num'):
@@ -172,9 +177,18 @@ def extract_pdf_data(file, page=0):
     data['text'] = txt
     data['line_num'] = [i + 1 for i in range(len(txt))]
 
-    ref_img = rgb2gray(pagedata.render(scale=10).to_numpy())
-    scale = _TARGET_DPI / ref_img.shape[1] * (80 / 25.4)
-    ref_img = rescale(ref_img, scale)
+    scale = _TARGET_DPI / pagedata.get_width() * (80 / 25.4)
+    ref_img = rgb2gray(pagedata.render(scale=scale).to_numpy())
+
+    # Text BB
+    txtpage = pagedata.get_textpage()
+    rects = np.array([txtpage.get_rect(i) for i in range(txtpage.count_rects())])
+    # Now this is left, bottom, right and top in pdf, so scale, invert y
+    # and convert for MPL
+    data['left'] = rects[:, 0] * scale
+    data['top'] = ref_img.shape[0] - rects[:, 3] * scale
+    data['width'] = (rects[:, 2] - rects[:, 0]) * scale
+    data['height'] = (rects[:, 3] - rects[:, 1]) * scale
 
     return data, raw_text, ref_img
 
@@ -318,6 +332,7 @@ pdfs = [Path(f) for f in [
 
 # for rec in receipts:
 rec = pdfs[0]
+# rec = receipts[2]
 
 if imghdr.what(rec) is not None:
     proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
@@ -327,7 +342,7 @@ if imghdr.what(rec) is not None:
 else:
     if rec.suffix == '.pdf':
         data, raw_text, proc_img = extract_pdf_data(rec)
-        f, ax = plt.subplots(1, 2)
+        fig, ax = plt.subplots(1, 2)
         ax[0].imshow(proc_img)
     else:
         raise IOError('Only image files and pdf are supported!')
@@ -491,10 +506,7 @@ for _, group in data.loc[first_item:, :].iterrows():
     # Heavy lifting done, phew! Now just plot if this was valid
     # Plot box if this line is a valid price around the full line
     if has_price and 'left' in group:
-        box_xy = group['left'], group['top']
-        box_height = group['height_plus_top'] - box_xy[1]
-        box_width = group['width_plus_left'] - box_xy[0]
-        text_rec = Rectangle(box_xy, box_width, box_height,
+        text_rec = Rectangle((group['left'], group['top']), group['width'], group['height'],
                              ec='green', fc='none', lw=0.3)
 
         fig.axes[0].add_patch(text_rec)
