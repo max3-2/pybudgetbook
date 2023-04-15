@@ -78,7 +78,9 @@ _patterns = {
     'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2},\d{1,3})'),
                'valid_article_pattern_mult': re.compile(
                    r'(?=_[a-zA-Z]).*?(?=_\d{1,2},\d{1,3})')
-               }
+               },
+    'unverpackt_deu': {'article_number': re.compile(r'\d{1,}'),
+                       'mult_pattern': re.compile(r'\d{1,2},\d{1,3}')},
 }
 
 
@@ -207,7 +209,7 @@ def preprocess_image(imgpath, otsu='global',
     # If final filters are set, do the best to get strong black letters
     if final_er_dil >= 1:
         for i in range(final_er_dil):
-            bin_img = binary_erosion(bin_img, diamond(1))
+            bin_img = binary_erosion(bin_img, diamond(final_er_dil))
         # bin_img = gaussian(bin_img, sigma=1) > threshold
 
     if remove_border_art:
@@ -227,10 +229,86 @@ def preprocess_image(imgpath, otsu='global',
     return proc_img, bin_img, fig
 
 
+def parse_unverpackt(data, pats, retrieved_data, fig=None):
+    total_price = 0
+    line_buffer = []
+    # First item is usually first price - 2
+    first_item = 0
+    first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
+    first_item = max(0, first_item - 2)
+    for _, group in data.loc[first_item:, :].iterrows():
+        this_line = group['text']
+        print('Analyzing: ', this_line)
+
+        # Is there a price with tax class? Then the line before is ArtNr
+        # and the one before that name
+        if (re_res := pats['price_with_class'].search(this_line)) is not None:
+            price, tax_class = re_res.group(0).split('_')
+
+            try:
+                price = float(price.replace(',', '.'))
+            except ValueError:
+                price = 0.
+
+            tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2'))
+            article_number = int(pats['article_number'].search(line_buffer[-1]).group(0))
+            article_name = line_buffer[-2].replace('_', ' ')
+
+            print('Item: ', article_number, article_name, price, tax_class)
+
+            # extract units and price per unit
+            weight_info = pats['mult_pattern'].findall(this_line)
+            try:
+                amount = float(weight_info[0].replace(',', '.'))
+                price_per_unit = float(weight_info[1].replace(',', '.'))
+            except ValueError:
+                print("Add this to logger")
+                amount = 0
+                price_per_unit = 0
+
+            line_buffer = []
+
+            retrieved_data = pd.concat(
+                [retrieved_data, pd.DataFrame({
+                    'ArtNr': article_number,
+                    'Name': article_name,
+                    'Price': price,
+                    'TaxClass': tax_class,
+                    'Units': amount,
+                    'PricePerUnit': price_per_unit
+                }, index=[0])],
+                ignore_index=True)
+
+            if fig is not None:
+                box_xy = group['left'], group['top']
+                box_height = group['height_plus_top'] - box_xy[1]
+                box_width = group['width_plus_left'] - box_xy[0]
+                text_rec = Rectangle(box_xy, box_width, box_height,
+                                     ec='green', fc='none', lw=0.3)
+
+                fig.axes[0].add_patch(text_rec)
+
+        line_buffer.append(this_line)
+
+        # Finally, is there a final price? If so break the loop
+        if (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
+            try:
+                total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
+                print('Found total price: ', total_price)
+                break
+            except ValueError:
+                ...
+
+    return retrieved_data, total_price
+
+# TODO DM negative prices
+
+# %% Main process
 receipts = [Path(f) for f in [
     r'examples/IMG_5991.JPG',
     r'examples/IMG_6005.JPG',  # meh
     r'examples/IMG_6006.JPG',
+    r'examples/IMG_6277.jpg',
 ]]
 
 pdfs = [Path(f) for f in [
@@ -239,7 +317,7 @@ pdfs = [Path(f) for f in [
 ]]
 
 # for rec in receipts:
-rec = receipts[2]
+rec = pdfs[0]
 
 if imghdr.what(rec) is not None:
     proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
@@ -259,18 +337,26 @@ else:
 vendor, pattern = get_vendor(raw_text)
 pats = get_patterns(pattern, _lang)
 
+# Initialize, general
+# TODO replace by mandatory cols from config
+retrieved_data = pd.DataFrame(
+    columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
+
+
+if vendor == 'Unverpackt':
+    retrieved_data, total_price = parse_unverpackt(
+        data, pats, retrieved_data, fig)
+
+# And this will be something like "general" function
 # First item is usually first price, if not let it 0 so get everything
 first_item = 0
 first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
 
-# Initialize variables
-# TODO replace by mandatory cols from config
-retrieved_data = pd.DataFrame(
-    columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
+# Initialize variables, special
 this_row_exists = False
-total_price = 0
+bonus = 0
 unused_lines = []
-
+total_price = 0
 # Parse line by line and see what can be classified
 for _, group in data.loc[first_item:, :].iterrows():
     has_price, has_weight, has_mult = False, False, False
@@ -319,6 +405,10 @@ for _, group in data.loc[first_item:, :].iterrows():
                 price_per_unit = 0
         has_mult = True
         print('Found mult: ', price_per_unit)
+
+    if pattern == 'dm':
+        # TODO parse negative values into bonus
+        ...
 
     # Analysis done, now extract and sort the data, this is the most
     # critical part and, as the search above, vendor specific!
@@ -420,7 +510,7 @@ for _, group in data.loc[first_item:, :].iterrows():
 
     print(20 * '-')
 
-# Post process, DM with weight info in text
+# TODO Post process, DM with weight info in text
 if vendor == 'DM Drogerie':
     ...
 
@@ -434,3 +524,10 @@ retrieved_data['Units'] = retrieved_data['Units'].fillna(1)
 ppu_nan = retrieved_data['PricePerUnit'].isna()
 retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
                                                retrieved_data.loc[ppu_nan, 'Units'])
+
+# Add more data. Some of this is not needed "per item" but this makes this
+# data the most accessbile later on
+retrieved_data['category'] = 'Supermarket'
+retrieved_data['group'] = 'na'
+retrieved_data['vendor'] = vendor
+retrieved_data['date'] = pd.to_datetime('02/11/2022', dayfirst=True)
