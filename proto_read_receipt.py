@@ -527,7 +527,7 @@ retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Pric
 
 # Add more data. Some of this is not needed "per item" but this makes this
 # data the most accessbile later on
-retrieved_data['category'] = 'Supermarket'
-retrieved_data['group'] = 'na'
-retrieved_data['vendor'] = vendor
-retrieved_data['date'] = pd.to_datetime('02/11/2022', dayfirst=True)
+retrieved_data['Category'] = 'Supermarket'
+retrieved_data['Group'] = 'na'
+retrieved_data['Vendor'] = vendor
+retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)

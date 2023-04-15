@@ -27,6 +27,7 @@ def _concatenate_to_main(dataframe, work_dir):
 
 
 def save_with_metadata(dataframe):
+    # TODO ideas are tags,
     ...
 
 
