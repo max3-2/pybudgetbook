@@ -16,6 +16,9 @@ receipt_types: `dict`
     receipt type. This type then determines the pattern used for matching.
     Patterns are defined in constants, only change if you know what you are
     doing!
+_negative_groups: `dict`
+    MHolds lang. spec. lists of small words and patterns to trash when adding
+    new items to groups, so some of the clustering is prevented.
 """
 move_on_parse = True
 data_folder = None
@@ -35,3 +38,8 @@ receipt_types = {
     'DM Drogerie': 'dm',
     'Unverpackt': 'unverpackt',
 }
+
+_negative_groups = {'deu': ['stück', 'stk', 'gourmet', 'premium', 'prem'],
+                    'eng': [],
+                    'fra': [],
+                    }

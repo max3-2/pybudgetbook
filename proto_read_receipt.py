@@ -9,6 +9,7 @@ import pytesseract as ocr
 from PIL import Image
 import imghdr
 import pypdfium2 as pdfium
+import json
 
 from skimage.color import rgb2gray
 from skimage import io as skio
@@ -195,10 +196,7 @@ else:
     retrieved_data, total_price = parsers.parse_receipt_general(
         data, pats, pattern, plot_ax)
 
-# TODO Post process, DM with weight info in text, add to post-proc dict as
-# parse dict with funcs ref
-if pattern == 'dm':
-    ...
+# TODO Post process DM with weight info in text, maybe upcoming
 
 # Post process, general
 units_nan = retrieved_data['Units'].isna()
@@ -211,11 +209,36 @@ ppu_nan = retrieved_data['PricePerUnit'].isna()
 retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
+
+def match_group(data, group_file):
+    # TODO Add brute force remark
+    with open(Path(group_file), 'r',) as jsonfile:
+        reference_groups = json.load(jsonfile)
+
+    # Loop groups and count matches  article
+    result = list()
+    for key, grp in reference_groups.items():
+        matches = sum([tester.casefold() in data['Name'].casefold() for tester in grp])
+        if matches > 0:
+            result.append((key, matches))
+
+    # Best match
+    if not result:
+        return 'none'
+    else:
+        return result[np.array([match[1] for match in result]).argmax()][0]
+
+
+# TODO Change path from config_tools
+grf = Path('pybudgetbook/config/item_groups_deu.json')
+
+retrieved_data['Group'] = retrieved_data.apply(
+    lambda data: match_group(data, grf), axis=1)
+
 # Add more data. Some of this is not needed "per item" but this makes this
 # data the most accessbile later on. This is mainly from UI so now its
 # manual
 retrieved_data['Category'] = 'Supermarket'
-retrieved_data['Group'] = 'na'
 
 retrieved_data['Vendor'] = vendor
 retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)

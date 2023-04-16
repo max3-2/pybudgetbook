@@ -4,6 +4,7 @@ import shutil
 import appdirs
 import logging
 
+# TODO dynamic app name
 logger = logging.getLogger(__name__)
 _config_path = Path(appdirs.user_config_dir(appname='pybudgetbook'))
 _c_file = _config_path / 'pybb_conf.ini'
