@@ -3,6 +3,12 @@ __version__ = '0.1.0'
 __name__ = 'pybudgetbook'
 
 
+from pybudgetbook.config.config_tools import _check_config, load_config
+
+# On init, check config
+_check_config()
+load_config()
+
 # TODO UI
 # Create UI f rom file
 # Change lang input from conf to dropdown and on the fly to functions
