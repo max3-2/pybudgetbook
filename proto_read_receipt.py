@@ -169,7 +169,7 @@ rec = receipts[1]
 
 if imghdr.what(rec) is not None:
     proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
-    data, raw_text = extract_image_text(bin_img, bbconfig.lang)
+    data, raw_text = extract_image_text(bin_img, bbconfig.options['lang'])
     plot_ax = fig.axes[0]
 
 else:
@@ -184,7 +184,7 @@ else:
 
 # Analyze vendor and get pattern
 vendor, pattern = parsers.get_vendor(raw_text)
-pats = parsers.get_patterns(pattern, bbconfig.lang)
+pats = parsers.get_patterns(pattern, bbconfig.options['lang'])
 if vendor is None:
     vendor = input("No vendor detected - please add: ")
     assert vendor in bbconfig.receipt_types.keys(), "Invalid vendor"
