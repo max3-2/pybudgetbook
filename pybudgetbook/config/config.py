@@ -8,7 +8,30 @@ data_folder: `Path`, defaults to None
 lang: `str`, defaults to `deu`
     Main language for pattern matching and tesseract, can be changed on the
     fly, this is just the preset.
+receipt_aliases: `dict`
+    Coontains aliases of strngs found in the specific receipts to identify
+    the vendor.
+receipt_types: `dict`
+    Maps vendors found by aliases or vendor.lower() pattern matching to a
+    receipt type. This type then determines the pattern used for matching.
+    Patterns are defined in constants, only change if you know what you are
+    doing!
 """
 move_on_parse = True
 data_folder = None
 lang = 'deu'
+
+# Search aliases for receipts
+receipt_aliases = {
+    'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
+    'Edeka': ['lieben[ _]lebensmittel'],
+}
+
+# Maps receipt types to pattern types
+receipt_types = {
+    'Aldi': 'gen',
+    'Edeka': 'gen',
+    'Nahkauf': 'gen',
+    'DM Drogerie': 'dm',
+    'Unverpackt': 'unverpackt',
+}
