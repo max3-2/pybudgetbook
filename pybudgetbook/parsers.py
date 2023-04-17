@@ -1,6 +1,9 @@
 """Contains all text parsing functions which extract data"""
 import re
+import numpy as np
 import pandas as pd
+from pathlib import Path
+import json
 
 # TODO make relative
 import pybudgetbook.config.config as bbconfig
@@ -39,6 +42,26 @@ def get_patterns(pattern, lang):
     pats = bbconstants._patterns['gen' + '_' + lang]
     pats.update(bbconstants._patterns[pattern + '_' + lang])
     return pats
+
+
+def match_group(data, group_file):
+    # TODO Add brute force remark
+    # data is a row from DF this is used in apply
+    with open(Path(group_file), 'r',) as jsonfile:
+        reference_groups = json.load(jsonfile)
+
+    # Loop groups and count matches  article
+    result = list()
+    for key, grp in reference_groups.items():
+        matches = sum([tester.casefold() in data['Name'].casefold() for tester in grp])
+        if matches > 0:
+            result.append((key, matches))
+
+    # Best match
+    if not result:
+        return 'none'
+    else:
+        return result[np.array([match[1] for match in result]).argmax()][0]
 
 
 def parse_receipt_general(data, pats, pattern, ax=None):
