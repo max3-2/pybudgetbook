@@ -10,6 +10,7 @@ from PIL import Image
 import imghdr
 import pypdfium2 as pdfium
 import json
+import logging
 
 from skimage.color import rgb2gray
 from skimage import io as skio
@@ -28,6 +29,9 @@ import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import parsers
 import pybudgetbook.config.plotting_conf
+
+
+logger = logging.getLogger(__name__)
 
 
 def extract_image_text(bin_img, lang):
@@ -210,30 +214,31 @@ retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Pric
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
 
-def match_group(data, group_file):
-    # TODO Add brute force remark
-    with open(Path(group_file), 'r',) as jsonfile:
-        reference_groups = json.load(jsonfile)
-
-    # Loop groups and count matches  article
-    result = list()
-    for key, grp in reference_groups.items():
-        matches = sum([tester.casefold() in data['Name'].casefold() for tester in grp])
-        if matches > 0:
-            result.append((key, matches))
-
-    # Best match
-    if not result:
-        return 'none'
-    else:
-        return result[np.array([match[1] for match in result]).argmax()][0]
+additional_cols = tuple(
+    set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
+retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
 
 
-# TODO Change path from config_tools
+# Now match the groups
+group_file_user = Path(
+    bbconfig.options['data_folder']) / f'item_groups_{bbconfig.options["lang"]:s}.json'
+
+if not group_file_user.exists():
+    logger.warning(
+        f'Group file {str(group_file_user):s} not found in data folder. Please '
+        'check that the data folder is set and an item_groups exist with the '
+        'correct name and language. You can use TODO to create a new one '
+        'from template but that will remove any learning which has happened '
+        'so far!')
+
 grf = Path('pybudgetbook/config/item_groups_deu.json')
 
 retrieved_data['Group'] = retrieved_data.apply(
     lambda data: match_group(data, grf), axis=1)
+
+
+# And feed back any invalid groups
+
 
 # Add more data. Some of this is not needed "per item" but this makes this
 # data the most accessbile later on. This is mainly from UI so now its
@@ -246,9 +251,5 @@ retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
 metadata = {'tags': 'adli;general;suerpmarket',
             'total_extracted': total_price}
 
-# if False
-#             'discount_extracted': discount}
 
-additional_cols = tuple(
-    set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
-retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
+# and then save with metadata
