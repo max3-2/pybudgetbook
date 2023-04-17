@@ -63,14 +63,19 @@ ToDo Start he UI and load the receipt
 - Try to apply a lateral Crop fairly close at the receipt borders. Rotate to
   have the text horizontal.
 
-### Categorizing
+### Grouping
 Categrorizing searches language specific (currently only german) dicts which
 are consecutively improved from data (if you want to help, see below). Tagging
-your articles will improve matching. Feel free to create issues / gists with your local dicts so I can merge them in. Best practice:
-- Basedict is maintained by repo and updated with versions
-- Userdict is in data folder
-- On load, those will be combined (set())
-- Feedback needs to be evaluated (update_base_dict(), create PR)
+your articles will improve matching. You can always create your own language
+specific dicts following a fairly simple `json` syntax for a dict with keys
+being groups and the values being list of case-insensitive patterns. Feel free
+to create issues / gists with your local dicts so I can merge them in.
+Best practice:
+- Base dataset dicts are delivered for some languages with the package and
+  updated from time to time with package updates.
+- A User data dict with the same syntax is kept in the data folder and is
+  updated with your data.
+- On load, those will be combined (exclusive set())
 
 ## Improving
 If you want, you can help to improve! Code improvement and bug fixes are
