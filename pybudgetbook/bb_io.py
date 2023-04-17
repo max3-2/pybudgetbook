@@ -1,26 +1,19 @@
 """Manages folder structure of data folder and IO of data"""
 from pathlib import Path
-
-# Move to constants
-_FOLDER_STRUCT = {'data': {'receipts': None,
-                           'images': None},
-                  'backup': None,
-                  'export': None,
-                  }
+# TODO MAKE RELATIVE
+import pybudgetbook.config.constants as bbconstant
+import pybudgetbook.config.config as bbconfig
 
 
-def make_folder_structure(root, template):
-    def one_directory(dic, path):
-        for name, info in dic.items():
-            next_path = path / Path(name)
-            next_path.mkdir(parents=True, exist_ok=True)
-            if isinstance(info, dict):
-                one_directory(info, next_path)
+def load_group_match_data(lang):
+    # TODO change path to module.__file__
+    basic_data = 1
+    user_data = 1
 
-    one_directory(template, Path(root))
-
-    print('Done, ok!')
-
+    # combine dicts use all values - those are lists. better make this
+    # manual
+    # a = {1:["A"]}
+    # b = {1:["b"], 2:["C"]}
 
 def _concatenate_to_main(dataframe, work_dir):
     ...

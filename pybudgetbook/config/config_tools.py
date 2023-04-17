@@ -7,12 +7,15 @@ import configparser
 
 # TODO rel. import
 import pybudgetbook.config.config as bbconfig
+import pybudgetbook.config.constants as bbconstants
 
 
 # TODO dynamic app name
 logger = logging.getLogger(__name__)
 _config_path = Path(appdirs.user_config_dir(appname='pybudgetbook'))
 _c_file = _config_path / 'pybb_conf.ini'
+
+# TODO Change parent path search to module.__file__
 
 
 def _check_config():
@@ -28,6 +31,19 @@ def _check_config():
         logger.debug('Found config file')
     else:
         raise FileNotFoundError('Config file can neither be found nor created')
+
+
+def _make_folder_structure(root, template):
+    def one_directory(dic, path):
+        for name, info in dic.items():
+            next_path = path / Path(name)
+            next_path.mkdir(parents=True, exist_ok=True)
+            if isinstance(info, dict):
+                one_directory(info, next_path)
+
+    one_directory(template, Path(root))
+
+    print('Done, ok!')
 
 
 def load_config(cfile=_c_file):
@@ -49,6 +65,21 @@ def location():
     return _c_file
 
 
+def copy_group_templates(force=False):
+    # TODO copy empty - no need for all data
+    assert bbconfig.options['data_folder'] != 'none', 'Data directory invalid'
+    # Get all files avaiable
+    templates = (Path(__file__).parent.parent / 'group_templates/').glob('*.json')
+    target = Path(bbconfig.options['data_folder'])
+    for template in templates:
+        if (target / template.name).exists() and not force:
+            logger.info(f'Skipping file {str(template.name):s} - already available')
+            continue
+
+        _ = shutil.copy2(template, target / template.name)
+        logger.debug(f'Created new grouping template: {str(template.name):s}')
+
+
 def set_data_dir(new_dir):
     cparser = configparser.ConfigParser()
     _ = cparser.read(_c_file)
@@ -61,6 +92,11 @@ def set_data_dir(new_dir):
         cparser.write(configfile)
 
     bbconfig.options['data_folder'] = str(new_dir)
+    _make_folder_structure(new_dir, bbconstants._FOLDER_STRUCT)
+    copy_group_templates()
+
+
+
 
 
 # TODO add general flag changer

@@ -1,11 +1,19 @@
 """Containts package wide constants"""
 import re
+from pathlib import Path
 
 """
 ALL CAPS consider constants which are most likely fixed and will stay in this
 location. Small caps are constants which might get changed and even moved to
 a better location in the future
 """
+_MODULE_ROOT = Path(__file__).parent.parent
+_FOLDER_STRUCT = {'data': {'receipts': None,
+                           'images': None},
+                  'backup': None,
+                  'export': None,
+                  }
+
 _TARGET_DPI = 600
 _TESS_OPTIONS = r'--psm 6'
 _MANDATORY_COLS = ('Date', 'Vendor', 'ArtNr', 'Name', 'Units', 'PricePerUnit',
