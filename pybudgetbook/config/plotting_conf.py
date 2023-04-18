@@ -8,7 +8,7 @@ mpl.rcParams.update({
     'axes.grid': True,
 
     'grid.linewidth': 0.7,
-    'grid.color': '#808080',
+    'grid.color': '#8C8080',
 
     'image.cmap': 'gray',
     'image.interpolation': 'none',
