@@ -28,9 +28,10 @@ import numpy as np
 import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import parsers
-import pybudgetbook.config.plotting_conf
+from pybudgetbook.config.plotting_conf import set_style
 
 
+set_style()
 logger = logging.getLogger(__name__)
 
 
@@ -213,13 +214,7 @@ ppu_nan = retrieved_data['PricePerUnit'].isna()
 retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
-
-additional_cols = tuple(
-    set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
-retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
-
-
-# %% Now match the groups
+# %% Now match the groups, TODO combine loader
 group_file_user = Path(
     bbconfig.options['data_folder']) / f'item_groups_{bbconfig.options["lang"]:s}.json'
 
@@ -234,7 +229,7 @@ if not group_file_user.exists():
 grf = Path('pybudgetbook/config/item_groups_deu.json')
 
 retrieved_data['Group'] = retrieved_data.apply(
-    lambda data: match_group(data, grf), axis=1)
+    lambda data: parsers.match_group(data, grf), axis=1)
 
 # %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this
@@ -248,6 +243,11 @@ retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
 metadata = {'tags': 'adli;general;suerpmarket',
             'total_extracted': total_price}
 
-## % Feed back the groups
+# %% Resort
+additional_cols = tuple(
+    set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
+retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
+
+# %% Feed back the groups
 
 # %% And then save with metadata

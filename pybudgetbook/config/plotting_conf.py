@@ -1,8 +1,9 @@
 """Updates package wide plot settings"""
+from pathlib import Path
 import matplotlib as mpl
 from matplotlib.patches import Rectangle
 
-mpl.rcParams.update({
+_def_style = {
     'figure.constrained_layout.use': True,
 
     'axes.grid': True,
@@ -12,7 +13,7 @@ mpl.rcParams.update({
 
     'image.cmap': 'gray',
     'image.interpolation': 'none',
-})
+}
 
 
 def default_rect(group, ax):
@@ -20,3 +21,7 @@ def default_rect(group, ax):
                          ec='green', fc='none', lw=0.3)
 
     ax.add_patch(text_rec)
+
+
+def set_style():
+    mpl.rcParams.update(_def_style)

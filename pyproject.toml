@@ -10,7 +10,7 @@ authors = [
 
 readme = 'README.md'
 description= '''
-Organize and sort your receipts locally, 
+Organize and sort your receipts locally,
 use pandas power to analyze your spendings!
 '''
 
@@ -39,9 +39,8 @@ Homepage = 'todo'
 dependencies = [
     'numpy',
     'appdirs',
+    'matplotlib > 3.7',
     ]
 
 [project.optional-dependencies]
 doc = ['Sphinx', 'Furo', 'MyST-parser']
-
-
