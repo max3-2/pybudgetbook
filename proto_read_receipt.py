@@ -29,7 +29,7 @@ import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import parsers
 from pybudgetbook.config.plotting_conf import set_style
-from pybudgetbook.bb_io import load_group_match_data
+from pybudgetbook import bb_io
 
 
 set_style()
@@ -216,7 +216,7 @@ retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Pric
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
 # %% Now match the groups
-match_data = load_group_match_data(bbconfig.options['lang'])
+match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
 
 retrieved_data['Group'] = retrieved_data.apply(
     lambda data: parsers.match_group(data, match_data), axis=1)
@@ -238,6 +238,34 @@ additional_cols = tuple(
     set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
 retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
 
-# %% Feed back the groups
+# %% Do manual grouping and correct any data NOW!
+# Then feed back the groups, get user data or warn
+# TODO Add flag if category does not exist to catch typos
+user_match_data, user_match_file = bb_io.load_user_match_data(bbconfig.options['lang'])
+basic_match_data, _ = bb_io.load_basic_match_data(bbconfig.options['lang'])
+
+feed_data = list(zip(retrieved_data.Name, retrieved_data.Group))
+# make for loop
+feedname, feedgroup = feed_data[0]
+if feedgroup not in user_match_data:
+    error = ('Group does not exist and creating is not enabled, check for '
+             'typos and / enable flag!')
+    logger.error(error)
+    raise RuntimeError(error)
+
+# Strip article name as best as possible, check if in base data and if not
+# run set with group
+
+# TODO strip
+
+if feedgroup in basic_match_data:
+    if feedname in basic_match_data[feedgroup]:
+        logger.debug('This article is already matched in the basic data set')
+        # continue
+
+user_match_data[feedgroup] = list(set(user_match_data[feedgroup]).union([feedname]))
+
+print('Updated data: ')
+print(user_match_data)
 
 # %% And then save with metadata

@@ -11,6 +11,40 @@ import pybudgetbook.config.config as bbconfig
 logger = logging.getLogger(__package__)
 
 
+def load_user_match_data(lang):
+    """Loads user only match data"""
+    user_data = Path(bbconfig.options['data_folder']) / f'item_groups_{lang:s}.json'
+
+    if not user_data.is_file():
+        error = (f'No matching data for {lang:s} in user folder, please '
+                 'create template to enable feedback of data.')
+        logger.error(error)
+        raise FileNotFoundError(error)
+
+    else:
+        with open(user_data) as udd:
+            result = json.load(udd)
+
+    return result, user_data
+
+
+def load_basic_match_data(lang):
+    """Loads basic only match data"""
+    basic_data = Path(__file__).parent / 'group_templates' / f'item_groups_{lang:s}.json'
+
+    if not basic_data.is_file():
+        error = (f'No matching data for {lang:s} delivered with package, please '
+                 'create PR if needed.')
+        logger.error(error)
+        raise FileNotFoundError(error)
+
+    else:
+        with open(basic_data) as bdd:
+            result = json.load(bdd)
+
+    return result, basic_data
+
+
 def load_group_match_data(lang):
     """
     Load and merge match data from different locations.
