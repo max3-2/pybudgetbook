@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 import json
+from difflib import get_close_matches
 
 # TODO make relative
 import pybudgetbook.config.config as bbconfig
@@ -47,6 +48,7 @@ def get_patterns(pattern, lang):
 def match_group(data, group_file):
     # TODO Add brute force remark
     # data is a row from DF this is used in apply
+    # TODO change to fuzzy get close matches
     with open(Path(group_file), 'r',) as jsonfile:
         reference_groups = json.load(jsonfile)
 

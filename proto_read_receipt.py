@@ -219,7 +219,7 @@ additional_cols = tuple(
 retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
 
 
-# Now match the groups
+# %% Now match the groups
 group_file_user = Path(
     bbconfig.options['data_folder']) / f'item_groups_{bbconfig.options["lang"]:s}.json'
 
@@ -236,10 +236,7 @@ grf = Path('pybudgetbook/config/item_groups_deu.json')
 retrieved_data['Group'] = retrieved_data.apply(
     lambda data: match_group(data, grf), axis=1)
 
-
-# And feed back any invalid groups
-
-
+# %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this
 # data the most accessbile later on. This is mainly from UI so now its
 # manual
@@ -251,5 +248,6 @@ retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
 metadata = {'tags': 'adli;general;suerpmarket',
             'total_extracted': total_price}
 
+## % Feed back the groups
 
-# and then save with metadata
+# %% And then save with metadata

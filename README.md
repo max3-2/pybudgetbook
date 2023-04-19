@@ -4,6 +4,10 @@ Organize and sort your receipts locally, use pandas power to analyze your
 spendings!
 But why? There are tons of Apps out there scanning and even some for receipts.
 
+
+TODO note that each part works by his own and describe parts
+
+Also, the core ideas are:
 <u>Reason 1: Data Privacy</u>
 
 Your receipts combined with some personal data are a pretty good estimator on

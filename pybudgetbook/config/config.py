@@ -33,6 +33,7 @@ options = {
 receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
     'Edeka': ['lieben[ _]lebensmittel'],
+    'Tankstelle': ['aral', 'shell', 'jet', 'eni']
 }
 
 # Maps receipt types to pattern types

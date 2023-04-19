@@ -1,5 +1,6 @@
 """Manages folder structure of data folder and IO of data"""
 from pathlib import Path
+
 # TODO MAKE RELATIVE
 import pybudgetbook.config.constants as bbconstant
 import pybudgetbook.config.config as bbconfig
