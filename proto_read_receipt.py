@@ -253,8 +253,6 @@ if feedgroup not in user_match_data:
     logger.error(error)
     raise RuntimeError(error)
 
-# Strip article name as best as possible, check if in base data and if not
-# run set with group
 
 # TODO strip
 

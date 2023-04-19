@@ -64,6 +64,16 @@ def match_group(data, reference_groups):
         return result[np.array([match[1] for match in result]).argmax()][0]
 
 
+def matcher_feedback(inp_data):
+    """
+    Feedback the data new to the matcher dict. This is pretty much brute force
+    and there will be a certain overlap in basic and user data since matching
+    works more generous than feedback. Anything else would be too complicated
+    and since the data is fairly small its better to have more!
+    """
+    ...
+
+
 def parse_receipt_general(data, pats, pattern, ax=None):
     retrieved_data = _retrieved_data_template.copy()
     # First item is usually first price, if not let it 0 so get everything

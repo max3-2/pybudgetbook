@@ -104,14 +104,33 @@ def load_group_match_data(lang):
     return result
 
 
+def _housekeep_new_data(img_path, data_path):
+    """
+    Housekeeping for valid new data, moves the images and the dataframe to data
+    folder.
+    """
+
+
 def _concatenate_to_main(dataframe, work_dir):
+    """
+    Loads main dataset and concatenates the new data to the main. Saves the
+    main to have a single growing source of data for easy analysis. Metadata
+    is lost in this case but kept for single data dataframes
+    """
     ...
 
 
-def save_with_metadata(dataframe):
-    # TODO ideas are tags,
+def save_with_metadata(dataframe, target):
+    """
+    Target is a path in this case, which will create a new hdf store with the
+    pandas dataframe and metadata attached to the dataframe.
+    """
     ...
 
 
-def load_with_metadata(dataframe):
+def load_with_metadata(source):
+    """
+    Source is a path in this case, which will load the hdf store with the
+    pandas dataframe and metadata and attach the metadata to the dataframe.
+    """
     ...
