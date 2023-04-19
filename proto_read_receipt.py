@@ -29,6 +29,7 @@ import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import parsers
 from pybudgetbook.config.plotting_conf import set_style
+from pybudgetbook.bb_io import load_group_match_data
 
 
 set_style()
@@ -214,22 +215,11 @@ ppu_nan = retrieved_data['PricePerUnit'].isna()
 retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
-# %% Now match the groups, TODO combine loader
-group_file_user = Path(
-    bbconfig.options['data_folder']) / f'item_groups_{bbconfig.options["lang"]:s}.json'
-
-if not group_file_user.exists():
-    logger.warning(
-        f'Group file {str(group_file_user):s} not found in data folder. Please '
-        'check that the data folder is set and an item_groups exist with the '
-        'correct name and language. You can use TODO to create a new one '
-        'from template but that will remove any learning which has happened '
-        'so far!')
-
-grf = Path('pybudgetbook/config/item_groups_deu.json')
+# %% Now match the groups
+match_data = load_group_match_data(bbconfig.options['lang'])
 
 retrieved_data['Group'] = retrieved_data.apply(
-    lambda data: parsers.match_group(data, grf), axis=1)
+    lambda data: parsers.match_group(data, match_data), axis=1)
 
 # %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this

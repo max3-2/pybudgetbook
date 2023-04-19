@@ -4,6 +4,7 @@ import shutil
 import appdirs
 import logging
 import configparser
+import json
 
 # TODO rel. import
 import pybudgetbook.config.config as bbconfig
@@ -66,7 +67,6 @@ def location():
 
 
 def copy_group_templates(force=False):
-    # TODO copy empty - no need for all data
     assert bbconfig.options['data_folder'] != 'none', 'Data directory invalid'
     # Get all files avaiable
     templates = (Path(__file__).parent.parent / 'group_templates/').glob('*.json')
@@ -76,7 +76,15 @@ def copy_group_templates(force=False):
             logger.info(f'Skipping file {str(template.name):s} - already available')
             continue
 
-        _ = shutil.copy2(template, target / template.name)
+        # Create an empty template
+        with open(template) as tmpl:
+            tmpl_dict = json.load(tmpl)
+        tmpl_dict = {key: [] for key in tmpl_dict.keys()}
+
+        # And write
+        with open(target / template.name, 'w') as trgt:
+            json.dump(tmpl_dict, trgt, indent=4, ensure_ascii=False)
+
         logger.debug(f'Created new grouping template: {str(template.name):s}')
 
 

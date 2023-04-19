@@ -45,12 +45,10 @@ def get_patterns(pattern, lang):
     return pats
 
 
-def match_group(data, group_file):
+def match_group(data, reference_groups):
     # TODO Add brute force remark
     # data is a row from DF this is used in apply
     # TODO change to fuzzy get close matches
-    with open(Path(group_file), 'r',) as jsonfile:
-        reference_groups = json.load(jsonfile)
 
     # Loop groups and count matches  article
     result = list()
