@@ -9,7 +9,6 @@ import pytesseract as ocr
 from PIL import Image
 import imghdr
 import pypdfium2 as pdfium
-import json
 import logging
 
 from skimage.color import rgb2gray
@@ -216,10 +215,10 @@ retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Pric
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
 # %% Now match the groups
-match_data = fuzzy_match.load_group_match_data(bbconfig.options['lang'])
+match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
 
 retrieved_data['Group'] = retrieved_data.apply(
-    lambda data: parsers.match_group(data, match_data), axis=1)
+    lambda data: fuzzy_match.match_group(data, match_data), axis=1)
 
 # %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this
@@ -230,7 +229,7 @@ retrieved_data['Category'] = 'Supermarket'
 retrieved_data['Vendor'] = vendor
 retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
 
-metadata = {'tags': 'adli;general;suerpmarket',
+metadata = {'tags': 'adli;general;supermarket',
             'total_extracted': total_price}
 
 retrieved_data.attrs = metadata
@@ -242,47 +241,7 @@ retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_co
 
 # %% Do manual grouping and correct any data NOW!
 # Then feed back the groups, get user data or warn
-# TODO Add flag if category does not exist to catch typos
-user_match_data, user_match_file = bb_io.load_user_match_data(bbconfig.options['lang'])
-basic_match_data, _ = bb_io.load_basic_match_data(bbconfig.options['lang'])
-
-import re
-from difflib import get_close_matches
-
-remove_thrash = re.compile(r'[^a-z0-9 ]', re.IGNORECASE)
-remove_weight = re.compile(r'\d{1,4}_*?[km]*?[gl]', re.IGNORECASE)
-
-feed_data = list(zip(retrieved_data.Name, retrieved_data.Group))
-for feedname, feedgroup in feed_data:
-    if feedgroup in basic_match_data:
-        if feedname in basic_match_data[feedgroup]:
-            logger.debug('This article is already matched in the basic data set')
-            continue
-
-    if feedgroup not in user_match_data:
-        error = (f'Group {feedgroup:s} does not exist and creating is not enabled, check for '
-                 'typos and / enable flag!')
-        logger.error(error)
-        continue
-        raise RuntimeError(error)
-
-    feedback = [substring.lower() for substring in
-                remove_weight.sub('', remove_thrash.sub('', feedname)).split(' ')
-                if substring and len(substring) > 2]
-
-    # Fuzzy backcheck to reduce redundancy
-    if feedgroup in basic_match_data:
-        fuzzy_fb = [not bool(get_close_matches(fb, basic_match_data[feedgroup]))
-                    for fb in feedback]
-        feedback = list(np.array(feedback)[fuzzy_fb])
-
-    user_match_data[feedgroup] = set(user_match_data[feedgroup]).union(
-        set(feedback))
-
-
-user_match_data[feedgroup] = list(set(user_match_data[feedgroup]).union([feedname]))
-
-print('Updated data: ')
-print(user_match_data)
+fuzzy_match.matcher_feedback(retrieved_data)
 
 # %% And then save with metadata
+bb_io.save_with_metadata(retrieved_data)
