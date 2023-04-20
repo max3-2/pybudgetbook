@@ -160,7 +160,7 @@ def save_with_metadata(dataframe, target=None, img_path=None):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        dataframe.to_hdf(target, 'receipt', 'w')
+        dataframe.to_hdf(target, 'receipt', 'w', complevel=6)
 
         with h5py.File(target, 'a') as hdfstore:
             # rec_grp = hdfstore['receipt']
