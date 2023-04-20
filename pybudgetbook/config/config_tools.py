@@ -76,14 +76,17 @@ def copy_group_templates(force=False):
             logger.info(f'Skipping file {str(template.name):s} - already available')
             continue
 
-        # Create an empty template
-        with open(template) as tmpl:
-            tmpl_dict = json.load(tmpl)
-        tmpl_dict = {key: [] for key in tmpl_dict.keys()}
+        # Negatives are copied full since there will be no active feedback
+        if 'negative' in template.name:
+            shutil.copy2(template, target / template.name)
+        else:  # Create an empty template
+            with open(template) as tmpl:
+                tmpl_dict = json.load(tmpl)
+            tmpl_dict = {key: [] for key in tmpl_dict.keys()}
 
-        # And write
-        with open(target / template.name, 'w') as trgt:
-            json.dump(tmpl_dict, trgt, indent=4, ensure_ascii=False)
+            # And write
+            with open(target / template.name, 'w') as trgt:
+                json.dump(tmpl_dict, trgt, indent=4, ensure_ascii=False)
 
         logger.debug(f'Created new grouping template: {str(template.name):s}')
 

@@ -44,8 +44,3 @@ receipt_types = {
     'DM Drogerie': 'dm',
     'Unverpackt': 'unverpackt',
 }
-
-_negative_groups = {'deu': ['stück', 'stk', 'gourmet', 'premium', 'prem'],
-                    'eng': [],
-                    'fra': [],
-                    }
