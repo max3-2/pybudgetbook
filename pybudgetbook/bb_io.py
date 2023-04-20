@@ -4,7 +4,6 @@ import logging
 import json
 
 # TODO MAKE RELATIVE
-import pybudgetbook.config.constants as bbconstant
 import pybudgetbook.config.config as bbconfig
 
 
