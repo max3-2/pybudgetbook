@@ -29,7 +29,7 @@ import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import parsers
 from pybudgetbook.config.plotting_conf import set_style
-from pybudgetbook import bb_io
+from pybudgetbook import bb_io, fuzzy_match
 
 
 set_style()
@@ -216,7 +216,7 @@ retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Pric
                                                retrieved_data.loc[ppu_nan, 'Units'])
 
 # %% Now match the groups
-match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
+match_data = fuzzy_match.load_group_match_data(bbconfig.options['lang'])
 
 retrieved_data['Group'] = retrieved_data.apply(
     lambda data: parsers.match_group(data, match_data), axis=1)
@@ -233,6 +233,8 @@ retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
 metadata = {'tags': 'adli;general;suerpmarket',
             'total_extracted': total_price}
 
+retrieved_data.attrs = metadata
+
 # %% Resort
 additional_cols = tuple(
     set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
@@ -244,22 +246,39 @@ retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_co
 user_match_data, user_match_file = bb_io.load_user_match_data(bbconfig.options['lang'])
 basic_match_data, _ = bb_io.load_basic_match_data(bbconfig.options['lang'])
 
+import re
+from difflib import get_close_matches
+
+remove_thrash = re.compile(r'[^a-z0-9 ]', re.IGNORECASE)
+remove_weight = re.compile(r'\d{1,4}_*?[km]*?[gl]', re.IGNORECASE)
+
 feed_data = list(zip(retrieved_data.Name, retrieved_data.Group))
-# make for loop
-feedname, feedgroup = feed_data[0]
-if feedgroup not in user_match_data:
-    error = ('Group does not exist and creating is not enabled, check for '
-             'typos and / enable flag!')
-    logger.error(error)
-    raise RuntimeError(error)
+for feedname, feedgroup in feed_data:
+    if feedgroup in basic_match_data:
+        if feedname in basic_match_data[feedgroup]:
+            logger.debug('This article is already matched in the basic data set')
+            continue
 
+    if feedgroup not in user_match_data:
+        error = (f'Group {feedgroup:s} does not exist and creating is not enabled, check for '
+                 'typos and / enable flag!')
+        logger.error(error)
+        continue
+        raise RuntimeError(error)
 
-# TODO strip
+    feedback = [substring.lower() for substring in
+                remove_weight.sub('', remove_thrash.sub('', feedname)).split(' ')
+                if substring and len(substring) > 2]
 
-if feedgroup in basic_match_data:
-    if feedname in basic_match_data[feedgroup]:
-        logger.debug('This article is already matched in the basic data set')
-        # continue
+    # Fuzzy backcheck to reduce redundancy
+    if feedgroup in basic_match_data:
+        fuzzy_fb = [not bool(get_close_matches(fb, basic_match_data[feedgroup]))
+                    for fb in feedback]
+        feedback = list(np.array(feedback)[fuzzy_fb])
+
+    user_match_data[feedgroup] = set(user_match_data[feedgroup]).union(
+        set(feedback))
+
 
 user_match_data[feedgroup] = list(set(user_match_data[feedgroup]).union([feedname]))
 

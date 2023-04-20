@@ -1,10 +1,6 @@
 """Contains all text parsing functions which extract data"""
 import re
-import numpy as np
 import pandas as pd
-from pathlib import Path
-import json
-from difflib import get_close_matches
 
 # TODO make relative
 import pybudgetbook.config.config as bbconfig
@@ -43,35 +39,6 @@ def get_patterns(pattern, lang):
     pats = bbconstants._patterns['gen' + '_' + lang]
     pats.update(bbconstants._patterns[pattern + '_' + lang])
     return pats
-
-
-def match_group(data, reference_groups):
-    # TODO Add brute force remark
-    # data is a row from DF this is used in apply
-    # TODO change to fuzzy get close matches
-
-    # Loop groups and count matches  article
-    result = list()
-    for key, grp in reference_groups.items():
-        matches = sum([tester.casefold() in data['Name'].casefold() for tester in grp])
-        if matches > 0:
-            result.append((key, matches))
-
-    # Best match
-    if not result:
-        return 'none'
-    else:
-        return result[np.array([match[1] for match in result]).argmax()][0]
-
-
-def matcher_feedback(inp_data):
-    """
-    Feedback the data new to the matcher dict. This is pretty much brute force
-    and there will be a certain overlap in basic and user data since matching
-    works more generous than feedback. Anything else would be too complicated
-    and since the data is fairly small its better to have more!
-    """
-    ...
 
 
 def parse_receipt_general(data, pats, pattern, ax=None):
