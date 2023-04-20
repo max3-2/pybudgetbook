@@ -1,3 +1,4 @@
 {
-"neg_match_data": ["stück", "stk", "gourmet", "premium", "prem", "lose"]
+"neg_match_data": ["stueck", "stk", "gourmet", "premium", "prem", "lose",
+                   "zart"]
 }
