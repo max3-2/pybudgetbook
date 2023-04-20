@@ -1,15 +1,17 @@
 {
-    "Gemüse": ["hokkaido", "tomaten", "gurke"],
-    "Früchte": ["kaki", "bananen", "zitrone"],
-    "Beeren": ["erdbeeren", "beere", "beeren", "himbeeren"],
     "Grundnahrungsmittel": ["zucker", "mehl", "roggen", "weizen", "dinkel", "hefe",
                             "hafer", "405", "marmelade", "konfitüre", "honig",
                             "öl", "raps", "toast", "sandwich",
                             "gemahlen"],
-    "Wurst / Käse": ["schinken", "salami", "bacon"],
     "Milchprodukte": ["milch", "joghurt", "quark"],
+    "Gemüse": ["hokkaido", "tomaten", "gurke"],
+    "Früchte": ["kaki", "bananen", "zitrone"],
+    "Beeren": ["erdbeeren", "beere", "beeren", "himbeeren"],
+    "Wurst / Käse": ["schinken", "salami", "bacon"],
     "Süßes": ["schoko", "keks", "chips", "pringles", "prinzen"],
-    "Haushalt": ["essig"],
     "Getränke": ["apfeldirektsaft", "apfelsaft", "saft", "orangensaft", "orangen"],
-    "Alkohol": ["bier", "wein", "san miguel", "riesling"]
+    "Alkohol": ["bier", "wein", "san miguel", "riesling"],
+    "Haushalt": ["essig", "seife"],
+    "Drogerie": ["zahnpasta"],
+    "Kinder": ["windel", "feucht"]
 }

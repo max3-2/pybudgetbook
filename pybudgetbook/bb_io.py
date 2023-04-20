@@ -44,6 +44,23 @@ def load_basic_match_data(lang):
     return result, basic_data
 
 
+def load_negative_match_data(lang):
+    """Loads negative group match data for a given language"""
+    neg_data = Path(bbconfig.options['data_folder']) / f'negative_match_{lang:s}.json'
+
+    if not neg_data.is_file():
+        error = (f'No negative match data found for {lang:s}, please check '
+                 'data folder or recopy templates')
+        logger.error(error)
+        raise FileNotFoundError(error)
+
+    else:
+        with open(neg_data) as ndd:
+            result = json.load(ndd)['neg_match_data']
+
+    return result
+
+
 def load_group_match_data(lang):
     """
     Load and merge match data from different locations.
