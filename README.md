@@ -80,6 +80,7 @@ Best practice:
 - A User data dict with the same syntax is kept in the data folder and is
   updated with your data.
 - On load, those will be combined (exclusive set())
+- Explain negative groups
 
 ## Improving
 If you want, you can help to improve! Code improvement and bug fixes are
