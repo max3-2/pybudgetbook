@@ -40,6 +40,7 @@ dependencies = [
     'numpy',
     'appdirs',
     'matplotlib > 3.7',
+    'h5py > 3.0',
     ]
 
 [project.optional-dependencies]

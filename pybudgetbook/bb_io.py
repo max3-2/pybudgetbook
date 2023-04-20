@@ -2,6 +2,9 @@
 from pathlib import Path
 import logging
 import json
+import pandas as pd
+import h5py
+import warnings
 
 # TODO MAKE RELATIVE
 import pybudgetbook.config.config as bbconfig
@@ -25,6 +28,16 @@ def load_user_match_data(lang):
             result = json.load(udd)
 
     return result, user_data
+
+
+def _save_user_match_data(data, target):
+    """Saves user match data"""
+    if not target.is_file():
+        logger.info('No matching data for in user folder, new file '
+                    'will be created.')
+
+    with open(target, 'w') as udd:
+        json.dump(data, udd, indent=4, ensure_ascii=False)
 
 
 def load_basic_match_data(lang):
@@ -120,13 +133,6 @@ def load_group_match_data(lang):
     return result
 
 
-def _housekeep_new_data(img_path, data_path):
-    """
-    Housekeeping for valid new data, moves the images and the dataframe to data
-    folder.
-    """
-
-
 def _concatenate_to_main(dataframe, work_dir):
     """
     Loads main dataset and concatenates the new data to the main. Saves the
@@ -136,12 +142,30 @@ def _concatenate_to_main(dataframe, work_dir):
     ...
 
 
-def save_with_metadata(dataframe, target):
+def save_with_metadata(dataframe, target=None, img_path=None):
     """
     Target is a path in this case, which will create a new hdf store with the
     pandas dataframe and metadata attached to the dataframe.
     """
-    ...
+    if target is None:
+        year = dataframe.loc[0, 'Date'].strftime('%Y')
+        mon_day = dataframe.loc[0, 'Date'].strftime('%m_%d')
+
+        target = Path(bbconfig.options['data_folder']) / 'data' / year
+        if not target.exists() or not target.is_dir():
+            target.mkdir(parents=True, exist_ok=True)
+
+        target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+
+        dataframe.to_hdf(target, 'receipt', 'w')
+
+        with h5py.File(target, 'a') as hdfstore:
+            # rec_grp = hdfstore['receipt']
+            for name, val in dataframe.attrs.items():
+                hdfstore.attrs.create(name, val)
 
 
 def load_with_metadata(source):
@@ -149,4 +173,13 @@ def load_with_metadata(source):
     Source is a path in this case, which will load the hdf store with the
     pandas dataframe and metadata and attach the metadata to the dataframe.
     """
-    ...
+    receipt = pd.read_hdf(source)
+    with h5py.File(source) as hdfstore:
+        att_dict = dict()
+        for key, val in hdfstore.attrs.items():
+            if not key.isupper():
+                att_dict[key] = val
+
+    receipt.attrs = att_dict
+
+    return receipt
