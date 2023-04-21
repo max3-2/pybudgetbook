@@ -120,7 +120,7 @@ def preprocess_image(imgpath, otsu='global',
         proc_img = rescale(proc_img, scale)
 
     if unsharp_ma:
-        proc_img = unsharp_mask(proc_img, radius=3, amount=0.55)
+        proc_img = unsharp_mask(proc_img, radius=3, amount=0.52)
 
     # Convert to binary
     if otsu == 'global':
@@ -242,6 +242,10 @@ retrieved_data.attrs = metadata
 additional_cols = tuple(
     set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
 retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
+
+# Quick sanity check
+diff = total_price - retrieved_data['Price'].sum()
+print(f'Price differece total to analyzed: {diff:.2f}')
 
 # %% Do manual grouping and correct any data NOW!
 # Then feed back the groups, get user data or warn
