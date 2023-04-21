@@ -1,5 +1,6 @@
 """Manages folder structure of data folder and IO of data"""
 from pathlib import Path
+import os
 import logging
 import json
 import pandas as pd
@@ -9,9 +10,43 @@ import shutil
 
 # TODO MAKE RELATIVE
 import pybudgetbook.config.config as bbconfig
-
+import pybudgetbook.config.constants as bbconstant
 
 logger = logging.getLogger(__package__)
+
+
+def _findFilesExt(directory, ext):
+    """Finds all files that have the extension(s) sepcified
+
+    Walks through all folders and sub-folders and generates an iterator
+    containing all files that match the extension. If a list is needed, use
+    list(findFilesExt())
+
+    Parameters
+    ----------
+    directory: `str`, `Path`
+        Super directory to search for files
+    ext: `list`, `str`
+        List of string patterns that files have to match or a single string
+
+    Returns
+    -------
+    (root, basename, filename): `generator` for `tuple`
+        Generator for the tuple containing the root folder of the file,
+        the basename (just the filename), and the filename as a full, absolute,
+        path.
+    """
+    if not Path(directory).is_dir():
+        logger.warning('Search directory does not exist')
+
+    if isinstance(ext, str):
+        ext = [ext]
+
+    for root, _, files in os.walk(directory):
+        for basename in files:
+            if os.path.splitext(basename)[1] in ext:
+                filename = os.path.join(root, basename)
+                yield Path(root), basename, Path(filename)
 
 
 def load_user_match_data(lang):
@@ -134,13 +169,24 @@ def load_group_match_data(lang):
     return result
 
 
-def _concatenate_to_main(dataframe, work_dir):
+def load_concatenad_data(work_dir=None):
     """
-    Loads main dataset and concatenates the new data to the main. Saves the
-    main to have a single growing source of data for easy analysis. Metadata
-    is lost in this case but kept for single data dataframes
+    Loads main dataset (eg concatenated data)
     """
-    ...
+    if work_dir is None:
+        data_files = Path(bbconfig.options['data_folder'])
+    else:
+        data_files = Path(work_dir)
+
+    data_files = _findFilesExt(data_files, '.hdf5')
+
+    conc_data = pd.DataFrame(columns=bbconstant._MANDATORY_COLS)
+
+    for _, _, file in data_files:
+        this_dataset = load_with_metadata(file)
+        conc_data = pd.concat((conc_data, this_dataset))
+
+    return conc_data.sort_values('Date').reset_index(drop=True)
 
 
 def save_with_metadata(dataframe, target=None, img_path=None):
