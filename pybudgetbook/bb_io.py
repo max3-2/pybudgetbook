@@ -5,6 +5,7 @@ import json
 import pandas as pd
 import h5py
 import warnings
+import shutil
 
 # TODO MAKE RELATIVE
 import pybudgetbook.config.config as bbconfig
@@ -155,17 +156,28 @@ def save_with_metadata(dataframe, target=None, img_path=None):
         if not target.exists() or not target.is_dir():
             target.mkdir(parents=True, exist_ok=True)
 
-        target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+        data_target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        dataframe.to_hdf(target, 'receipt', 'w', complevel=6)
+        dataframe.to_hdf(data_target, 'receipt', 'w', complevel=6)
 
-        with h5py.File(target, 'a') as hdfstore:
+        with h5py.File(data_target, 'a') as hdfstore:
             # rec_grp = hdfstore['receipt']
             for name, val in dataframe.attrs.items():
                 hdfstore.attrs.create(name, val)
+
+    if img_path is not None:
+        img_target = target / 'images' / data_target.with_suffix(img_path.suffix).name
+
+        if not img_target.parent.exists() or not img_target.parent.is_dir():
+            img_target.parent.mkdir(parents=True, exist_ok=True)
+
+        if bbconfig.options['move_on_parse']:
+            _ = shutil.move(img_path, img_target)
+        else:
+            _ = shutil.copy2(img_path, img_target)
 
 
 def load_with_metadata(source):
