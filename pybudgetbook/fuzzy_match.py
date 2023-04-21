@@ -54,6 +54,7 @@ def matcher_feedback(retrieved_data):
                 continue
 
         if feedgroup not in user_match_data:
+            if feedgroup == 'none': continue
             error = (f'Group {feedgroup:s} does not exist in user group data '
                      'and creating is not enabled, check for '
                      'typos and / enable flag!')

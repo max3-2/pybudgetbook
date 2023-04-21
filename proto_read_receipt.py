@@ -120,7 +120,7 @@ def preprocess_image(imgpath, otsu='global',
         proc_img = rescale(proc_img, scale)
 
     if unsharp_ma:
-        proc_img = unsharp_mask(proc_img, radius=3, amount=0.5)
+        proc_img = unsharp_mask(proc_img, radius=3, amount=0.55)
 
     # Convert to binary
     if otsu == 'global':
@@ -157,20 +157,24 @@ def preprocess_image(imgpath, otsu='global',
 
 
 # %% Main process
-receipts = [Path(f) for f in [
-    r'examples/IMG_5991.JPG',
-    r'examples/IMG_6006.JPG',
-    r'examples/IMG_6277.jpg',
-]]
+# receipts = [Path(f) for f in [
+#     r'examples/IMG_5991.JPG',
+#     r'examples/IMG_6006.JPG',
+#     r'examples/IMG_6277.jpg',
+# ]]
 
-pdfs = [Path(f) for f in [
-    r'examples/dm-eBon_2023-04-06_09-32-32.pdf.pdf',
-    r'examples/dm-eBon_2023-04-12_09-08-06.pdf.pdf'
-]]
+# pdfs = [Path(f) for f in [
+#     r'examples/dm-eBon_2023-04-06_09-32-32.pdf.pdf',
+#     r'examples/dm-eBon_2023-04-12_09-08-06.pdf.pdf'
+# ]]
 
-# for rec in receipts:
-# rec = pdfs[0]
-rec = receipts[1]
+# # for rec in receipts:
+# # rec = pdfs[0]
+# rec = receipts[1]
+
+# TODO create that in console!
+if rec is None:
+    rec = Path('')
 
 if imghdr.what(rec) is not None:
     proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
@@ -227,9 +231,9 @@ retrieved_data['Group'] = retrieved_data.apply(
 retrieved_data['Category'] = 'Supermarket'
 
 retrieved_data['Vendor'] = vendor
-retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
+retrieved_data['Date'] = pd.to_datetime('21/04/2023', dayfirst=True)
 
-metadata = {'tags': 'adli;general;supermarket',
+metadata = {'tags': 'DM;general;drogerie',
             'total_extracted': total_price}
 
 retrieved_data.attrs = metadata
@@ -244,4 +248,4 @@ retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_co
 fuzzy_match.matcher_feedback(retrieved_data)
 
 # %% And then save with metadata
-bb_io.save_with_metadata(retrieved_data)
+bb_io.save_with_metadata(retrieved_data, img_path=rec)
