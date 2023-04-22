@@ -24,7 +24,7 @@ _CATEGORIES = ['Supermarket', 'Cars & Gas', 'Clothing', 'Electronics', 'Other']
 # rest is updated on top!  -> constants so its closed
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3},\d{2})'),
-                'price_with_class': re.compile(r'(\d{1,3},\d{2,3}_[AB12])'),
+                'price_with_class': re.compile(r'(\d{1,3},\d{2,3}_[AB12]|AW)'),
                 'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3},\d{2})'),
                 'weight_pattern': re.compile(r'(\d{1,3},\d{1,3}(?=_EUR\/kg))'),
                 'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3},\d{2})))'),
