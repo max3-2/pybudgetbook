@@ -15,9 +15,9 @@ from skimage.color import rgb2gray
 from skimage import io as skio
 from skimage.filters import threshold_otsu, rank
 from skimage.transform import rescale
-from skimage.filters import unsharp_mask
+from skimage.filters import unsharp_mask, gaussian
 from skimage.segmentation import clear_border
-from skimage.morphology import disk, diamond, binary_erosion
+from skimage.morphology import disk, diamond, binary_erosion, rectangle
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -62,8 +62,6 @@ def extract_image_text(bin_img, lang):
 
     # Re-Get raw text instead of tesseract twice
     raw_text = '\n'.join(data_combined.text)
-    for _, grp in data.groupby('line_num'):
-        raw_text += ' '.join(grp.text.ravel()) + '\n'
 
     return data_combined, raw_text
 
@@ -120,7 +118,7 @@ def preprocess_image(imgpath, otsu='global',
         proc_img = rescale(proc_img, scale)
 
     if unsharp_ma:
-        proc_img = unsharp_mask(proc_img, radius=3, amount=0.52)
+        proc_img = unsharp_mask(proc_img, radius=3, amount=0.7)
 
     # Convert to binary
     if otsu == 'global':

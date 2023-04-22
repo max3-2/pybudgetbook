@@ -46,6 +46,9 @@ additional_cols = tuple(
     set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
 retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
 
+diff = total_price - retrieved_data['Price'].sum()
+print(f'Price differece total to analyzed: {diff:.2f}')
+
 # %% Do manual grouping and correct any data NOW!
 # Then feed back the groups, get user data or warn
 fuzzy_match.matcher_feedback(retrieved_data)
