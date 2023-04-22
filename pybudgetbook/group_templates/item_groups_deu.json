@@ -13,5 +13,6 @@
     "Alkohol": ["bier", "wein", "san miguel", "riesling"],
     "Haushalt": ["essig", "seife"],
     "Drogerie": ["zahnpasta"],
-    "Kinder": ["windel", "feucht"]
+    "Kinder": ["windel", "feucht"],
+    "Bäcker": ["brot", "brötchen", "brezel", "berliner", "weck", "lauge"]
 }

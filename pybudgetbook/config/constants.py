@@ -18,7 +18,7 @@ _TESS_OPTIONS = r'--psm 6'
 _MANDATORY_COLS = ('Date', 'Vendor', 'ArtNr', 'Name', 'Units', 'PricePerUnit',
                    'Price', 'TaxClass', 'Group', 'Category')
 
-_CATEGORIES = ['Supermarket', 'Cars & Gas', 'Clothing', 'Electronics', 'Other']
+_CATEGORIES = ['Supermarket', 'Small Stores', 'Cars & Gas', 'Clothing', 'Electronics', 'Other']
 
 # Maps pattern with lang to set of regexp, general is alwazs used and the
 # rest is updated on top!  -> constants so its closed
