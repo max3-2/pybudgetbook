@@ -73,13 +73,19 @@ def parse_receipt_general(data, pats, pattern, ax=None):
     # This works for the general case
     else:
         last_line = data['text'].str.extract(
-            pats['total_sum_pattern']).first_valid_index() - 1
+            pats['total_sum_pattern']).first_valid_index()
+
+        if last_line is None:
+            last_line = - 1
+        else:
+            last_line -= 1
+
         try:
             total_price = float(
                 pats['total_sum_pattern'].search(data.loc[last_line + 1, 'text']
                                                  ).group(0).replace(',', '.').replace('_', ''))
             print('Found total price: ', total_price)
-        except ValueError:
+        except (ValueError, AttributeError):  # Either no match or no valid conversion
             print('No total price')
 
     # Initialize variables
@@ -88,7 +94,8 @@ def parse_receipt_general(data, pats, pattern, ax=None):
     unused_lines = []
 
     # Parse line by line and see what can be classified
-    for _, group in data.loc[first_item:last_line, :].iterrows():
+    print(f' Searching from line {first_item:d} to {last_line:d}')
+    for _, group in data[first_item:last_line].iterrows():
         has_price, has_weight, has_mult = False, False, False
         this_line = group['text']
         print('Analyzing: ', this_line)
@@ -262,7 +269,7 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
     first_item = 0
     first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
     first_item = max(0, first_item - 2)
-    for _, group in data.loc[first_item:, :].iterrows():
+    for _, group in data[first_item:].iterrows():
         this_line = group['text']
         print('Analyzing: ', this_line)
 
