@@ -17,7 +17,8 @@ from skimage.filters import threshold_otsu, rank
 from skimage.transform import rescale
 from skimage.filters import unsharp_mask, gaussian
 from skimage.segmentation import clear_border
-from skimage.morphology import disk, diamond, binary_erosion, rectangle
+from skimage.morphology import disk, diamond, binary_erosion, binary_closing
+from skimage.util import img_as_ubyte
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -118,23 +119,26 @@ def preprocess_image(imgpath, otsu='global',
         proc_img = rescale(proc_img, scale)
 
     if unsharp_ma:
-        proc_img = unsharp_mask(proc_img, radius=3, amount=0.7)
+        proc_img = unsharp_mask(proc_img, radius=5, amount=0.7)
 
     # Convert to binary
     if otsu == 'global':
         threshold = threshold_otsu(proc_img)
+        dilate_kernel = diamond(1)
+        bin_img = proc_img >= threshold
 
     elif otsu == 'local':
         radius = 29
         selem = disk(radius)
-        threshold = rank.otsu(proc_img, selem) / 254
-
-    bin_img = proc_img >= threshold
+        threshold = rank.otsu(img_as_ubyte(proc_img), selem) / 255
+        dilate_kernel = disk(1)
+        bin_img = proc_img >= threshold
+        bin_img = binary_erosion(bin_img, disk(2))
 
     # If final filters are set, do the best to get strong black letters
     if final_er_dil >= 1:
         for i in range(final_er_dil):
-            bin_img = binary_erosion(bin_img, diamond(final_er_dil))
+            bin_img = binary_erosion(bin_img, dilate_kernel)
         # bin_img = gaussian(bin_img, sigma=1) > threshold
 
     if remove_border_art:
@@ -175,7 +179,7 @@ if rec is None:
     rec = Path('')
 
 if imghdr.what(rec) is not None:
-    proc_img, bin_img, fig = preprocess_image(rec, show=True, final_er_dil=1)
+    proc_img, bin_img, fig = preprocess_image(rec, otsu='global', show=True, final_er_dil=1)
     data, raw_text = extract_image_text(bin_img, bbconfig.options['lang'])
     plot_ax = fig.axes[0]
 
