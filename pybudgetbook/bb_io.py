@@ -189,6 +189,12 @@ def load_concatenad_data(work_dir=None):
     return conc_data.sort_values('Date').reset_index(drop=True)
 
 
+def resort_data(data):
+    additional_cols = tuple(
+        set(data.columns).difference(set(bbconstant._MANDATORY_COLS)))
+    data = data[list(bbconstant._MANDATORY_COLS + additional_cols)]
+    return data
+
 def save_with_metadata(dataframe, target=None, img_path=None):
     """
     Target is a path in this case, which will create a new hdf store with the

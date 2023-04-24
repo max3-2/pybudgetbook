@@ -12,11 +12,11 @@ from pybudgetbook import bb_io
 logger = logging.getLogger(__package__)
 
 
-def match_group(data, reference_groups, use_fuzzy=False):
+def _match_group(data, reference_groups, use_fuzzy=False):
     # TODO Add brute force remark in doc
     # data is a row from DF this is used in apply
 
-    # Loop groups and (fuzzy) match and count matche
+    # Loop groups and (fuzzy) match and count matches.
     result = list()
     for key, grp in reference_groups.items():
         if use_fuzzy:
@@ -81,3 +81,12 @@ def matcher_feedback(retrieved_data):
             set(feedback)))
 
     bb_io._save_user_match_data(user_match_data, user_match_file)
+
+
+def find_groups(retrieved_data):
+    match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
+
+    retrieved_data['Group'] = retrieved_data.apply(
+        lambda data: _match_group(data, match_data), axis=1)
+
+    return retrieved_data

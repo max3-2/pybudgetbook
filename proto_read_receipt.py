@@ -4,69 +4,36 @@
 
 Prototyping the receipt recognition
 """
-from pathlib import Path
-import imghdr
-import logging
-
-import matplotlib.pyplot as plt
+from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtCore import QCoreApplication
 import pandas as pd
 
 # TODO make relative imports
-import pybudgetbook.config.constants as bbconstants
-import pybudgetbook.config.config as bbconfig
-from pybudgetbook import parsers
 from pybudgetbook.config.plotting_conf import set_style
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.receipt import Receipt
 
+
 set_style()
-logger = logging.getLogger(__name__)
 
 
-# %% Main process
-# receipts = [Path(f) for f in [
-#     r'examples/IMG_5991.JPG',
-#     r'examples/IMG_6006.JPG',
-#     r'examples/IMG_6277.jpg',
-# ]]
+if QCoreApplication.instance() is None:
+    app = QCoreApplication()
+receipt_file = QFileDialog().getOpenFileName(caption='Select receipt')[0]
 
-# pdfs = [Path(f) for f in [
-#     r'examples/dm-eBon_2023-04-06_09-32-32.pdf.pdf',
-#     r'examples/dm-eBon_2023-04-12_09-08-06.pdf.pdf'
-# ]]
+rec = Receipt(receipt_file)
+rec.filter_image().extract_data()
+rec.show_receipt()
+_ = rec.parse_vendor()
+retrieved_data, total_price = rec.parse_data()
 
-# # for rec in receipts:
-# # rec = pdfs[0]
-# rec = receipts[1]
+retrieved_data = fuzzy_match.find_groups(retrieved_data)
 
-# TODO create that in console!
-if rec is None:
-    rec = Path('')
-
-recc = Receipt(rec)
-recc.filter_image().extract_data()
-recc.show_receipt()
-_ = recc.parse_vendor()
-retrieved_data, total_price = recc.parse_data()
+# Quick sanity check
+diff = total_price - retrieved_data['Price'].sum()
+print(f'Price differece total to analyzed: {diff:.2f}')
 
 # TODO Post process DM with weight info in text, maybe upcoming
-
-# Post process, general
-units_nan = retrieved_data['Units'].isna()
-retrieved_data.loc[units_nan, 'Units'] = (retrieved_data.loc[units_nan, 'Price'] /
-                                          retrieved_data.loc[units_nan, 'PricePerUnit'])
-
-retrieved_data['Units'] = retrieved_data['Units'].fillna(1)
-
-ppu_nan = retrieved_data['PricePerUnit'].isna()
-retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (retrieved_data.loc[ppu_nan, 'Price'] /
-                                               retrieved_data.loc[ppu_nan, 'Units'])
-
-# %% Now match the groups
-match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
-
-retrieved_data['Group'] = retrieved_data.apply(
-    lambda data: fuzzy_match.match_group(data, match_data), axis=1)
 
 # %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this
@@ -74,7 +41,7 @@ retrieved_data['Group'] = retrieved_data.apply(
 # manual
 retrieved_data['Category'] = 'Supermarket'
 
-retrieved_data['Vendor'] = vendor
+retrieved_data['Vendor'] = rec.vendor
 retrieved_data['Date'] = pd.to_datetime('13/04/2023', dayfirst=True)
 
 metadata = {'tags': 'aldi;general',
@@ -82,14 +49,7 @@ metadata = {'tags': 'aldi;general',
 
 retrieved_data.attrs = metadata
 
-# %% Resort
-additional_cols = tuple(
-    set(retrieved_data.columns).difference(set(bbconstants._MANDATORY_COLS)))
-retrieved_data = retrieved_data[list(bbconstants._MANDATORY_COLS + additional_cols)]
-
-# Quick sanity check
-diff = total_price - retrieved_data['Price'].sum()
-print(f'Price differece total to analyzed: {diff:.2f}')
+retrieved_data = bb_io.resort_data(retrieved_data)
 
 # %% Do manual grouping and correct any data NOW!
 # Then feed back the groups, get user data or warn
