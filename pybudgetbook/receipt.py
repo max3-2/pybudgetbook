@@ -134,7 +134,7 @@ class ImgReceipt(_BaseReceipt):
             raise FileNotFoundError(error)
 
         self._file = filepath
-        self._gs_img = image_filters.load_image(self._file)
+        self._gs_image = image_filters.load_image(self._file)
 
         # Reset
         self._proc_img = None
@@ -158,7 +158,7 @@ class ImgReceipt(_BaseReceipt):
     def image(self):
         if not self._is_filtered:
             logger.warning('Image is not filtered - using base grayscale')
-            return self._gs_img
+            return self._gs_image
         else:
             return self._proc_img
 
@@ -173,7 +173,7 @@ class ImgReceipt(_BaseReceipt):
 
     def filter_image(self, **kwargs):
         self._proc_img, self._bin_img = image_filters.preprocess_image(
-            self._gs_img, **kwargs)
+            self._gs_image, **kwargs)
         self._is_filtered = True
         if self._fig is not None:
             self.disp_ax = self._fig.axes[0]
@@ -301,7 +301,7 @@ class PdfReceipt(_BaseReceipt):
 
         self._data = data
         self._raw_text = raw_text
-        self._gs_img = ref_img
+        self._gs_image = ref_img
         self._data_extracted = True
 
 
