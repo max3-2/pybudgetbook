@@ -19,7 +19,7 @@ def load_image(imgpath):
 
 
 def preprocess_image(grayscale, otsu='global',
-                     rescale_image=True, unsharp_ma=True, final_er_dil=1,
+                     rescale_image=True, unsharp_ma=(5, 0.65), final_er_dil=1,
                      remove_border_art=True, receipt_width=80, show=False):
     """
     Assumes portrait mode. Filter factors are designed after scaling!
@@ -30,8 +30,8 @@ def preprocess_image(grayscale, otsu='global',
         scale = bbconstants._TARGET_DPI / grayscale.shape[1] * (80 / 25.4)
         proc_img = rescale(grayscale, scale)
 
-    if unsharp_ma:
-        proc_img = unsharp_mask(proc_img, radius=5, amount=0.7)
+    if not any(param is None for param in unsharp_ma):
+        proc_img = unsharp_mask(proc_img, radius=unsharp_ma[0], amount=unsharp_ma[1])
 
     # Convert to binary
     if otsu == 'global':
