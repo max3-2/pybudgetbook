@@ -26,7 +26,7 @@ _retrieved_data_template = pd.DataFrame(
 def get_vendor(raw_text):
     for rec_t in bbconfig.receipt_types.keys():
         check_strings = [rec_t] + bbconfig.receipt_aliases.get(rec_t, [])
-        this_check = any([re.search(rf'(\b{cs:s}|{cs:s}\b)', raw_text, re.IGNORECASE) is not None
+        this_check = any([re.search(rf'([\b_]*?{cs:s}|{cs:s}[_\b])', raw_text, re.IGNORECASE) is not None
                           for cs in check_strings])
 
         if this_check:
