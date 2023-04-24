@@ -20,7 +20,7 @@ logger = logging.getLogger(__package__)
 
 
 _retrieved_data_template = pd.DataFrame(
-    columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
+    columns=bbconstants._MANDATORY_COLS)
 
 
 def get_vendor(raw_text):
@@ -42,6 +42,23 @@ def get_patterns(pattern, lang):
     pats = bbconstants._patterns['gen' + '_' + lang]
     pats.update(bbconstants._patterns[pattern + '_' + lang])
     return pats
+
+
+def fill_missing_data(retrieved_data):
+    """Do some logic steps to fill holes in the data"""
+    units_nan = retrieved_data['Units'].isna()
+    retrieved_data.loc[units_nan, 'Units'] = (
+        retrieved_data.loc[units_nan, 'Price'] /
+        retrieved_data.loc[units_nan, 'PricePerUnit'])
+
+    retrieved_data['Units'] = retrieved_data['Units'].fillna(1)
+
+    ppu_nan = retrieved_data['PricePerUnit'].isna()
+    retrieved_data.loc[ppu_nan, 'PricePerUnit'] = (
+        retrieved_data.loc[ppu_nan, 'Price'] /
+        retrieved_data.loc[ppu_nan, 'Units'])
+
+    return retrieved_data
 
 
 ##################

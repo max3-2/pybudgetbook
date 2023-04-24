@@ -23,10 +23,7 @@ logger = logging.getLogger(__package__)
 
 class _BaseReceipt():
 
-    def __init__(self, filepath):
-        self._file = None
-        self.file = filepath
-
+    def __init__(self):
         self._gs_image = None
         self._data_extracted = False
         self._raw_text = ''
@@ -89,7 +86,7 @@ class _BaseReceipt():
 
         return self._vendor
 
-    def parse_data(self):
+    def parse_data(self, fill=True):
         if not self._data_extracted:
             logger.info('Please extract data first')
             return None
@@ -100,8 +97,12 @@ class _BaseReceipt():
 
         parsing_func = parsers.select_parser(self._patident)
 
-        return parsing_func(
+        retrieved_data, total_price = parsing_func(
             self.valid_data, self._patset, self._patident, self.disp_ax)
+        if fill:
+            return parsers.fill_missing_data(retrieved_data), total_price
+        else:
+            return retrieved_data, total_price
 
 
 class ImgReceipt(_BaseReceipt):
@@ -111,7 +112,9 @@ class ImgReceipt(_BaseReceipt):
     """
 
     def __init__(self, filepath):
-        _BaseReceipt.__init__(self, filepath)
+        _BaseReceipt.__init__(self)
+        self._file = None
+        self.file = filepath
 
         self._rotation = 0
         self._has_rotation = False
@@ -230,7 +233,10 @@ class PdfReceipt(_BaseReceipt):
     """
 
     def __init__(self, filepath):
-        _BaseReceipt.__init__(self, filepath)
+        _BaseReceipt.__init__(self)
+        self._file = None
+        self.file = filepath
+
 
     @property
     def file(self):
