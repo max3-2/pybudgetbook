@@ -49,20 +49,6 @@ recc.show_receipt()
 _ = recc.parse_vendor()
 retrieved_data, total_price = recc.parse_data()
 
-# # Analyze vendor and get pattern
-# vendor, pattern = parsers.get_vendor(raw_text)
-# pats = parsers.get_patterns(pattern, bbconfig.options['lang'])
-# if vendor is None:
-#     vendor = input("No vendor detected - please add: ")
-#     assert vendor in bbconfig.receipt_types.keys(), "Invalid vendor"
-
-if pattern == 'unverpackt':
-    retrieved_data, total_price = parsers.parse_receipt_unverpackt(
-        data, pats, pattern, plot_ax)
-else:
-    retrieved_data, total_price = parsers.parse_receipt_general(
-        data, pats, pattern, plot_ax)
-
 # TODO Post process DM with weight info in text, maybe upcoming
 
 # Post process, general
