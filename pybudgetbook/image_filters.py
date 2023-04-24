@@ -1,6 +1,5 @@
 """Image filtering functions"""
 import numpy as np
-import matplotlib.pyplot as plt
 from skimage.color import rgb2gray
 from skimage import io as skio
 from skimage.filters import threshold_otsu, rank

@@ -190,15 +190,18 @@ def load_concatenad_data(work_dir=None):
 
 
 def resort_data(data):
+    """Ensures the correct column order and that all needed columns exists"""
     additional_cols = tuple(
         set(data.columns).difference(set(bbconstant._MANDATORY_COLS)))
     data = data[list(bbconstant._MANDATORY_COLS + additional_cols)]
     return data
 
+
 def save_with_metadata(dataframe, target=None, img_path=None):
     """
     Target is a path in this case, which will create a new hdf store with the
-    pandas dataframe and metadata attached to the dataframe.
+    pandas dataframe and metadata attached to the dataframe. If img is
+    specified, it will be moved to data folder (or copied)
     """
     if target is None:
         year = dataframe.loc[0, 'Date'].strftime('%Y')
@@ -208,7 +211,7 @@ def save_with_metadata(dataframe, target=None, img_path=None):
         if not target.exists() or not target.is_dir():
             target.mkdir(parents=True, exist_ok=True)
 
-        data_target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+    data_target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

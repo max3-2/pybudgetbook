@@ -11,12 +11,9 @@ import pybudgetbook.config.config as bbconfig
 import pybudgetbook.config.constants as bbconstants
 
 
-# TODO dynamic app name
-logger = logging.getLogger(__name__)
-_config_path = Path(appdirs.user_config_dir(appname='pybudgetbook'))
+logger = logging.getLogger(__package__)
+_config_path = Path(appdirs.user_config_dir(appname=__package__))
 _c_file = _config_path / 'pybb_conf.ini'
-
-# TODO Change parent path search to module.__file__
 
 
 def _check_config():
@@ -44,7 +41,7 @@ def _make_folder_structure(root, template):
 
     one_directory(template, Path(root))
 
-    print('Done, ok!')
+    logging.info('New Folder structure created')
 
 
 def load_config(cfile=_c_file):

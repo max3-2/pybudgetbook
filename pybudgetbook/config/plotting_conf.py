@@ -1,5 +1,4 @@
 """Updates package wide plot settings"""
-from pathlib import Path
 import matplotlib as mpl
 from matplotlib.patches import Rectangle
 

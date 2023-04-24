@@ -53,7 +53,7 @@ class _BaseReceipt():
             return None
 
     @property
-    def parsing_patters(self):
+    def parsing_patterns(self):
         return self._patset
 
     @property
@@ -194,6 +194,9 @@ class ImgReceipt(_BaseReceipt):
         self._ax[1].imshow(self.bin_img)
         self.disp_ax = self._ax[0]
 
+        # Chaining support
+        return self
+
     def extract_data(self, lang=bbconfig.options['lang']):
         """Extracts text **and** converts to data"""
         tess_in = Image.fromarray(self.bin_img)
@@ -225,6 +228,9 @@ class ImgReceipt(_BaseReceipt):
         self._data = data_combined
         self._data_extracted = True
 
+        # Chaining support
+        return self
+
 
 class PdfReceipt(_BaseReceipt):
     """
@@ -236,7 +242,6 @@ class PdfReceipt(_BaseReceipt):
         _BaseReceipt.__init__(self)
         self._file = None
         self.file = filepath
-
 
     @property
     def file(self):
@@ -251,6 +256,8 @@ class PdfReceipt(_BaseReceipt):
             raise FileNotFoundError(error)
 
         self._file = filepath
+        self._gs_image = None
+        self._data_extracted = False
 
     @property
     def image(self):
@@ -269,6 +276,8 @@ class PdfReceipt(_BaseReceipt):
         self._create_figure()
         self._ax[0].imshow(self.image)
         self.disp_ax = self._ax[0]
+
+        return self
 
     def extract_data(self, page=0, show=False):
         """Extracts text **and** converts to data"""
@@ -309,6 +318,8 @@ class PdfReceipt(_BaseReceipt):
         self._raw_text = raw_text
         self._gs_image = ref_img
         self._data_extracted = True
+
+        return self
 
 
 def Receipt(file):

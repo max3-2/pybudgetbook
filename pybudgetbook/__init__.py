@@ -14,7 +14,8 @@ load_config()
 # Change lang input from conf to dropdown and on the fly to functions
 # Add logging
 # Add field for rabatt
-# Receipt to class
+# Add unsharp mask amount slider (delay to update)
+# add rotate mode,  output field, delay to update, auto rotate funcs
 
 # cid = fig.canvas.mpl_connect(
 #     'key_press_event', lambda event: rot_event(ax[1], event))
