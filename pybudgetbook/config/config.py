@@ -44,4 +44,5 @@ receipt_types = {
     'Nahkauf': 'gen',
     'DM Drogerie': 'dm',
     'Unverpackt': 'unverpackt',
+    'General': 'gen',
 }
