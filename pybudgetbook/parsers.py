@@ -1,6 +1,7 @@
 """Contains all text parsing functions which extract data"""
 import re
 import pandas as pd
+import logging
 
 # TODO make relative
 import pybudgetbook.config.config as bbconfig
@@ -15,7 +16,9 @@ called automated. They will all need the same API, currently this is:
     retrieved_data, total_price = parse_receipt_NAME(data, pats, pattern, ax=None)
     ```
 """
-# Initialize
+logger = logging.getLogger(__package__)
+
+
 _retrieved_data_template = pd.DataFrame(
     columns=['ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass'])
 
@@ -28,11 +31,11 @@ def get_vendor(raw_text):
 
         if this_check:
             patterns = bbconfig.receipt_types[rec_t]
-            print('Vendor found: ', rec_t)
+            logger.debug('Vendor found: ', rec_t)
             return rec_t, patterns
 
-    print('No vendor found, using general')
-    return None, 'gen'
+    logger.debug('No vendor found, using general')
+    return 'General', 'gen'
 
 
 def get_patterns(pattern, lang):
@@ -41,6 +44,9 @@ def get_patterns(pattern, lang):
     return pats
 
 
+##################
+# Parser, selection dict at the end
+##################
 def parse_receipt_general(data, pats, pattern, ax=None):
     retrieved_data = _retrieved_data_template.copy()
     # First item is usually first price, if not let it 0 so get everything
@@ -327,3 +333,16 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
                 ...
 
     return retrieved_data, total_price
+
+
+_av_parser = {
+    'unverpackt': parse_receipt_unverpackt,
+    'general': parse_receipt_general,
+}
+
+
+def select_parser(patident):
+    if patident in _av_parser:
+        return _av_parser[patident]
+    else:
+        return _av_parser['general']
