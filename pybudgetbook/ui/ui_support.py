@@ -316,7 +316,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
              orientation == Qt.Horizontal and (0 <= section < self.columnCount())):
             return self._data.columns[section]
 
-        elif role == Qt.DisplayRole and orientation == Qt.Vertical:
+        elif (role == Qt.DisplayRole or role == Qt.SizeHintRole) and orientation == Qt.Vertical:
             return section
 
         return False
