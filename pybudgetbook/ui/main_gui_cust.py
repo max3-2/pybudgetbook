@@ -1,11 +1,14 @@
 """Inherits from the UI design and adapts the class with some core features"""
 import logging
 from PySide6 import QtWidgets
+import pandas as pd
+from copy import copy
 
 # TODO relative and change plot import
 import pybudgetbook.ui.ui_support as uisupport
 from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 import pybudgetbook.config.plotting_conf
+import pybudgetbook.config.constants as bbconstant
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -57,6 +60,19 @@ class main_window(Ui_pybb_MainWindow):
 
         self.plot_area_data.draw()
         logger.debug("Created plotting area 2")
+
+        # Set up data viewer
+        viewer_cols = list(copy(bbconstant._MANDATORY_COLS))
+        viewer_cols.remove('Vendor')
+        viewer_cols.remove('Date')
+        viewer_cols.remove('Category')
+        init_data_viewer = pd.DataFrame(columns=viewer_cols)
+        # init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
+
+        self.tableModel = uisupport.PandasTableModel(init_data_viewer)
+        self.tableView_mainData.setModel(self.tableModel)
+
+        self.tableView_mainData.set_combo_column(6, ["test1", "test2"])
 
     def _about(self):
         """

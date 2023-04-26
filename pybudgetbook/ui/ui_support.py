@@ -5,8 +5,8 @@ from matplotlib.pyplot import subplots
 from collections.abc import Iterable
 import logging
 from PySide6 import QtCore, QtWidgets, QtGui
-from PySide6.QtCore import Signal, Slot, QObject
-
+from PySide6.QtCore import Signal, Slot, Qt
+import numpy as np
 
 logger = logging.getLogger(__package__)
 
@@ -205,3 +205,208 @@ class QLoggingWindow(QtWidgets.QDialog):
         self.show()
         self.resize(640, 480)
         self.hide()
+
+
+def _fix_group(value, possibles):
+    if str(value) not in possibles:
+        return 'none'
+    return str(value)
+
+
+class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent=None, possible_groups=[]):
+        super(ComboBoxDelegate, self).__init__(parent)
+        self.possible_groups = possible_groups
+
+    def createEditor(self, parent, option, index):
+        combo = QtWidgets.QComboBox(parent)
+        combo.addItems(self.possible_groups)
+        combo.setAutoFillBackground(True)
+        return combo
+
+    def setEditorData(self, editor, index):
+        value = index.model().data(index, Qt.EditRole)
+        if str(value) in self.possible_groups:
+            editor.setCurrentText(
+                self.possible_groups[self.possible_groups.index(str(value))])
+        else:
+            editor.setCurrentText(self.possible_groups[-1])
+
+    # That changes the displayed value but not the undelying data
+    def displayText(self, value, locale):
+        if str(value) in self.possible_groups:
+            return self.possible_groups[self.possible_groups.index(str(value))]
+        else:
+            return self.possible_groups[-1]
+
+    def setModelData(self, editor, model, index):
+        model.setData(index, editor.currentText(), Qt.EditRole)
+
+    def paint(self, painter, option, index):
+        value = str(index.model().data(index, Qt.DisplayRole))
+
+        if value == 'none':
+            painter.fillRect(option.rect, QtGui.QColor(255, 0, 0, 170))
+            option.font.setBold(True)
+            option.palette.setColor(QtGui.QPalette.Text, QtGui.QColor(240, 240, 240))
+
+        super().paint(painter, option, index)
+
+
+class PandasTableModel(QtCore.QAbstractTableModel):
+    def __init__(self, data=None, parent=None):
+        QtCore.QAbstractTableModel.__init__(self, parent)
+        self._ref_idx = 'Orig. Index'
+        self._data = data.copy().reset_index(names=self._ref_idx)
+        self._dtypes = self._data.dtypes
+
+        # Fix invalid group columns - this should be done beforehand!
+        # self._data['Group'] = self._data['Group'].apply(_fix_group, )
+
+        # Sorting
+        self._sort_column = 0
+        self._sort_order = Qt.AscendingOrder
+
+    def sort(self, column, order=Qt.AscendingOrder):
+        self.layoutAboutToBeChanged.emit()
+
+        self._sort_column = column
+        self._sort_order = order
+        column_name = self._data.columns[column]
+        self._data = self._data.sort_values(
+            column_name, ascending=order == Qt.AscendingOrder).reset_index(drop=True)
+
+        self.layoutChanged.emit()
+
+    def sortColumn(self):
+        return self._sort_column
+
+    def sortOrder(self):
+        return self._sort_order
+
+    def rowCount(self, parent=QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        return self._data.shape[0]
+
+    def columnCount(self, parent=QtCore.QModelIndex()):
+        if parent.isValid():
+            return 0
+        return self._data.shape[1]
+
+    def data(self, index, role=Qt.DisplayRole):
+        if not index.isValid() or not (0 <= index.row() < self.rowCount()):
+            return False
+        row = self._data.loc[index.row()]
+        col = index.column()
+
+        if role == Qt.DisplayRole:
+            return str(row[col])
+
+        elif role == Qt.EditRole:
+            return row[col]
+
+        elif role == Qt.TextAlignmentRole:
+            return Qt.AlignVCenter + Qt.AlignLeft
+
+        return False
+
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal and (0 <= section < self.columnCount()):
+            return self._data.columns[section]
+
+        elif role == Qt.DisplayRole and orientation == Qt.Vertical:
+            return section
+
+        return False
+
+    def flags(self, index):
+        if not index.isValid():
+            return Qt.NoItemFlags
+        elif index.column() == 0:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        else:
+            return Qt.ItemIsEditable | Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def setData(self, index, value, role=Qt.EditRole):
+        if index.isValid() and 0 <= index.row() < self.rowCount():
+            try:
+                if np.issubdtype(self._dtypes[index.column()], float):
+                    value = float(value)
+                elif np.issubdtype(self._dtypes[index.column()], int):
+                    value = int(value)
+            except ValueError:
+                print("Wrong dtype")
+                return False
+
+            self._data.iat[index.row(), index.column()] = value
+            self.dataChanged.emit(index, index, [Qt.DisplayRole, Qt.EditRole])
+            return True
+        return False
+
+    def insertRows(self, row, count, parent=QtCore.QModelIndex()):
+        self.beginInsertRows(parent, row, row + count - 1)
+        for i in range(count):
+            self._data.loc[row + i] = [
+                self._data[self._ref_idx].max() + 1, -1,
+                'New Article Name', 1, 1, 1, 0, 'none']
+        self.endInsertRows()
+        return True
+
+    def removeRow(self, row, parent=QtCore.QModelIndex()):
+        self.beginRemoveRows(parent, row, row)
+        self._data = self._data.drop(self._data.index[row]).reset_index(drop=True)
+        self.endRemoveRows()
+
+
+class PandasViewer(QtWidgets.QTableView):
+    def __init__(self, parent=None, model=None, vert_header=False):
+        QtWidgets.QTableView.__init__(self, parent)
+        self._combo_delegate = None
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
+
+        self.setSortingEnabled(True)
+
+        self.verticalHeader().setDefaultSectionSize(18)
+        self.verticalHeader().setMinimumSectionSize(18)
+        self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
+        self.verticalHeader().setVisible(vert_header)
+
+        if model is not None:
+            self.setModel(model)
+
+    def setModel(self, model):
+        super().setModel(model)
+        self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
+        self.horizontalHeader().setVisible(True)
+        self.model().sort(0)
+
+    def showContextMenu(self, pos):
+        menu = QtWidgets.QMenu(self)
+        add_action = menu.addAction("Add row")
+        remove_row_action = menu.addAction("Remove Row")
+        action = menu.exec(self.mapToGlobal(pos))
+
+        # Evaluate menu
+        if action == add_action:
+            self.model().insertRows(self.model().rowCount(), 1)
+
+        elif action == remove_row_action:
+            selected_indexes = self.selectedIndexes()
+            if selected_indexes:
+                selected_rows = sorted(list(set(index.row() for index in selected_indexes)), reverse=True)
+                for row in selected_rows:
+                    self.model().removeRow(row)
+
+    def set_combo_column(self, column, possible_data):
+        self._combo_delegate = ComboBoxDelegate(self, possible_groups=possible_data)
+        self.setItemDelegateForColumn(column, self._combo_delegate)
+
+    def get_final_data(self, remove_orig_index=True):
+        if remove_orig_index:
+            return self.model()._data.copy().drop(
+                columns=[self.model()._ref_idx])
+        else:
+            return self.model()._data.copy()

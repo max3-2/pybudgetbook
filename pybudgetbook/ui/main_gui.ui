@@ -402,7 +402,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>13</hour>
+                        <hour>11</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -412,7 +412,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>17</hour>
+                        <hour>16</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -422,7 +422,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>19</hour>
+                        <hour>18</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -458,7 +458,11 @@
                 </widget>
                </item>
                <item>
-                <widget class="QTableWidget" name="tableWidget_mainData"/>
+                <widget class="PandasViewer" name="tableView_mainData">
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                </widget>
                </item>
                <item>
                 <widget class="QGroupBox" name="groupBox_saveReceipt">
@@ -596,7 +600,43 @@
           <property name="bottomMargin">
            <number>4</number>
           </property>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox_mainPlotType">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>100</width>
+              <height>0</height>
+             </size>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="0">
+           <widget class="QLabel" name="label_mainPlotType">
+            <property name="text">
+             <string>Plot Type:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <spacer name="horizontalSpacer_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="1" column="0" colspan="3">
            <widget class="QFrame" name="frame_dataAnalysis">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
@@ -683,6 +723,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PandasViewer</class>
+   <extends>QTableView</extends>
+   <header>pybudgetbook.ui.ui_support</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
