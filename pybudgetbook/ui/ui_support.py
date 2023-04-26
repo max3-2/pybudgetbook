@@ -230,14 +230,14 @@ class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
             editor.setCurrentText(
                 self.possible_groups[self.possible_groups.index(str(value))])
         else:
-            editor.setCurrentText(self.possible_groups[-1])
+            editor.setCurrentText('none')
 
     # That changes the displayed value but not the undelying data
     def displayText(self, value, locale):
         if str(value) in self.possible_groups:
             return self.possible_groups[self.possible_groups.index(str(value))]
         else:
-            return self.possible_groups[-1]
+            return 'none'
 
     def setModelData(self, editor, model, index):
         model.setData(index, editor.currentText(), Qt.EditRole)
@@ -260,8 +260,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self._data = data.copy().reset_index(names=self._ref_idx)
         self._dtypes = self._data.dtypes
 
-        # Fix invalid group columns - this should be done beforehand!
-        # self._data['Group'] = self._data['Group'].apply(_fix_group, )
+        # Fix invalid group columns
+        # self._data['Group'] = self._data['Group'].apply(_fix_group)
 
         # Sorting
         self._sort_column = 0
@@ -296,7 +296,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or not (0 <= index.row() < self.rowCount()):
-            return False
+            return None
         row = self._data.loc[index.row()]
         col = index.column()
 
@@ -309,17 +309,16 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         elif role == Qt.TextAlignmentRole:
             return Qt.AlignVCenter + Qt.AlignLeft
 
-        return False
+        return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        if ((role == Qt.DisplayRole or role == Qt.SizeHintRole) and
-             orientation == Qt.Horizontal and (0 <= section < self.columnCount())):
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal and (0 <= section < self.columnCount()):
             return self._data.columns[section]
 
-        elif (role == Qt.DisplayRole or role == Qt.SizeHintRole) and orientation == Qt.Vertical:
+        elif role == Qt.DisplayRole and orientation == Qt.Vertical:
             return section
 
-        return False
+        return None
 
     def flags(self, index):
         if not index.isValid():
@@ -361,7 +360,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
 
 class PandasViewer(QtWidgets.QTableView):
-    def __init__(self, parent=None, model=None, vert_header=False):
+    def __init__(self, model, parent=None, vert_header=False):
         QtWidgets.QTableView.__init__(self, parent)
         self._combo_delegate = None
 
@@ -371,14 +370,13 @@ class PandasViewer(QtWidgets.QTableView):
         self.setModel(model)
         self.setSortingEnabled(True)
         self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
-        # self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
-        self.horizontalHeader().setVisible(True)
-        self.model().sort(0)
 
         self.verticalHeader().setDefaultSectionSize(18)
         self.verticalHeader().setMinimumSectionSize(18)
         self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.verticalHeader().setVisible(vert_header)
+
+        self.model().sort(0)
 
     def showContextMenu(self, pos):
         menu = QtWidgets.QMenu(self)
@@ -397,8 +395,8 @@ class PandasViewer(QtWidgets.QTableView):
                 for row in selected_rows:
                     self.model().removeRow(row)
 
-    def set_combo_column(self, column, possible_data):
-        self._combo_delegate = ComboBoxDelegate(self, possible_groups=possible_data)
+    def set_combo_column(self, column, poss_col):
+        self._combo_delegate = ComboBoxDelegate(self, possible_groups=poss_col)
         self.setItemDelegateForColumn(column, self._combo_delegate)
 
     def get_final_data(self, remove_orig_index=True):

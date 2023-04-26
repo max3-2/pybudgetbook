@@ -70,7 +70,7 @@ class main_window(Ui_pybb_MainWindow):
         init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
 
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
-        self.table_dataview = uisupport.PandasViewer(model=table_model, vert_header=True)
+        self.table_dataview = uisupport.PandasViewer(model=table_model)
         self.table_dataview.set_combo_column(7, ["test1", "test2"])
 
         layout = QtWidgets.QVBoxLayout()
