@@ -11,6 +11,7 @@ from pybudgetbook.ui.main_gui_cust import main_window
 
 def start_main_ui(sys_argv=[]):
     app = QtWidgets.QApplication(sys_argv)
+    app.setStyle('Light')
     qt_main_window = QtWidgets.QMainWindow()
     _ = main_window(qt_main_window)
 

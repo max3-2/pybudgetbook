@@ -312,7 +312,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         return False
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
-        if role == Qt.DisplayRole and orientation == Qt.Horizontal and (0 <= section < self.columnCount()):
+        if ((role == Qt.DisplayRole or role == Qt.SizeHintRole) and
+             orientation == Qt.Horizontal and (0 <= section < self.columnCount())):
             return self._data.columns[section]
 
         elif role == Qt.DisplayRole and orientation == Qt.Vertical:
@@ -367,21 +368,17 @@ class PandasViewer(QtWidgets.QTableView):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
 
+        self.setModel(model)
         self.setSortingEnabled(True)
+        self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
+        # self.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeToContents)
+        self.horizontalHeader().setVisible(True)
+        self.model().sort(0)
 
         self.verticalHeader().setDefaultSectionSize(18)
         self.verticalHeader().setMinimumSectionSize(18)
         self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
         self.verticalHeader().setVisible(vert_header)
-
-        if model is not None:
-            self.setModel(model)
-
-    def setModel(self, model):
-        super().setModel(model)
-        self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
-        self.horizontalHeader().setVisible(True)
-        self.model().sort(0)
 
     def showContextMenu(self, pos):
         menu = QtWidgets.QMenu(self)

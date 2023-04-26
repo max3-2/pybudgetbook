@@ -61,18 +61,22 @@ class main_window(Ui_pybb_MainWindow):
         self.plot_area_data.draw()
         logger.debug("Created plotting area 2")
 
-        # Set up data viewer
+        # Create data viewer and attach to frame
         viewer_cols = list(copy(bbconstant._MANDATORY_COLS))
         viewer_cols.remove('Vendor')
         viewer_cols.remove('Date')
         viewer_cols.remove('Category')
         init_data_viewer = pd.DataFrame(columns=viewer_cols)
-        # init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
+        init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
 
-        self.tableModel = uisupport.PandasTableModel(init_data_viewer)
-        self.tableView_mainData.setModel(self.tableModel)
+        table_model = uisupport.PandasTableModel(data=init_data_viewer)
+        self.table_dataview = uisupport.PandasViewer(model=table_model, vert_header=True)
+        self.table_dataview.set_combo_column(7, ["test1", "test2"])
 
-        self.tableView_mainData.set_combo_column(6, ["test1", "test2"])
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.table_dataview)
+        layout.setContentsMargins(0, 0, 0, 0)
+        self.frame_dataViewer.setLayout(layout)
 
     def _about(self):
         """
