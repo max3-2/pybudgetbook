@@ -20,23 +20,22 @@ retrieved_data = pd.DataFrame(columns=bbconstants._MANDATORY_COLS)
 total_price = 0.
 
 # %% Add Data here
+# retrieved_data.loc[0] = [0, 0, -1, "Name", 1, 1, 1, 1, '', '']
+# total_price = 0.
 
 # %% Now match the groups
-match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
-
-retrieved_data['Group'] = retrieved_data.apply(
-    lambda data: fuzzy_match.match_group(data, match_data), axis=1)
+retrieved_data = fuzzy_match.find_groups(retrieved_data)
 
 # %% With no UI, do some manual processing
 # Add more data. Some of this is not needed "per item" but this makes this
 # data the most accessbile later on. This is mainly from UI so now its
 # manual
-retrieved_data['Category'] = 'Supermarket'
+retrieved_data['Category'] = 'Small Stores'
 
-retrieved_data['Vendor'] = 'Vendor'
-retrieved_data['Date'] = pd.to_datetime('02/11/2022', dayfirst=True)
+retrieved_data['Vendor'] = 'Schaufenster'
+retrieved_data['Date'] = pd.to_datetime('21/04/2023', dayfirst=True)
 
-metadata = {'tags': 'adli;general;supermarket',
+metadata = {'tags': 'other;sweets',
             'total_extracted': total_price}
 
 retrieved_data.attrs = metadata
