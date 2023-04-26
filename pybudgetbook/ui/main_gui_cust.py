@@ -2,7 +2,7 @@
 import logging
 from PySide6 import QtWidgets
 
-# TODO relative
+# TODO relative and change plot import
 import pybudgetbook.ui.ui_support as uisupport
 from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 import pybudgetbook.config.plotting_conf
@@ -44,12 +44,19 @@ class main_window(Ui_pybb_MainWindow):
         self.actionAbout.triggered.connect(self._about)
         self.actionShow_Logger.triggered.connect(self.qt_log_window.show_logging_window)
 
-        # Setup plot area
+        # Setup plot area, 1
         self.plot_area_receipts = uisupport.MplCanvas(
-            self.frame_plotReceipt, 1, dpi=300, constrained_layout=True)
+            self.frame_plotReceipt, 1, constrained_layout=True)
 
         self.plot_area_receipts.draw()
-        logger.info("Created plotting area")
+        logger.debug("Created plotting area 1")
+
+        # Setup plot area, 2
+        self.plot_area_data = uisupport.MplCanvas(
+            self.frame_dataAnalysis, 2, 1, constrained_layout=False)
+
+        self.plot_area_data.draw()
+        logger.debug("Created plotting area 2")
 
     def _about(self):
         """
