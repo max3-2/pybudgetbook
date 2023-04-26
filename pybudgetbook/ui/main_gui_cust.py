@@ -61,7 +61,7 @@ class main_window(Ui_pybb_MainWindow):
         self.plot_area_data.draw()
         logger.debug("Created plotting area 2")
 
-        # Create data viewer and attach to frame
+        # Create data viewer and attach to frame, TODO
         viewer_cols = list(copy(bbconstant._MANDATORY_COLS))
         viewer_cols.remove('Vendor')
         viewer_cols.remove('Date')
@@ -77,6 +77,8 @@ class main_window(Ui_pybb_MainWindow):
         layout.addWidget(self.table_dataview)
         layout.setContentsMargins(0, 0, 0, 0)
         self.frame_dataViewer.setLayout(layout)
+
+        # TODO Slider print val and convert data
 
     def _about(self):
         """
