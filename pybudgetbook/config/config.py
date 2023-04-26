@@ -29,6 +29,11 @@ options = {
     'lang': 'deu',
 }
 
+# TODO [ux]
+# show_logger_on_start = false
+# logger_popup_level = 20
+# logger_show_debug = false
+
 # Search aliases for receipts
 receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
