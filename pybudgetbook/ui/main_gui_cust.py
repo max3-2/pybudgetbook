@@ -68,17 +68,13 @@ class main_window(Ui_pybb_MainWindow):
         viewer_cols.remove('Category')
         init_data_viewer = pd.DataFrame(columns=viewer_cols)
         init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
-
+        
+        
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
-        self.table_dataview = uisupport.PandasViewer(model=table_model)
-        self.table_dataview.set_combo_column(7, ["test1", "test2"])
+        self.tableView_pandasViewer.setModel(table_model)
+        self.tableView_pandasViewer.set_combo_column(7, ["test1", "test2"])
 
-        layout = QtWidgets.QVBoxLayout()
-        layout.addWidget(self.table_dataview)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.frame_dataViewer.setLayout(layout)
-
-        # TODO Slider print val and convert data
+        self.horizontalSliderFilterAmount.custom_setup()
 
     def _about(self):
         """

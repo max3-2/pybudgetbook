@@ -360,21 +360,26 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
 
 class PandasViewer(QtWidgets.QTableView):
-    def __init__(self, model, parent=None, vert_header=False):
+    def __init__(self, model=None, parent=None, vert_header=False):
         QtWidgets.QTableView.__init__(self, parent)
         self._combo_delegate = None
-
+        self.vert_header =vert_header
+        
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
 
-        self.setModel(model)
+        if model is not None:
+            self.setModel(model)
+
+    def setModel(self, model):
+        super().setModel(model)
         self.setSortingEnabled(True)
         self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
 
         self.verticalHeader().setDefaultSectionSize(18)
         self.verticalHeader().setMinimumSectionSize(18)
         self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
-        self.verticalHeader().setVisible(vert_header)
+        self.verticalHeader().setVisible(self.vert_header)
 
         self.model().sort(0)
 
@@ -405,3 +410,65 @@ class PandasViewer(QtWidgets.QTableView):
                 columns=[self.model()._ref_idx])
         else:
             return self.model()._data.copy()
+
+
+class SliderWithVal(QtWidgets.QWidget):
+    def __init__(
+            self, parent=None):
+        super().__init__(parent)
+
+        # Create a horizontal layout for slider and label
+        slider_layout = QtWidgets.QHBoxLayout(self)
+
+        # Create a slider widget
+        self.slider = QtWidgets.QSlider(self)
+        self.slider.setSingleStep(1)   # Set step size of slider
+        self.slider.valueChanged.connect(self.slider_moved)  # Connect signal to slot
+        self.slider.setOrientation(Qt.Horizontal)
+
+        self.slider_value_label = QtWidgets.QLabel(parent=self)
+        # Add the slider and label to the horizontal layout
+        slider_layout.addWidget(self.slider)
+        slider_layout.addWidget(self.slider_value_label)
+
+        # Create a timer
+        self.timer = QtCore.QTimer()
+
+        # Show
+        self.setLayout(slider_layout)
+        
+    def custom_setup(self, minval=0.5, maxval=2, step=0.05,
+                     label='Amount: ', value_change_delay=750, 
+                     def_callback=False):
+        self.labeltext = label
+        self.delay = value_change_delay
+        self.minval = minval
+        self.maxval = maxval
+        self.step = step
+        self.timer.setInterval(self.delay)
+        
+        self.slider.setRange(
+            int(self.minval // self.step) + 1,
+            int(self.maxval // self.step) + 1)   # Set range of slider in int
+        
+        # Create a label for slider value
+        self.slider_value_label.setText(
+            f'{ self.labeltext:s}{self.slider.value() * step:.2f}', parent=self) 
+        
+        if def_callback:
+            self.timer.timeout.connect(self.timer_callback)
+
+    def slider_moved(self):
+        self.timer.stop()  # Stop the timer if running
+        slider_value = self.slider.value() * self.step
+        self.slider_value_label.setText(
+            f'{ self.labeltext:s}{slider_value:.2f}')
+        self.timer.start()  # Start the timer again
+
+    def timer_callback(self):
+        self.timer.stop()
+
+    def closeEvent(self, event):
+        self.timer.stop()  # Stop the timer
+        self.timer.deleteLater()  # Delete the timer
+        event.accept()  # Accept the close event

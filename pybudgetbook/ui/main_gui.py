@@ -18,16 +18,18 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QTransform)
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QDateTimeEdit, QFrame, QGridLayout, QGroupBox,
-    QHBoxLayout, QLabel, QLineEdit, QMainWindow,
-    QMenu, QMenuBar, QPushButton, QSizePolicy,
-    QSlider, QSpacerItem, QStatusBar, QTabWidget,
-    QVBoxLayout, QWidget)
+    QHBoxLayout, QHeaderView, QLabel, QLineEdit,
+    QMainWindow, QMenu, QMenuBar, QPushButton,
+    QSizePolicy, QSlider, QSpacerItem, QStatusBar,
+    QTabWidget, QVBoxLayout, QWidget)
+
+from pybudgetbook.ui.ui_support import (PandasViewer, SliderWithVal)
 
 class Ui_pybb_MainWindow(object):
     def setupUi(self, pybb_MainWindow):
         if not pybb_MainWindow.objectName():
             pybb_MainWindow.setObjectName(u"pybb_MainWindow")
-        pybb_MainWindow.resize(1500, 992)
+        pybb_MainWindow.resize(1440, 962)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -76,11 +78,8 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_tabWidgetPage1.setContentsMargins(4, 4, 6, 4)
         self.frame_plotReceipt = QFrame(self.tabWidgetPage1)
         self.frame_plotReceipt.setObjectName(u"frame_plotReceipt")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.frame_plotReceipt.sizePolicy().hasHeightForWidth())
-        self.frame_plotReceipt.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.frame_plotReceipt.sizePolicy().hasHeightForWidth())
+        self.frame_plotReceipt.setSizePolicy(sizePolicy1)
         self.frame_plotReceipt.setMinimumSize(QSize(600, 700))
         self.frame_plotReceipt.setFrameShape(QFrame.StyledPanel)
         self.frame_plotReceipt.setFrameShadow(QFrame.Raised)
@@ -89,8 +88,11 @@ class Ui_pybb_MainWindow(object):
 
         self.groupBox_inputControl = QGroupBox(self.tabWidgetPage1)
         self.groupBox_inputControl.setObjectName(u"groupBox_inputControl")
-        sizePolicy1.setHeightForWidth(self.groupBox_inputControl.sizePolicy().hasHeightForWidth())
-        self.groupBox_inputControl.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.groupBox_inputControl.sizePolicy().hasHeightForWidth())
+        self.groupBox_inputControl.setSizePolicy(sizePolicy2)
         self.groupBox_inputControl.setMinimumSize(QSize(0, 150))
         self.groupBox_inputControl.setFlat(True)
         self.groupBox_inputControl.setCheckable(False)
@@ -122,27 +124,6 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_inputControl.addWidget(self.comboBox_baseLang, 1, 2, 1, 1)
 
-        self.labelFilterValue = QLabel(self.groupBox_inputControl)
-        self.labelFilterValue.setObjectName(u"labelFilterValue")
-
-        self.gridLayout_inputControl.addWidget(self.labelFilterValue, 2, 5, 1, 1)
-
-        self.horizontalSliderFilterAmount = QSlider(self.groupBox_inputControl)
-        self.horizontalSliderFilterAmount.setObjectName(u"horizontalSliderFilterAmount")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.horizontalSliderFilterAmount.sizePolicy().hasHeightForWidth())
-        self.horizontalSliderFilterAmount.setSizePolicy(sizePolicy3)
-        self.horizontalSliderFilterAmount.setMinimum(50)
-        self.horizontalSliderFilterAmount.setMaximum(200)
-        self.horizontalSliderFilterAmount.setSingleStep(5)
-        self.horizontalSliderFilterAmount.setValue(80)
-        self.horizontalSliderFilterAmount.setOrientation(Qt.Horizontal)
-        self.horizontalSliderFilterAmount.setTickPosition(QSlider.NoTicks)
-
-        self.gridLayout_inputControl.addWidget(self.horizontalSliderFilterAmount, 2, 3, 1, 2)
-
         self.pushButton_parseVendor = QPushButton(self.groupBox_inputControl)
         self.pushButton_parseVendor.setObjectName(u"pushButton_parseVendor")
 
@@ -156,6 +137,22 @@ class Ui_pybb_MainWindow(object):
         self.pushButton_loadNewReceipt.setObjectName(u"pushButton_loadNewReceipt")
 
         self.gridLayout_inputControl.addWidget(self.pushButton_loadNewReceipt, 0, 2, 1, 4)
+
+        self.horizontalSliderFilterAmount = SliderWithVal(self.groupBox_inputControl)
+        self.horizontalSliderFilterAmount.setObjectName(u"horizontalSliderFilterAmount")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.horizontalSliderFilterAmount.sizePolicy().hasHeightForWidth())
+        self.horizontalSliderFilterAmount.setSizePolicy(sizePolicy3)
+        self.horizontalSliderFilterAmount.setMinimum(50)
+        self.horizontalSliderFilterAmount.setMaximum(200)
+        self.horizontalSliderFilterAmount.setSingleStep(5)
+        self.horizontalSliderFilterAmount.setValue(80)
+        self.horizontalSliderFilterAmount.setOrientation(Qt.Horizontal)
+        self.horizontalSliderFilterAmount.setTickPosition(QSlider.NoTicks)
+
+        self.gridLayout_inputControl.addWidget(self.horizontalSliderFilterAmount, 2, 3, 1, 3)
 
 
         self.horizontalLayout_7.addLayout(self.gridLayout_inputControl)
@@ -191,6 +188,42 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setSpacing(5)
         self.gridLayout_additionalData.setObjectName(u"gridLayout_additionalData")
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 10)
+        self.label_marketVendor = QLabel(self.groupBox_additionalData)
+        self.label_marketVendor.setObjectName(u"label_marketVendor")
+
+        self.gridLayout_additionalData.addWidget(self.label_marketVendor, 0, 0, 1, 1)
+
+        self.label_shopDate = QLabel(self.groupBox_additionalData)
+        self.label_shopDate.setObjectName(u"label_shopDate")
+
+        self.gridLayout_additionalData.addWidget(self.label_shopDate, 2, 0, 1, 1)
+
+        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
+        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(7, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(14, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(16, 0, 0)))
+        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
+        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
+        self.dateEdit_shopDate.setCalendarPopup(True)
+        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
+
+        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 1, 1, 1)
+
+        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
+        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
+
+        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 4, 2, 1, 1)
+
+        self.comboBox_overalCat = QComboBox(self.groupBox_additionalData)
+        self.comboBox_overalCat.setObjectName(u"comboBox_overalCat")
+
+        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 1, 1, 1)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_additionalData.addItem(self.horizontalSpacer_3, 4, 0, 1, 1)
+
         self.lineEdit_marketVendor = QLineEdit(self.groupBox_additionalData)
         self.lineEdit_marketVendor.setObjectName(u"lineEdit_marketVendor")
 
@@ -201,62 +234,19 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_additionalData.addWidget(self.label_overallCat, 1, 0, 1, 1)
 
-        self.label_shopDate = QLabel(self.groupBox_additionalData)
-        self.label_shopDate.setObjectName(u"label_shopDate")
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.gridLayout_additionalData.addWidget(self.label_shopDate, 2, 0, 1, 1)
-
-        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
-        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 4, 2, 1, 1)
-
-        self.label_marketVendor = QLabel(self.groupBox_additionalData)
-        self.label_marketVendor.setObjectName(u"label_marketVendor")
-
-        self.gridLayout_additionalData.addWidget(self.label_marketVendor, 0, 0, 1, 1)
-
-        self.comboBox_overalCat = QComboBox(self.groupBox_additionalData)
-        self.comboBox_overalCat.setObjectName(u"comboBox_overalCat")
-
-        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 1, 1, 1)
+        self.gridLayout_additionalData.addItem(self.horizontalSpacer_2, 4, 1, 1, 1)
 
         self.pushButton = QPushButton(self.groupBox_additionalData)
         self.pushButton.setObjectName(u"pushButton")
 
         self.gridLayout_additionalData.addWidget(self.pushButton, 0, 2, 1, 1)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.tableView_pandasViewer = PandasViewer(self.groupBox_additionalData)
+        self.tableView_pandasViewer.setObjectName(u"tableView_pandasViewer")
 
-        self.gridLayout_additionalData.addItem(self.horizontalSpacer_3, 4, 0, 1, 1)
-
-        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
-        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(9, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(15, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(17, 0, 0)))
-        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
-        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
-        self.dateEdit_shopDate.setCalendarPopup(True)
-        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
-
-        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 1, 1, 1)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_additionalData.addItem(self.horizontalSpacer_2, 4, 1, 1, 1)
-
-        self.frame_dataViewer = QFrame(self.groupBox_additionalData)
-        self.frame_dataViewer.setObjectName(u"frame_dataViewer")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.frame_dataViewer.sizePolicy().hasHeightForWidth())
-        self.frame_dataViewer.setSizePolicy(sizePolicy5)
-        self.frame_dataViewer.setFrameShape(QFrame.StyledPanel)
-        self.frame_dataViewer.setFrameShadow(QFrame.Raised)
-
-        self.gridLayout_additionalData.addWidget(self.frame_dataViewer, 5, 0, 1, 3)
+        self.gridLayout_additionalData.addWidget(self.tableView_pandasViewer, 5, 0, 1, 3)
 
 
         self.horizontalLayout_5.addLayout(self.gridLayout_additionalData)
@@ -287,11 +277,11 @@ class Ui_pybb_MainWindow(object):
 
         self.lineEdit_totalAmountReceipt = QLineEdit(self.groupBox_saveReceipt)
         self.lineEdit_totalAmountReceipt.setObjectName(u"lineEdit_totalAmountReceipt")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        sizePolicy6.setHorizontalStretch(100)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.lineEdit_totalAmountReceipt.sizePolicy().hasHeightForWidth())
-        self.lineEdit_totalAmountReceipt.setSizePolicy(sizePolicy6)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy5.setHorizontalStretch(100)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.lineEdit_totalAmountReceipt.sizePolicy().hasHeightForWidth())
+        self.lineEdit_totalAmountReceipt.setSizePolicy(sizePolicy5)
         self.lineEdit_totalAmountReceipt.setMinimumSize(QSize(100, 0))
 
         self.gridLayout_saveReceipt.addWidget(self.lineEdit_totalAmountReceipt, 0, 1, 1, 1)
@@ -303,8 +293,8 @@ class Ui_pybb_MainWindow(object):
 
         self.lineEdit_totalAmountData = QLineEdit(self.groupBox_saveReceipt)
         self.lineEdit_totalAmountData.setObjectName(u"lineEdit_totalAmountData")
-        sizePolicy6.setHeightForWidth(self.lineEdit_totalAmountData.sizePolicy().hasHeightForWidth())
-        self.lineEdit_totalAmountData.setSizePolicy(sizePolicy6)
+        sizePolicy5.setHeightForWidth(self.lineEdit_totalAmountData.sizePolicy().hasHeightForWidth())
+        self.lineEdit_totalAmountData.setSizePolicy(sizePolicy5)
         self.lineEdit_totalAmountData.setMinimumSize(QSize(100, 0))
 
         self.gridLayout_saveReceipt.addWidget(self.lineEdit_totalAmountData, 1, 1, 1, 1)
@@ -373,7 +363,7 @@ class Ui_pybb_MainWindow(object):
         pybb_MainWindow.setCentralWidget(self.centralwidget)
         self.pybb_menubar = QMenuBar(pybb_MainWindow)
         self.pybb_menubar.setObjectName(u"pybb_menubar")
-        self.pybb_menubar.setGeometry(QRect(0, 0, 1500, 24))
+        self.pybb_menubar.setGeometry(QRect(0, 0, 1440, 24))
         self.menuFile = QMenu(self.pybb_menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuEdit = QMenu(self.pybb_menubar)
@@ -419,14 +409,13 @@ class Ui_pybb_MainWindow(object):
         self.comboBox_receiptDisplayMode.setItemText(1, QCoreApplication.translate("pybb_MainWindow", u"Filtered", None))
 
         self.label_baseLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Show:", None))
-        self.labelFilterValue.setText("")
         self.pushButton_parseVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Vendor", None))
         self.pushButton_loadNewReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Load Receipt", None))
         self.groupBox_additionalData.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Receipt Data", None))
-        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
+        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
         self.label_shopDate.setText(QCoreApplication.translate("pybb_MainWindow", u"Date:", None))
         self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
-        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
+        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
         self.pushButton.setText(QCoreApplication.translate("pybb_MainWindow", u"Detect Vendor", None))
         self.groupBox_saveReceipt.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Save Receipt", None))
         self.label_totalAmountReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Total amount extracted:", None))
