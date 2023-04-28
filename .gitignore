@@ -24,7 +24,7 @@ __pycache__/
 .idea/
 
 # ms visual code settings
-.vscode
+# .vscode
 
 # mac folder index
 .DS_STORE
