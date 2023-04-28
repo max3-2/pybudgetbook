@@ -1,9 +1,9 @@
 """Starts the main GUI of the tool from the inherited and customized class"""
 import sys
+from pathlib import Path
 from PySide6 import QtWidgets
 
 # TODO make package
-from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from pybudgetbook.ui.main_gui_cust import main_window
 

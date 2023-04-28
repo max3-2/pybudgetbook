@@ -360,18 +360,17 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
 
 class PandasViewer(QtWidgets.QTableView):
-    def __init__(self, model=None, parent=None, vert_header=False):
+    def __init__(self, parent=None, model=None):
         QtWidgets.QTableView.__init__(self, parent)
         self._combo_delegate = None
-        self.vert_header =vert_header
-        
+
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
 
         if model is not None:
             self.setModel(model)
 
-    def setModel(self, model):
+    def setModel(self, model, vert_header=False):
         super().setModel(model)
         self.setSortingEnabled(True)
         self.horizontalHeader().sortIndicatorChanged.connect(self.model().sort)
@@ -379,7 +378,7 @@ class PandasViewer(QtWidgets.QTableView):
         self.verticalHeader().setDefaultSectionSize(18)
         self.verticalHeader().setMinimumSectionSize(18)
         self.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed)
-        self.verticalHeader().setVisible(self.vert_header)
+        self.verticalHeader().setVisible(vert_header)
 
         self.model().sort(0)
 
@@ -417,6 +416,11 @@ class SliderWithVal(QtWidgets.QWidget):
             self, parent=None):
         super().__init__(parent)
 
+        # Dummy init
+        self.step = 1
+        self.labeltext = ''
+        self.delay = 1000
+
         # Create a horizontal layout for slider and label
         slider_layout = QtWidgets.QHBoxLayout(self)
 
@@ -436,9 +440,31 @@ class SliderWithVal(QtWidgets.QWidget):
 
         # Show
         self.setLayout(slider_layout)
-        
+
+    # Expose Slider Core methods so the init from designer works
+    def setMinimum(self, val):
+        self.minval = val
+        self.slider.setMinimum(val)
+
+    def setMaximum(self, val):
+        self.maxval = val
+        self.slider.setMaximum(val)
+
+    def setSingleStep(self, val):
+            self.step = val
+            self.slider.setSingleStep(val)
+
+    def setValue(self, val):
+        self.slider.setValue(val)
+
+    def setOrientation(self, val):
+        self.slider.setOrientation(val)
+
+    def setTickPosition(self, val):
+        self.slider.setTickPosition(val)
+
     def custom_setup(self, minval=0.5, maxval=2, step=0.05,
-                     label='Amount: ', value_change_delay=750, 
+                     label='Amount: ', value_change_delay=750,
                      def_callback=False):
         self.labeltext = label
         self.delay = value_change_delay
@@ -446,15 +472,15 @@ class SliderWithVal(QtWidgets.QWidget):
         self.maxval = maxval
         self.step = step
         self.timer.setInterval(self.delay)
-        
+
         self.slider.setRange(
             int(self.minval // self.step) + 1,
             int(self.maxval // self.step) + 1)   # Set range of slider in int
-        
+
         # Create a label for slider value
         self.slider_value_label.setText(
-            f'{ self.labeltext:s}{self.slider.value() * step:.2f}', parent=self) 
-        
+            f'{ self.labeltext:s}{self.slider.value() * step:.2f}')
+
         if def_callback:
             self.timer.timeout.connect(self.timer_callback)
 
