@@ -1,14 +1,17 @@
 """Inherits from the UI design and adapts the class with some core features"""
 import logging
+from pathlib import Path
 from PySide6 import QtWidgets
 import pandas as pd
 from copy import copy
+from os.path import expanduser
 
 # TODO relative and change plot import
 import pybudgetbook.ui.ui_support as uisupport
 from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 import pybudgetbook.config.plotting_conf
 import pybudgetbook.config.constants as bbconstant
+from pybudgetbook import __version__ as bbvers
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -61,20 +64,25 @@ class main_window(Ui_pybb_MainWindow):
         self.plot_area_data.draw()
         logger.debug("Created plotting area 2")
 
-        # Create data viewer and attach to frame, TODO
+        # Create data viewer and attach to frame
+        # TODO change Column setup with new constant
         viewer_cols = list(copy(bbconstant._MANDATORY_COLS))
         viewer_cols.remove('Vendor')
         viewer_cols.remove('Date')
         viewer_cols.remove('Category')
         init_data_viewer = pd.DataFrame(columns=viewer_cols)
         init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
-        
-        
+
+
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
         self.tableView_pandasViewer.set_combo_column(7, ["test1", "test2"])
 
         self.horizontalSliderFilterAmount.custom_setup()
+        self.horizontalSliderFilterAmount.slider.setValue(16)
+
+        # Attach all the handlers for custom functions
+        self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
 
     def _about(self):
         """
@@ -84,10 +92,12 @@ class main_window(Ui_pybb_MainWindow):
         self.about_box.setIcon(QtWidgets.QMessageBox.Information)
 
         # TODO Add dynamic version
-        about_main = 'This is the about information of this UI.'
+        about_main = ('PyBudgetbook UI. Use to scan and categorize your '
+                      'receipts.')
         about_sub = (
-            'CR @ Whatever. Please see licensing for more details.\n'
-            f'Version: {0.1}'
+            'CR @ M. Elfner. MIT license.\n Have fun, report issues and '
+            'improve!\n'
+            f'Version: {bbvers}'
         )
 
         self.about_box.setWindowTitle('About...')
@@ -96,3 +106,15 @@ class main_window(Ui_pybb_MainWindow):
         self.about_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
 
         self.about_box.exec()
+
+    def load_receipt(self):
+        file, ok = QtWidgets.QFileDialog(self.parent).getOpenFileName(
+            caption='Select a receipt file',
+            dir=expanduser('~'),
+            filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG);;'
+                    'FreeForAll (*.*)')
+        )
+        if Path(file).exists():
+            self.statusbar.showMessage('New receipt loaded', 3000)
+        else:
+            self.statusbar.showMessage('File not valid', 3000)
