@@ -9,9 +9,10 @@ from os.path import expanduser
 # TODO relative and change plot import
 import pybudgetbook.ui.ui_support as uisupport
 from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
-import pybudgetbook.config.plotting_conf
+from pybudgetbook.config.plotting_conf import set_style
 import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
+from pybudgetbook.receipt import Receipt
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -20,7 +21,7 @@ _log_formatter = logging.Formatter(
 
 logger = logging.getLogger(__package__)
 logger.setLevel(logging.DEBUG)
-
+set_style()
 
 class main_window(Ui_pybb_MainWindow):
     """
@@ -30,6 +31,9 @@ class main_window(Ui_pybb_MainWindow):
     def __init__(self, parent):
         self.parent = parent
         self.setupUi(self.parent)
+
+        # Additional vars
+        self.receipt = None
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
@@ -114,7 +118,24 @@ class main_window(Ui_pybb_MainWindow):
             filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG);;'
                     'FreeForAll (*.*)')
         )
-        if Path(file).exists():
-            self.statusbar.showMessage('New receipt loaded', 3000)
+        if file and Path(file).exists():
+            self.statusbar.showMessage('New receipt loaded', 2000, color='green')
         else:
-            self.statusbar.showMessage('File not valid', 3000)
+            self.statusbar.showMessage('Invalid File', 3000, color='red')
+
+        try:
+            self.receipt = Receipt(file)
+            self.receipt.filter_image().extract_data()
+            if self.receipt.type == 'pdf':
+                self.horizontalSliderFilterAmount.setEnabled(False)
+
+        except (IOError, FileNotFoundError):
+            logger.warning('Invalid file type for a new receipt!')
+
+        self.comboBox_mainPlotType.setCurrentIndex(0)
+
+    def display_receipt(self):
+        if self.receipt is None:
+            return
+
+        self.plot_area_receipts.ax.imshow(self.receipt.image)
