@@ -20,16 +20,16 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QDateTimeEdit, QFrame, QGridLayout, QGroupBox,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSlider, QSpacerItem, QStatusBar,
-    QTabWidget, QVBoxLayout, QWidget)
+    QSizePolicy, QSlider, QSpacerItem, QTabWidget,
+    QVBoxLayout, QWidget)
 
-from pybudgetbook.ui.ui_support import (PandasViewer, SliderWithVal)
+from pybudgetbook.ui.ui_support import (ColoredStatusBar, PandasViewer, SliderWithVal)
 
 class Ui_pybb_MainWindow(object):
     def setupUi(self, pybb_MainWindow):
         if not pybb_MainWindow.objectName():
             pybb_MainWindow.setObjectName(u"pybb_MainWindow")
-        pybb_MainWindow.resize(1440, 962)
+        pybb_MainWindow.resize(1396, 962)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -148,7 +148,8 @@ class Ui_pybb_MainWindow(object):
         self.horizontalSliderFilterAmount.setMinimum(50)
         self.horizontalSliderFilterAmount.setMaximum(200)
         self.horizontalSliderFilterAmount.setSingleStep(5)
-        self.horizontalSliderFilterAmount.setValue(80)
+        self.horizontalSliderFilterAmount.setValue(50)
+        self.horizontalSliderFilterAmount.setSliderPosition(50)
         self.horizontalSliderFilterAmount.setOrientation(Qt.Horizontal)
         self.horizontalSliderFilterAmount.setTickPosition(QSlider.NoTicks)
 
@@ -200,9 +201,9 @@ class Ui_pybb_MainWindow(object):
 
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(7, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(14, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(16, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(5, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(13, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(15, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -363,7 +364,7 @@ class Ui_pybb_MainWindow(object):
         pybb_MainWindow.setCentralWidget(self.centralwidget)
         self.pybb_menubar = QMenuBar(pybb_MainWindow)
         self.pybb_menubar.setObjectName(u"pybb_menubar")
-        self.pybb_menubar.setGeometry(QRect(0, 0, 1440, 24))
+        self.pybb_menubar.setGeometry(QRect(0, 0, 1396, 24))
         self.menuFile = QMenu(self.pybb_menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuEdit = QMenu(self.pybb_menubar)
@@ -373,7 +374,7 @@ class Ui_pybb_MainWindow(object):
         self.menuHelp = QMenu(self.pybb_menubar)
         self.menuHelp.setObjectName(u"menuHelp")
         pybb_MainWindow.setMenuBar(self.pybb_menubar)
-        self.statusbar = QStatusBar(pybb_MainWindow)
+        self.statusbar = ColoredStatusBar(pybb_MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         pybb_MainWindow.setStatusBar(self.statusbar)
 

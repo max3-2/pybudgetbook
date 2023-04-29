@@ -451,8 +451,11 @@ class SliderWithVal(QtWidgets.QWidget):
         self.slider.setMaximum(val)
 
     def setSingleStep(self, val):
-            self.step = val
-            self.slider.setSingleStep(val)
+        self.step = val
+        self.slider.setSingleStep(val)
+
+    def setSliderPosition(self, val):
+        self.slider.setSliderPosition(val)
 
     def setValue(self, val):
         self.slider.setValue(val)
@@ -498,3 +501,28 @@ class SliderWithVal(QtWidgets.QWidget):
         self.timer.stop()  # Stop the timer
         self.timer.deleteLater()  # Delete the timer
         event.accept()  # Accept the close event
+
+
+class ColoredStatusBar(QtWidgets.QStatusBar):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Create a label with rich text format
+        self.statusLabel = QtWidgets.QLabel()
+        self.statusLabel.setTextFormat(Qt.RichText)
+
+        # Add the label to the status bar
+        self.addWidget(self.statusLabel)
+
+    def showMessage(self, message, timeout=0, color='black'):
+        self.statusLabel.setText(
+            f'<font color="{color:s}">{message:s}</font>')
+
+        if timeout > 0:
+            timer = QtCore.QTimer(self)
+            timer.setInterval(timeout)
+            timer.timeout.connect(self.clearMessage)
+            timer.start()
+
+    def clearMessage(self):
+        self.statusLabel.setText('')

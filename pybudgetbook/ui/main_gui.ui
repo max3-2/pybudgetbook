@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1440</width>
+    <width>1396</width>
     <height>962</height>
    </rect>
   </property>
@@ -345,7 +345,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>7</hour>
+                        <hour>5</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -355,7 +355,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>14</hour>
+                        <hour>13</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -365,7 +365,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>16</hour>
+                        <hour>15</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -651,7 +651,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1440</width>
+     <width>1396</width>
      <height>24</height>
     </rect>
    </property>
@@ -685,7 +685,7 @@
    <addaction name="menuEdit"/>
    <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="ColoredStatusBar" name="statusbar"/>
   <action name="actionMove_on_Save">
    <property name="text">
     <string>Move on Save</string>
@@ -724,6 +724,11 @@
   <customwidget>
    <class>PandasViewer</class>
    <extends>QTableView</extends>
+   <header>pybudgetbook.ui.ui_support</header>
+  </customwidget>
+  <customwidget>
+   <class>ColoredStatusBar</class>
+   <extends>QStatusBar</extends>
    <header>pybudgetbook.ui.ui_support</header>
   </customwidget>
  </customwidgets>
