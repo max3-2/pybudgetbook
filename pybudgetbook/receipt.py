@@ -24,6 +24,7 @@ logger = logging.getLogger(__package__)
 class _BaseReceipt():
 
     def __init__(self):
+        self._type = None
         self._gs_image = None
         self._data_extracted = False
         self._raw_text = ''
@@ -43,6 +44,10 @@ class _BaseReceipt():
         else:
             logger.warning('No valid data extracted (yet)')
             return None
+
+    @property
+    def type(self):
+        return self._type
 
     @property
     def valid_data(self):
@@ -113,6 +118,7 @@ class ImgReceipt(_BaseReceipt):
 
     def __init__(self, filepath):
         _BaseReceipt.__init__(self)
+        self._type = 'img'
         self._file = None
         self.file = filepath
 
@@ -240,6 +246,7 @@ class PdfReceipt(_BaseReceipt):
 
     def __init__(self, filepath):
         _BaseReceipt.__init__(self)
+        self._type = 'pdf'
         self._file = None
         self.file = filepath
 
