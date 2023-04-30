@@ -83,10 +83,14 @@ class main_window(Ui_pybb_MainWindow):
         self.tableView_pandasViewer.set_combo_column(7, ["test1", "test2"])
 
         self.horizontalSliderFilterAmount.custom_setup()
-        self.horizontalSliderFilterAmount.slider.setValue(16)
+        self.horizontalSliderFilterAmount.slider.setValue(13)
+        # Stop initial timer
+        self.horizontalSliderFilterAmount.timer.stop()
 
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
+        self.horizontalSliderFilterAmount.set_timer_callback(self.refilter_and_display)
+        self.comboBox_receiptDisplayMode.currentIndexChanged.connect(self.update_rec_plot)
 
     def _about(self):
         """
@@ -122,20 +126,44 @@ class main_window(Ui_pybb_MainWindow):
             self.statusbar.showMessage('New receipt loaded', 2000, color='green')
         else:
             self.statusbar.showMessage('Invalid File', 3000, color='red')
+            return
 
         try:
             self.receipt = Receipt(file)
-            self.receipt.filter_image().extract_data()
+            self.receipt.filter_image(
+                unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
             if self.receipt.type == 'pdf':
                 self.horizontalSliderFilterAmount.setEnabled(False)
+                self.comboBox_receiptDisplayMode.setEnabled(False)
 
         except (IOError, FileNotFoundError):
             logger.warning('Invalid file type for a new receipt!')
+            return
 
-        self.comboBox_mainPlotType.setCurrentIndex(0)
+        self.comboBox_receiptDisplayMode.setCurrentIndex(0)
+        self.display_receipt()
 
     def display_receipt(self):
         if self.receipt is None:
             return
+        if self.comboBox_receiptDisplayMode.currentIndex() == 0:
+            self.plot_area_receipts.ax.imshow(self.receipt.image)
+        else:
+            self.plot_area_receipts.ax.imshow(self.receipt.bin_img)
 
-        self.plot_area_receipts.ax.imshow(self.receipt.image)
+        self.plot_area_receipts.canvas.draw()
+
+    def refilter_and_display(self):
+        self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
+        self.receipt.filter_image(
+            unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
+
+        self.update_rec_plot()
+
+    def update_rec_plot(self):
+        current_lim = (
+            self.plot_area_receipts.ax.get_xlim(),
+            self.plot_area_receipts.ax.get_ylim())
+        self.display_receipt()
+        self.plot_area_receipts.ax.set_xlim(current_lim[0])
+        self.plot_area_receipts.ax.set_ylim(current_lim[1])

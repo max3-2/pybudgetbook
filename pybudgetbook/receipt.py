@@ -66,7 +66,7 @@ class _BaseReceipt():
         return self._vendor
 
     # Template to allow chaining if receipt type not known beforehand
-    def filter_image(self):
+    def filter_image(self, **kwargs):
         return self
 
     def _create_figure(self):
@@ -207,9 +207,16 @@ class ImgReceipt(_BaseReceipt):
         """Extracts text **and** converts to data"""
         tess_in = Image.fromarray(self.bin_img)
         tess_in.format = 'TIFF'
-        data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
-                                 config=bbconstants._TESS_OPTIONS).dropna(
-            subset=['text']).reset_index()
+        try:
+            data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
+                                    config=bbconstants._TESS_OPTIONS).dropna(
+                subset=['text']).reset_index()
+        except (ocr.TesseractError, ocr.TesseractNotFoundError) as tess_e:
+            # TODO Sub packages log wrong this might be resolved with package build
+            logger.exception(
+                'Tesseract nor found or failure. This has to be '
+                f'resolved on system level: {tess_e}')
+            return self
 
         data['height_plus_top'] = data['height'] + data['top']
         data['width_plus_left'] = data['width'] + data['left']

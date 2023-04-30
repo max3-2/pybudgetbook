@@ -47,6 +47,7 @@ class MplCanvas(FigureCanvas):
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self)
+        self.canvas = self.fig.canvas
 
 
 class QLoggingThread(QtCore.QThread, logging.StreamHandler):
@@ -420,6 +421,7 @@ class SliderWithVal(QtWidgets.QWidget):
         self.step = 1
         self.labeltext = ''
         self.delay = 1000
+        self._timer_cb = None
 
         # Create a horizontal layout for slider and label
         slider_layout = QtWidgets.QHBoxLayout(self)
@@ -437,6 +439,7 @@ class SliderWithVal(QtWidgets.QWidget):
 
         # Create a timer
         self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.timer_callback)
 
         # Show
         self.setLayout(slider_layout)
@@ -467,8 +470,7 @@ class SliderWithVal(QtWidgets.QWidget):
         self.slider.setTickPosition(val)
 
     def custom_setup(self, minval=0.5, maxval=2, step=0.05,
-                     label='Amount: ', value_change_delay=750,
-                     def_callback=False):
+                     label='Amount: ', value_change_delay=1500):
         self.labeltext = label
         self.delay = value_change_delay
         self.minval = minval
@@ -484,18 +486,27 @@ class SliderWithVal(QtWidgets.QWidget):
         self.slider_value_label.setText(
             f'{ self.labeltext:s}{self.slider.value() * step:.2f}')
 
-        if def_callback:
-            self.timer.timeout.connect(self.timer_callback)
+    def get_scaled_val(self):
+        return self.slider.value() * self.step
 
     def slider_moved(self):
         self.timer.stop()  # Stop the timer if running
-        slider_value = self.slider.value() * self.step
+        slider_value = self.get_scaled_val()
         self.slider_value_label.setText(
             f'{ self.labeltext:s}{slider_value:.2f}')
         self.timer.start()  # Start the timer again
 
+    def set_timer_callback(self, new_cb):
+        if callable(new_cb):
+            self._timer_cb = new_cb
+        else:
+            logger.warning(
+                'This function input must be callable. Not set, try again')
+
     def timer_callback(self):
         self.timer.stop()
+        if self._timer_cb is not None:
+            self._timer_cb()
 
     def closeEvent(self, event):
         self.timer.stop()  # Stop the timer
@@ -519,10 +530,10 @@ class ColoredStatusBar(QtWidgets.QStatusBar):
             f'<font color="{color:s}">{message:s}</font>')
 
         if timeout > 0:
-            timer = QtCore.QTimer(self)
-            timer.setInterval(timeout)
-            timer.timeout.connect(self.clearMessage)
-            timer.start()
+            self.timer = QtCore.QTimer(self)
+            self.timer.setInterval(timeout)
+            self.timer.timeout.connect(self.clearMessage)
+            self.timer.start()
 
     def clearMessage(self):
         self.statusLabel.setText('')
