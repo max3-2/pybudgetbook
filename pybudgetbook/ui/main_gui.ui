@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1396</width>
-    <height>962</height>
+    <width>1200</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -80,16 +80,16 @@
            <number>4</number>
           </property>
           <property name="topMargin">
-           <number>4</number>
+           <number>2</number>
           </property>
           <property name="rightMargin">
-           <number>6</number>
+           <number>4</number>
           </property>
           <property name="bottomMargin">
            <number>4</number>
           </property>
-          <item row="2" column="0" rowspan="2">
-           <widget class="QFrame" name="frame_plotReceipt">
+          <item row="0" column="0" rowspan="2">
+           <widget class="QGroupBox" name="groupBox_inputControl">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -98,30 +98,8 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>600</width>
-              <height>700</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" rowspan="2">
-           <widget class="QGroupBox" name="groupBox_inputControl">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>150</height>
+              <width>350</width>
+              <height>0</height>
              </size>
             </property>
             <property name="title">
@@ -248,17 +226,17 @@
             </layout>
            </widget>
           </item>
-          <item row="0" column="1" rowspan="4">
+          <item row="0" column="1" rowspan="3">
            <widget class="QFrame" name="frame_dataDisplay">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>700</width>
+              <width>650</width>
               <height>0</height>
              </size>
             </property>
@@ -294,6 +272,12 @@
                </property>
                <item>
                 <widget class="QGroupBox" name="groupBox_additionalData">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="title">
                   <string>Receipt Data</string>
                  </property>
@@ -322,7 +306,7 @@
                      <number>0</number>
                     </property>
                     <property name="bottomMargin">
-                     <number>10</number>
+                     <number>5</number>
                     </property>
                     <property name="spacing">
                      <number>5</number>
@@ -345,7 +329,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>5</hour>
+                        <hour>17</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -355,7 +339,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>13</hour>
+                        <hour>7</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -365,7 +349,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>15</hour>
+                        <hour>9</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -458,6 +442,12 @@
                </item>
                <item>
                 <widget class="QGroupBox" name="groupBox_saveReceipt">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
                  <property name="font">
                   <font>
                    <underline>false</underline>
@@ -552,6 +542,28 @@
               </layout>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QFrame" name="frame_plotReceipt">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>350</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
            </widget>
           </item>
          </layout>
@@ -651,7 +663,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1396</width>
+     <width>1200</width>
      <height>24</height>
     </rect>
    </property>
