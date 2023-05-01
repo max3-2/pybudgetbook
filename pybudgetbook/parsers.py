@@ -100,14 +100,12 @@ def parse_receipt_general(data, pats, pattern, ax=None):
 
         if last_line is None:
             last_line = - 1
-        else:
-            last_line -= 1
 
         try:
             total_price = float(
-                pats['total_sum_pattern'].search(data.loc[last_line + 1, 'text']
+                pats['total_sum_pattern'].search(data.loc[last_line, 'text']
                                                  ).group(0).replace(',', '.').replace('_', ''))
-            print('Found total price: ', total_price)
+            print('Found total price @ line: ', total_price, '@', last_line)
         except (ValueError, AttributeError):  # Either no match or no valid conversion
             print('No total price')
 
@@ -162,7 +160,7 @@ def parse_receipt_general(data, pats, pattern, ax=None):
                         price_per_unit = 0
 
                     has_mult = True
-                    print('Found mult: ', price_per_unit)
+                    print('Found mult: ', price_per_unit, ' Amount: ', amount)
 
             # And the general case
             else:
@@ -191,13 +189,19 @@ def parse_receipt_general(data, pats, pattern, ax=None):
 
         # Has mult, e.g. weight (before item): pre-create row and set flag
         # Mult and weight cant occur together if the code above works!
+        # Real places mult after item: look behind
         if has_mult and not has_price:
-            retrieved_data = pd.concat(
-                [retrieved_data, pd.DataFrame({
-                    'PricePerUnit': price_per_unit,
-                }, index=[0])],
-                ignore_index=True)
-            this_row_exists = True
+            if pattern == 'real':
+                print('Debug: Real look behind')
+                retrieved_data.loc[
+                    retrieved_data.index[-1], ['PricePerUnit']] = price_per_unit
+            else:
+                retrieved_data = pd.concat(
+                    [retrieved_data, pd.DataFrame({
+                        'PricePerUnit': price_per_unit,
+                    }, index=[0])],
+                    ignore_index=True)
+                this_row_exists = True
 
         # Found weight but no price with tax class: Lookbehind and assemble
         if has_weight and not has_price:
