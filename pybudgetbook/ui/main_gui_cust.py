@@ -91,6 +91,7 @@ class main_window(Ui_pybb_MainWindow):
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
         self.horizontalSliderFilterAmount.set_timer_callback(self.refilter_and_display)
         self.comboBox_receiptDisplayMode.currentIndexChanged.connect(self.update_rec_plot)
+        self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
 
     def _about(self):
         """
@@ -154,10 +155,9 @@ class main_window(Ui_pybb_MainWindow):
         self.plot_area_receipts.canvas.draw()
 
     def refilter_and_display(self):
-        self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
         self.receipt.filter_image(
             unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
-
+        self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
         self.update_rec_plot()
 
     def update_rec_plot(self):

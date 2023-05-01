@@ -311,25 +311,47 @@
                     <property name="spacing">
                      <number>5</number>
                     </property>
-                    <item row="0" column="0">
-                     <widget class="QLabel" name="label_marketVendor">
+                    <item row="1" column="2">
+                     <widget class="QComboBox" name="comboBox_overalCat"/>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QLineEdit" name="lineEdit_marketVendor"/>
+                    </item>
+                    <item row="0" column="3">
+                     <widget class="QPushButton" name="pushButton">
                       <property name="text">
-                       <string>Supermarket / Vendor:</string>
+                       <string>Detect Vendor</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="label_shopDate">
-                      <property name="text">
-                       <string>Date:</string>
+                    <item row="5" column="0" colspan="4">
+                     <widget class="PandasViewer" name="tableView_pandasViewer"/>
+                    </item>
+                    <item row="4" column="0">
+                     <spacer name="horizontalSpacer_3">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item row="4" column="2">
+                     <widget class="QComboBox" name="comboBox_diffParsingLang">
+                      <property name="enabled">
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="1">
+                    <item row="2" column="2">
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>17</hour>
+                        <hour>15</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -339,7 +361,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>7</hour>
+                        <hour>6</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -349,7 +371,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>9</hour>
+                        <hour>8</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -379,61 +401,43 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="4" column="2">
+                    <item row="4" column="3">
                      <widget class="QPushButton" name="pushButton_parseData">
                       <property name="text">
                        <string>Parse Data</string>
                       </property>
                      </widget>
                     </item>
+                    <item row="4" column="1">
+                     <widget class="QCheckBox" name="checkBox_useDiffParsingLang">
+                      <property name="toolTip">
+                       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This can be used to use a different language to parse the extracted string and group match the data. Examples are parsing a receipt in french or english from a vacation but adding and matching the data to the german patterns. &lt;span style=&quot; font-weight:700; color:#ca4d69;&quot;&gt;Warning:&lt;/span&gt; This can make your patterns slightly obscure!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                      </property>
+                      <property name="text">
+                       <string>Use different lang. for data parsing</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLabel" name="label_shopDate">
+                      <property name="text">
+                       <string>Date:</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="1" column="1">
-                     <widget class="QComboBox" name="comboBox_overalCat"/>
-                    </item>
-                    <item row="4" column="0">
-                     <spacer name="horizontalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QLineEdit" name="lineEdit_marketVendor"/>
-                    </item>
-                    <item row="1" column="0">
                      <widget class="QLabel" name="label_overallCat">
                       <property name="text">
                        <string>Overall Category:</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="4" column="1">
-                     <spacer name="horizontalSpacer_2">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QPushButton" name="pushButton">
+                    <item row="0" column="1">
+                     <widget class="QLabel" name="label_marketVendor">
                       <property name="text">
-                       <string>Detect Vendor</string>
+                       <string>Supermarket / Vendor:</string>
                       </property>
                      </widget>
-                    </item>
-                    <item row="5" column="0" colspan="3">
-                     <widget class="PandasViewer" name="tableView_pandasViewer"/>
                     </item>
                    </layout>
                   </item>

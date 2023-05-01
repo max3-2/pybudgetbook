@@ -178,65 +178,72 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setSpacing(5)
         self.gridLayout_additionalData.setObjectName(u"gridLayout_additionalData")
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
-        self.label_marketVendor = QLabel(self.groupBox_additionalData)
-        self.label_marketVendor.setObjectName(u"label_marketVendor")
-
-        self.gridLayout_additionalData.addWidget(self.label_marketVendor, 0, 0, 1, 1)
-
-        self.label_shopDate = QLabel(self.groupBox_additionalData)
-        self.label_shopDate.setObjectName(u"label_shopDate")
-
-        self.gridLayout_additionalData.addWidget(self.label_shopDate, 2, 0, 1, 1)
-
-        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
-        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(17, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(7, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(9, 0, 0)))
-        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
-        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
-        self.dateEdit_shopDate.setCalendarPopup(True)
-        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
-
-        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 1, 1, 1)
-
-        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
-        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 4, 2, 1, 1)
-
         self.comboBox_overalCat = QComboBox(self.groupBox_additionalData)
         self.comboBox_overalCat.setObjectName(u"comboBox_overalCat")
 
-        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 1, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 2, 1, 1)
+
+        self.lineEdit_marketVendor = QLineEdit(self.groupBox_additionalData)
+        self.lineEdit_marketVendor.setObjectName(u"lineEdit_marketVendor")
+
+        self.gridLayout_additionalData.addWidget(self.lineEdit_marketVendor, 0, 2, 1, 1)
+
+        self.pushButton = QPushButton(self.groupBox_additionalData)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.gridLayout_additionalData.addWidget(self.pushButton, 0, 3, 1, 1)
+
+        self.tableView_pandasViewer = PandasViewer(self.groupBox_additionalData)
+        self.tableView_pandasViewer.setObjectName(u"tableView_pandasViewer")
+
+        self.gridLayout_additionalData.addWidget(self.tableView_pandasViewer, 5, 0, 1, 4)
 
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.gridLayout_additionalData.addItem(self.horizontalSpacer_3, 4, 0, 1, 1)
 
-        self.lineEdit_marketVendor = QLineEdit(self.groupBox_additionalData)
-        self.lineEdit_marketVendor.setObjectName(u"lineEdit_marketVendor")
+        self.comboBox_diffParsingLang = QComboBox(self.groupBox_additionalData)
+        self.comboBox_diffParsingLang.setObjectName(u"comboBox_diffParsingLang")
+        self.comboBox_diffParsingLang.setEnabled(False)
 
-        self.gridLayout_additionalData.addWidget(self.lineEdit_marketVendor, 0, 1, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.comboBox_diffParsingLang, 4, 2, 1, 1)
+
+        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
+        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(15, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(6, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(8, 0, 0)))
+        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
+        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
+        self.dateEdit_shopDate.setCalendarPopup(True)
+        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
+
+        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 2, 1, 1)
+
+        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
+        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
+
+        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 4, 3, 1, 1)
+
+        self.checkBox_useDiffParsingLang = QCheckBox(self.groupBox_additionalData)
+        self.checkBox_useDiffParsingLang.setObjectName(u"checkBox_useDiffParsingLang")
+
+        self.gridLayout_additionalData.addWidget(self.checkBox_useDiffParsingLang, 4, 1, 1, 1)
+
+        self.label_shopDate = QLabel(self.groupBox_additionalData)
+        self.label_shopDate.setObjectName(u"label_shopDate")
+
+        self.gridLayout_additionalData.addWidget(self.label_shopDate, 2, 1, 1, 1)
 
         self.label_overallCat = QLabel(self.groupBox_additionalData)
         self.label_overallCat.setObjectName(u"label_overallCat")
 
-        self.gridLayout_additionalData.addWidget(self.label_overallCat, 1, 0, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.label_overallCat, 1, 1, 1, 1)
 
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.label_marketVendor = QLabel(self.groupBox_additionalData)
+        self.label_marketVendor.setObjectName(u"label_marketVendor")
 
-        self.gridLayout_additionalData.addItem(self.horizontalSpacer_2, 4, 1, 1, 1)
-
-        self.pushButton = QPushButton(self.groupBox_additionalData)
-        self.pushButton.setObjectName(u"pushButton")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton, 0, 2, 1, 1)
-
-        self.tableView_pandasViewer = PandasViewer(self.groupBox_additionalData)
-        self.tableView_pandasViewer.setObjectName(u"tableView_pandasViewer")
-
-        self.gridLayout_additionalData.addWidget(self.tableView_pandasViewer, 5, 0, 1, 3)
+        self.gridLayout_additionalData.addWidget(self.label_marketVendor, 0, 1, 1, 1)
 
 
         self.horizontalLayout_5.addLayout(self.gridLayout_additionalData)
@@ -417,11 +424,15 @@ class Ui_pybb_MainWindow(object):
         self.pushButton_parseVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Vendor", None))
         self.pushButton_loadNewReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Load Receipt", None))
         self.groupBox_additionalData.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Receipt Data", None))
-        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
-        self.label_shopDate.setText(QCoreApplication.translate("pybb_MainWindow", u"Date:", None))
-        self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
-        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
         self.pushButton.setText(QCoreApplication.translate("pybb_MainWindow", u"Detect Vendor", None))
+        self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
+#if QT_CONFIG(tooltip)
+        self.checkBox_useDiffParsingLang.setToolTip(QCoreApplication.translate("pybb_MainWindow", u"<html><head/><body><p>This can be used to use a different language to parse the extracted string and group match the data. Examples are parsing a receipt in french or english from a vacation but adding and matching the data to the german patterns. <span style=\" font-weight:700; color:#ca4d69;\">Warning:</span> This can make your patterns slightly obscure!</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.checkBox_useDiffParsingLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Use different lang. for data parsing", None))
+        self.label_shopDate.setText(QCoreApplication.translate("pybb_MainWindow", u"Date:", None))
+        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
+        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
         self.groupBox_saveReceipt.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Save Receipt", None))
         self.label_totalAmountReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Total amount extracted:", None))
         self.checkBox_feedbackMatch.setText(QCoreApplication.translate("pybb_MainWindow", u"Feedback matching data", None))
