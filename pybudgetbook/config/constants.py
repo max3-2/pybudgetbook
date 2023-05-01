@@ -51,4 +51,5 @@ _patterns = {
         'mult_pattern': re.compile(r'\d{1,2},\d{1,3}'),
         'total_sum_pattern': re.compile(r'((?<=summe.)\d{1,3}_*?,_*?\d{2})', re.IGNORECASE),
     },
+    'real_deu': {},  # inherits all, but the flag is needed for sorting
 }

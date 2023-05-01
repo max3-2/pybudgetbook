@@ -39,7 +39,8 @@ receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
     'Edeka': ['lieben[ _]lebensmittel'],
     'Tankstelle': ['aral', 'shell', 'jet', 'eni'],
-    'Aldi': ['aldi', 'aldl', 'aidi']
+    'Aldi': ['aldi', 'aldl', 'aidi'],
+    'Real': ['real', 'rael']
 }
 
 # Maps receipt types to pattern types
@@ -49,5 +50,6 @@ receipt_types = {
     'Nahkauf': 'gen',
     'DM Drogerie': 'dm',
     'Unverpackt': 'unverpackt',
+    'Real': 'real',
     'General': 'gen',
 }
