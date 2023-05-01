@@ -12,7 +12,9 @@ import pybudgetbook.config.constants as bbconstants
 
 
 logger = logging.getLogger(__package__)
-_config_path = Path(appdirs.user_config_dir(appname=__package__))
+# TODO package if its a package, else this wont work
+# _config_path = Path(appdirs.user_config_dir(appname=__package__))
+_config_path = Path(appdirs.user_config_dir(appname='pybudgetbook'))
 _c_file = _config_path / 'pybb_conf.ini'
 
 

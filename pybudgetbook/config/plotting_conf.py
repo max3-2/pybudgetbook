@@ -17,7 +17,7 @@ _def_style = {
 
 def default_rect(group, ax):
     text_rec = Rectangle((group['left'], group['top']), group['width'], group['height'],
-                         ec='green', fc='none', lw=0.3)
+                         ec='green', fc='none', lw=0.6)
 
     ax.add_patch(text_rec)
 
