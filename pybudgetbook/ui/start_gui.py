@@ -15,7 +15,7 @@ def start_main_ui(sys_argv=[]):
     app = QtWidgets.QApplication(sys_argv)
     app.setStyle('Light')
 
-    icon = Path('pybudgetbook/img/tray/tray_icon.svg')
+    icon = Path('pybudgetbook/img/tray_icon.svg')
     if icon.exists():
         tray_icon = QIcon(str(icon))
         app.setWindowIcon(tray_icon)
