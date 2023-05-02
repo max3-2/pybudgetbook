@@ -26,6 +26,7 @@ rec.filter_image().extract_data()
 rec.show_receipt()
 _ = rec.parse_vendor()
 retrieved_data, total_price = rec.parse_data()
+rec_date = rec.parse_date()
 
 retrieved_data = fuzzy_match.find_groups(retrieved_data)
 
@@ -42,9 +43,13 @@ print(f'Price differece total to analyzed: {diff:.2f}')
 retrieved_data['Category'] = 'Supermarket'
 
 retrieved_data['Vendor'] = rec.vendor
-retrieved_data['Date'] = pd.to_datetime('13/04/2023', dayfirst=True)
 
-metadata = {'tags': 'aldi;general',
+if rec_date is None:
+    rec_date = pd.to_datetime('13/04/2023', dayfirst=True)
+
+retrieved_data['Date'] = rec_date
+
+metadata = {'tags': 'real;general',
             'total_extracted': total_price}
 
 retrieved_data.attrs = metadata
@@ -56,4 +61,4 @@ retrieved_data = bb_io.resort_data(retrieved_data)
 fuzzy_match.matcher_feedback(retrieved_data)
 
 # %% And then save with metadata
-bb_io.save_with_metadata(retrieved_data, img_path=rec)
+bb_io.save_with_metadata(retrieved_data, img_path=rec.file)
