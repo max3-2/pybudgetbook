@@ -27,6 +27,8 @@ The data is saved in `hdf`-files for `pandas` and can be easily exported to
 over time (even though the initial version does just that. Feel free to add
 ideas and improvements!)
 
+Uses some icons from [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/)
+
 ## Current State of Functionality and Roadmap
 
 - Prepare receipt images for `tesseract`
@@ -57,6 +59,8 @@ iPhones are fine. Lateral crop to the receipt borders. Straighten / Rotate to
 make the text horizontal. This all takes a minute on any modern phone.
 
 ToDo Start he UI and load the receipt
+
+TODO Manual corrections, e.g. chaning amount if bulk packages are bought
 
 ## More Informations
 ### Good Scans / Images
