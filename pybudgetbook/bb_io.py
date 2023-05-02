@@ -203,15 +203,18 @@ def save_with_metadata(dataframe, target=None, img_path=None):
     pandas dataframe and metadata attached to the dataframe. If img is
     specified, it will be moved to data folder (or copied)
     """
+    year = dataframe.loc[0, 'Date'].strftime('%Y')
+    mon_day = dataframe.loc[0, 'Date'].strftime('%m_%d')
     if target is None:
-        year = dataframe.loc[0, 'Date'].strftime('%Y')
-        mon_day = dataframe.loc[0, 'Date'].strftime('%m_%d')
-
         target = Path(bbconfig.options['data_folder']) / 'data' / year
         if not target.exists() or not target.is_dir():
             target.mkdir(parents=True, exist_ok=True)
 
-    data_target = target / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+    elif Path(target).is_dir():
+        data_target = Path(target) / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+
+    else:
+        data_target = target
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
