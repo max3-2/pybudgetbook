@@ -210,6 +210,8 @@ def save_with_metadata(dataframe, target=None, img_path=None):
         if not target.exists() or not target.is_dir():
             target.mkdir(parents=True, exist_ok=True)
 
+        data_target = Path(target) / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
+
     elif Path(target).is_dir():
         data_target = Path(target) / f'{mon_day:s}_{dataframe.loc[0, "Vendor"]:s}.hdf5'
 
