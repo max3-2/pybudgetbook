@@ -38,6 +38,19 @@ def get_vendor(raw_text):
     return 'General', 'gen'
 
 
+def get_date(raw_text, pattern):
+    """TODO"""
+    date = pattern.search(raw_text)
+    if date is not None:
+        date = date.group(0).replace('_', '').replace('/', '.')
+        try:
+            date = pd.to_datetime(date, format='%d.%m.%Y')
+        except ValueError:
+            date = pd.to_datetime(date, format='%d.%m.%y')
+
+    return date
+
+
 def get_patterns(pattern, lang):
     pats = bbconstants._patterns['gen' + '_' + lang]
     pats.update(bbconstants._patterns[pattern + '_' + lang])

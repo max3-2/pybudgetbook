@@ -104,10 +104,24 @@ class _BaseReceipt():
 
         retrieved_data, total_price = parsing_func(
             self.valid_data, self._patset, self._patident, self.disp_ax)
+
+        # Type check
+        retrieved_data = retrieved_data.astype(
+            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
+
         if fill:
             return parsers.fill_missing_data(retrieved_data), total_price
         else:
             return retrieved_data, total_price
+
+    def parse_date(self):
+        if 'date_pattern' in self._patset:
+            date = parsers.get_date(self._raw_text, self._patset['date_pattern'])
+        else:
+            print('Warn: No date matching pattern')
+            date = None
+
+        return date
 
 
 class ImgReceipt(_BaseReceipt):
@@ -209,7 +223,7 @@ class ImgReceipt(_BaseReceipt):
         tess_in.format = 'TIFF'
         try:
             data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
-                                    config=bbconstants._TESS_OPTIONS).dropna(
+                                     config=bbconstants._TESS_OPTIONS).dropna(
                 subset=['text']).reset_index()
         except (ocr.TesseractError, ocr.TesseractNotFoundError) as tess_e:
             # TODO Sub packages log wrong this might be resolved with package build

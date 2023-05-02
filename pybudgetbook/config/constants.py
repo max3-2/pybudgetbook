@@ -36,7 +36,9 @@ _patterns = {
                     r'((?<=total.)\d{1,3}_*?,_*?\d{2})|'
                     r'((?<=betrag.)\d{1,3}_*?,_*?\d{2})|'
                     r'((?<=summe.)\d{1,3}_*?,_*?\d{2})',
-                    re.IGNORECASE)
+                    re.IGNORECASE),
+                'date_pattern': re.compile(
+                    r'[0-3]\d[,.\/]_*?[0,1]\d[,.\/]_*?(2[0,1]\d{2}|\d{2})'),
                 },
     'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2},\d{1,3})'),
                'valid_article_pattern_mult': re.compile(
