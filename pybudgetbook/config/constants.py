@@ -54,4 +54,12 @@ _patterns = {
         'total_sum_pattern': re.compile(r'((?<=summe.)\d{1,3}_*?,_*?\d{2})', re.IGNORECASE),
     },
     'real_deu': {},  # inherits all, but the flag is needed for sorting
+    'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3},\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
+                 },
+    'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12]|AW)'),
+                  'mult_pattern': re.compile(r'(\d{1,3}(?=[xX*]))'),
+                  'mult_price': re.compile(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})'),
+                  'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
+                  'total_sum_pattern': re.compile(r'((?<=summe.))_*?\d{1,3}_*?[,.]_*?\d{2}', re.IGNORECASE),
+            },
 }

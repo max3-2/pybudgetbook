@@ -1,6 +1,7 @@
 """Contains all text parsing functions which extract data"""
 import re
 import pandas as pd
+import numpy as np
 import logging
 
 # TODO make relative
@@ -53,7 +54,10 @@ def get_date(raw_text, pattern):
 
 def get_patterns(pattern, lang):
     pats = bbconstants._patterns['gen' + '_' + lang]
-    pats.update(bbconstants._patterns[pattern + '_' + lang])
+    try:
+        pats.update(bbconstants._patterns[pattern + '_' + lang])
+    except KeyError:
+        logger.info('No additional patterns found for {pattern:s}')
     return pats
 
 
@@ -369,9 +373,108 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
     return retrieved_data, total_price
 
 
+def parse_receipt_raiff(data, pats, pattern, ax=None):
+    def _clear_name(this_line):
+        start = this_line.find('(ST)')
+        if start != -1:
+            start = start + 4
+        else:
+            start = 0
+        name = re.search(r'(.*?(?=(\d{1,3}[,.]\d{2})))', this_line).group(0)  # valid art ptn
+        name = name[start:].replace('_', ' ').strip()
+        return name
+
+
+    retrieved_data = _retrieved_data_template.copy()
+    total_price = 0
+    line_buffer = []
+
+    first_item = 0
+    first_item = data['text'].str.extract(r'([\dI]_[xX])').first_valid_index()
+
+    for _, group in data[first_item:].iterrows():
+        this_line = group['text']
+        has_mult, has_price, add_data = False, False, False
+        print('Analyzing: ', this_line)
+        # Is there a price with tax class? Is the amount 1?
+        if (re_res := pats['price_with_class'].search(this_line)) is not None:
+            price, tax_class = re_res.group(0).split('_')
+
+            try:
+                price = float(price.replace(',', '.'))
+            except ValueError:
+                price = 0.
+
+            tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2'))
+
+            has_price = True
+            print(price, tax_class)
+
+            # Now get the count if there, else this is a sum line
+            if (re_res := re.search(r'^[I\d]{1,2}_*?[xX]', this_line)) is not None:
+                try:
+                    amount = int(re_res.group(0).split('_')[0].replace('I', '1'))
+                except ValueError:
+                    amount = 1
+                ppu = price
+
+            else:
+                if (re_res := re.search(r'(\d{1,3}(?=[xX*]))', this_line)) is not None:
+                    try:
+                        amount = int(re_res.group(0).replace('_', ''))
+                    except ValueError:
+                        amount = 1
+                    if (re_res := re.search(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})', this_line)) is not None:
+                        try:
+                            ppu = float(re_res.group(0).replace('_', '').replace(',', '.'))
+                        except ValueError:
+                            ...
+
+                has_mult = True
+                print(amount, ppu)
+
+        # normal line
+        if has_price and not has_mult:
+            art_name = _clear_name(this_line)
+            add_data = True
+
+        # Data line, name from buffer
+        if has_price and has_mult:
+            art_name = _clear_name(line_buffer[-1])
+            add_data = True
+
+        # Line before mult
+        elif not has_price:
+            line_buffer.append(this_line)
+
+        if add_data:
+            retrieved_data = pd.concat(
+                [retrieved_data, pd.DataFrame({
+                    'ArtNr': -1,
+                    'Name': art_name,
+                    'Price': price,
+                    'TaxClass': tax_class,
+                    'Units': amount,
+                    'PricePerUnit': ppu
+                }, index=[0])],
+                ignore_index=True)
+
+        if (re_res := re.search(
+                r'((?<=summe.))_*?\d{1,3}_*?[,.]_*?\d{2}', this_line, re.IGNORECASE)) is not None:
+            try:
+                total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
+                print('Found total price: ', total_price)
+                break
+            except ValueError:
+                ...
+
+    return retrieved_data, total_price
+
+
 _av_parser = {
     'unverpackt': parse_receipt_unverpackt,
     'general': parse_receipt_general,
+    'raiff': parse_receipt_raiff,
 }
 
 
