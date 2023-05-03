@@ -380,8 +380,9 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
             start = start + 4
         else:
             start = 0
-        name = re.search(r'(.*?(?=(\d{1,3}[,.]\d{2})))', this_line).group(0)  # valid art ptn
-        name = name[start:].replace('_', ' ').strip()
+        name = pats['valid_article_pattern'].search(this_line).group(0)  # valid art ptn
+        if name is not None:
+            name = name[start:].replace('_', ' ').strip()
         return name
 
 
@@ -405,7 +406,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
             except ValueError:
                 price = 0.
 
-            tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2'))
+            tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2').replace('I', '1'))
 
             has_price = True
             print(price, tax_class)
@@ -419,12 +420,12 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
                 ppu = price
 
             else:
-                if (re_res := re.search(r'(\d{1,3}(?=[xX*]))', this_line)) is not None:
+                if (re_res := pats['mult_pattern'].search(this_line)) is not None:
                     try:
                         amount = int(re_res.group(0).replace('_', ''))
                     except ValueError:
                         amount = 1
-                    if (re_res := re.search(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})', this_line)) is not None:
+                    if (re_res := pats['mult_price'].search(this_line)) is not None:
                         try:
                             ppu = float(re_res.group(0).replace('_', '').replace(',', '.'))
                         except ValueError:
@@ -459,8 +460,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
                 }, index=[0])],
                 ignore_index=True)
 
-        if (re_res := re.search(
-                r'((?<=summe.))_*?\d{1,3}_*?[,.]_*?\d{2}', this_line, re.IGNORECASE)) is not None:
+        if (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
             try:
                 total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
                 print('Found total price: ', total_price)
