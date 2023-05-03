@@ -14,5 +14,6 @@
     "Haushalt": ["essig", "seife"],
     "Drogerie": ["zahnpasta"],
     "Kinder": ["windel", "feucht"],
-    "Bäcker": ["brot", "brötchen", "brezel", "berliner", "weck", "lauge"]
+    "Bäcker": ["brot", "brötchen", "brezel", "berliner", "weck", "lauge"],
+    "Auto": ["diesel", "benzin", "super", "tankstelle"]
 }
