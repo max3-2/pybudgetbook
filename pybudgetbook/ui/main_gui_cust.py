@@ -15,6 +15,7 @@ import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
 from pybudgetbook.receipt import Receipt, _BaseReceipt
 from pybudgetbook import bb_io
+from pybudgetbook.config.config import options
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -78,7 +79,9 @@ class main_window(Ui_pybb_MainWindow):
 
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
-        self.tableView_pandasViewer.set_combo_column(7, ["test1", "test2"])
+        poss_groups = list(bb_io.load_basic_match_data(options['lang'])[0].keys())
+        self.tableView_pandasViewer.set_combo_column(7, poss_groups)
+        self.tableView_pandasViewer.model().combo_col = 7
 
         self.horizontalSliderFilterAmount.custom_setup()
         self.horizontalSliderFilterAmount.slider.setValue(13)
@@ -190,6 +193,8 @@ class main_window(Ui_pybb_MainWindow):
             self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
 
     def refilter_and_display(self):
+        if self.receipt is None:
+            return
         self.receipt.filter_image(
             unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
         self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')

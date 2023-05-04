@@ -8,7 +8,30 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtCore import Signal, Slot, Qt
 import numpy as np
 
+# TODO make rel
+from pybudgetbook.config.constants import icons
+
 logger = logging.getLogger(__package__)
+
+def _check_numeric(data):
+    if isinstance(data, str):
+        return False
+
+    return (
+        np.issubdtype(data, int) or
+        np.issubdtype(data, np.int32) or
+        np.issubdtype(data, np.int64) or
+        np.issubdtype(data, float) or
+        np.issubdtype(data, np.float32) or
+        np.issubdtype(data, np.float64) or
+        np.issubdtype(data, complex) or
+        np.issubdtype(data, np.complex64) or
+        np.issubdtype(data, np.complex128)
+    )
+
+# Build icons to reduce IO, only possible after App is started
+def _create_icons():
+    return {key: QtGui.QIcon(value) for key, value in icons.items()}
 
 
 class _LogSignalProxies(QtCore.QObject):
@@ -208,12 +231,6 @@ class QLoggingWindow(QtWidgets.QDialog):
         self.hide()
 
 
-def _fix_group(value, possibles):
-    if str(value) not in possibles:
-        return 'none'
-    return str(value)
-
-
 class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent=None, possible_groups=[]):
         super(ComboBoxDelegate, self).__init__(parent)
@@ -260,6 +277,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self._ref_idx = 'Orig. Index'
         self._data = data.copy().reset_index(names=self._ref_idx)
         self._dtypes = self._data.dtypes
+        self.combo_col = -1
+        self.icons = _create_icons()
 
         # Fix invalid group columns
         # self._data['Group'] = self._data['Group'].apply(_fix_group)
@@ -308,7 +327,20 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             return row[col]
 
         elif role == Qt.TextAlignmentRole:
-            return Qt.AlignVCenter + Qt.AlignLeft
+            if _check_numeric(row[col]):
+                return Qt.AlignVCenter + Qt.AlignRight
+            else:
+                return Qt.AlignVCenter + Qt.AlignLeft
+
+        elif role == Qt.DecorationRole and col == self.combo_col:
+            if (this_val := self._data.iat[index.row(), self.combo_col]) != 'none':
+                try:
+                    return QtGui.QIcon(self.icons[this_val])
+                except KeyError:
+                    logger.debug(f'No icon for group {this_val:s}')
+
+            else:
+                return None
 
         return None
 

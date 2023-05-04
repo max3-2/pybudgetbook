@@ -65,3 +65,21 @@ _patterns = {
                   'total_sum_pattern': re.compile(r'((?<=summe.))_*?\d{1,3}_*?[,.]_*?\d{2}', re.IGNORECASE),
             },
 }
+
+_icon_root = Path('pybudgetbook/img/groups')
+icons = {
+    'Grundnahrungsmittel': str(_icon_root / 'general.png'),
+    'Milchprodukte': str(_icon_root / 'dairy.png'),
+    'Gemüse': str(_icon_root / 'veggies.png'),
+    'Früchte': str(_icon_root / 'fruit.png'),
+    'Beeren': str(_icon_root / 'berry.png'),
+    'Wurst / Käse': str(_icon_root / 'sausage.png'),
+    'Süßes': str(_icon_root / 'sweets.png'),
+    'Getränke': str(_icon_root / 'drinks.png'),
+    'Alkohol': str(_icon_root / 'alco.png'),
+    'Haushalt': str(_icon_root / 'house_gen.png'),
+    'Drogerie': str(_icon_root / 'drugstore.png'),
+    'Kinder': str(_icon_root / 'kids.png'),
+    'Bäcker': str(_icon_root / 'bakery.png'),
+    'Auto': str(_icon_root / 'car.png'),
+}
