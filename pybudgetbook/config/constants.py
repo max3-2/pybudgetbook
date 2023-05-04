@@ -56,7 +56,7 @@ _patterns = {
     'real_deu': {},  # inherits all, but the flag is needed for sorting
     'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3},\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
                  },
-    'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12I]|AW)'),
+    'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12I\]\[]|AW)'),
                   'mult_pattern': re.compile(r'(\d{1,3}(?=[xX*]))'),
                   'mult_price': re.compile(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})'),
                   'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
