@@ -125,7 +125,6 @@ class main_window(Ui_pybb_MainWindow):
     def show_raw_text(self):
         if self.raw_text_window is None:
             self.raw_text_window = uisupport.TextDisplayWindow()
-            self.raw_text_window.closed.connect(self.on_text_window_closed)
 
         if self.receipt is None:
             self.raw_text_window.update_text('')
@@ -134,6 +133,7 @@ class main_window(Ui_pybb_MainWindow):
 
         self.raw_text_window.show()
         self.raw_text_window.raise_()
+        self.raw_text_window.closed.connect(self.on_text_window_closed)
 
     def on_text_window_closed(self):
         self.raw_text_window = None
@@ -175,6 +175,8 @@ class main_window(Ui_pybb_MainWindow):
             self.plot_area_receipts.ax.imshow(self.receipt.bin_img)
 
         self.plot_area_receipts.canvas.draw()
+        if self.raw_text_window is not None:
+            self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
 
     def refilter_and_display(self):
         self.receipt.filter_image(

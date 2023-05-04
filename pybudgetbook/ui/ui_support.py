@@ -555,7 +555,7 @@ class TextDisplayWindow(QtWidgets.QWidget):
         self.text_edit.setHorizontalScrollBarPolicy(scroll_bar_policy)
 
         layout = QtWidgets.QVBoxLayout()
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(2, 2, 2, 2)
         layout.addWidget(self.text_edit)
 
         self.setLayout(layout)
