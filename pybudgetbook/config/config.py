@@ -33,6 +33,7 @@ options = {
 # show_logger_on_start = false
 # logger_popup_level = 20
 # logger_show_debug = false
+# ask_for_image = true  ASK on save if no imae / receipt loaded
 
 # Search aliases for receipts
 receipt_aliases = {
