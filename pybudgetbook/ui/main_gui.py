@@ -54,6 +54,8 @@ class Ui_pybb_MainWindow(object):
         self.actionShow_Logger.setObjectName(u"actionShow_Logger")
         self.actionAbout = QAction(pybb_MainWindow)
         self.actionAbout.setObjectName(u"actionAbout")
+        self.actionRaw_Text = QAction(pybb_MainWindow)
+        self.actionRaw_Text.setObjectName(u"actionRaw_Text")
         self.centralwidget = QWidget(pybb_MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
@@ -210,9 +212,9 @@ class Ui_pybb_MainWindow(object):
 
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(15, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(6, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(8, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(13, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(5, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(7, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -290,18 +292,15 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_saveReceipt.addWidget(self.label_totalAmountData, 1, 0, 1, 1)
 
-        self.lineEdit_totalAmountData = QLineEdit(self.groupBox_saveReceipt)
-        self.lineEdit_totalAmountData.setObjectName(u"lineEdit_totalAmountData")
-        sizePolicy4.setHeightForWidth(self.lineEdit_totalAmountData.sizePolicy().hasHeightForWidth())
-        self.lineEdit_totalAmountData.setSizePolicy(sizePolicy4)
-        self.lineEdit_totalAmountData.setMinimumSize(QSize(100, 0))
-
-        self.gridLayout_saveReceipt.addWidget(self.lineEdit_totalAmountData, 1, 1, 1, 1)
-
         self.pushButton_saveData = QPushButton(self.groupBox_saveReceipt)
         self.pushButton_saveData.setObjectName(u"pushButton_saveData")
 
         self.gridLayout_saveReceipt.addWidget(self.pushButton_saveData, 1, 3, 1, 1)
+
+        self.label_totalAmountDataValue = QLabel(self.groupBox_saveReceipt)
+        self.label_totalAmountDataValue.setObjectName(u"label_totalAmountDataValue")
+
+        self.gridLayout_saveReceipt.addWidget(self.label_totalAmountDataValue, 1, 1, 1, 1)
 
 
         self.horizontalLayout_6.addLayout(self.gridLayout_saveReceipt)
@@ -384,6 +383,8 @@ class Ui_pybb_MainWindow(object):
         self.menuFlags.setObjectName(u"menuFlags")
         self.menuHelp = QMenu(self.pybb_menubar)
         self.menuHelp.setObjectName(u"menuHelp")
+        self.menuShow = QMenu(self.pybb_menubar)
+        self.menuShow.setObjectName(u"menuShow")
         pybb_MainWindow.setMenuBar(self.pybb_menubar)
         self.statusbar = ColoredStatusBar(pybb_MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -391,13 +392,15 @@ class Ui_pybb_MainWindow(object):
 
         self.pybb_menubar.addAction(self.menuFile.menuAction())
         self.pybb_menubar.addAction(self.menuEdit.menuAction())
+        self.pybb_menubar.addAction(self.menuShow.menuAction())
         self.pybb_menubar.addAction(self.menuHelp.menuAction())
         self.menuEdit.addAction(self.menuFlags.menuAction())
         self.menuEdit.addAction(self.actionData_Directory)
         self.menuFlags.addAction(self.actionMove_on_Save)
         self.menuFlags.addAction(self.actionUpdate_Groups)
-        self.menuHelp.addAction(self.actionShow_Logger)
         self.menuHelp.addAction(self.actionAbout)
+        self.menuShow.addAction(self.actionRaw_Text)
+        self.menuShow.addAction(self.actionShow_Logger)
 
         self.retranslateUi(pybb_MainWindow)
 
@@ -415,6 +418,7 @@ class Ui_pybb_MainWindow(object):
         self.actionData_Directory.setText(QCoreApplication.translate("pybb_MainWindow", u"Data Directory", None))
         self.actionShow_Logger.setText(QCoreApplication.translate("pybb_MainWindow", u"Show Logger", None))
         self.actionAbout.setText(QCoreApplication.translate("pybb_MainWindow", u"About", None))
+        self.actionRaw_Text.setText(QCoreApplication.translate("pybb_MainWindow", u"Raw Text", None))
         self.groupBox_inputControl.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Input control", None))
         self.label_receiptDisplayMode.setText(QCoreApplication.translate("pybb_MainWindow", u"Language:", None))
         self.comboBox_receiptDisplayMode.setItemText(0, QCoreApplication.translate("pybb_MainWindow", u"Original", None))
@@ -438,6 +442,7 @@ class Ui_pybb_MainWindow(object):
         self.checkBox_feedbackMatch.setText(QCoreApplication.translate("pybb_MainWindow", u"Feedback matching data", None))
         self.label_totalAmountData.setText(QCoreApplication.translate("pybb_MainWindow", u"Difference to data sum:", None))
         self.pushButton_saveData.setText(QCoreApplication.translate("pybb_MainWindow", u"Save Data", None))
+        self.label_totalAmountDataValue.setText("")
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("pybb_MainWindow", u"Add New Receipt", None))
         self.label_mainPlotType.setText(QCoreApplication.translate("pybb_MainWindow", u"Plot Type:", None))
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage2), QCoreApplication.translate("pybb_MainWindow", u"Data Analysis", None))
@@ -445,5 +450,6 @@ class Ui_pybb_MainWindow(object):
         self.menuEdit.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Edit", None))
         self.menuFlags.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Flags", None))
         self.menuHelp.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Help", None))
+        self.menuShow.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Show", None))
     # retranslateUi
 

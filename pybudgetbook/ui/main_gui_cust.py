@@ -1,7 +1,8 @@
 """Inherits from the UI design and adapts the class with some core features"""
 import logging
 from pathlib import Path
-from PySide6 import QtWidgets
+from PySide6 import QtWidgets, QtCore
+from PySide6.QtCore import Qt
 import pandas as pd
 from copy import copy
 from os.path import expanduser
@@ -34,6 +35,7 @@ class main_window(Ui_pybb_MainWindow):
 
         # Additional vars
         self.receipt = None
+        self.raw_text_window = None
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
@@ -87,11 +89,15 @@ class main_window(Ui_pybb_MainWindow):
         # Stop initial timer
         self.horizontalSliderFilterAmount.timer.stop()
 
+        # Other configs for fields
+        self.label_totalAmountDataValue.setTextFormat(Qt.RichText)
+
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
         self.horizontalSliderFilterAmount.set_timer_callback(self.refilter_and_display)
         self.comboBox_receiptDisplayMode.currentIndexChanged.connect(self.update_rec_plot)
         self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
+        self.actionRaw_Text.triggered.connect(self.show_raw_text)
 
     def _about(self):
         """
@@ -115,6 +121,22 @@ class main_window(Ui_pybb_MainWindow):
         self.about_box.setStandardButtons(QtWidgets.QMessageBox.Ok)
 
         self.about_box.exec()
+
+    def show_raw_text(self):
+        if self.raw_text_window is None:
+            self.raw_text_window = uisupport.TextDisplayWindow()
+            self.raw_text_window.closed.connect(self.on_text_window_closed)
+
+        if self.receipt is None:
+            self.raw_text_window.update_text('')
+        else:
+            self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
+
+        self.raw_text_window.show()
+        self.raw_text_window.raise_()
+
+    def on_text_window_closed(self):
+        self.raw_text_window = None
 
     def load_receipt(self):
         file, ok = QtWidgets.QFileDialog(self.parent).getOpenFileName(

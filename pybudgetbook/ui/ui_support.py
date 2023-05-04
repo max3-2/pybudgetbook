@@ -537,3 +537,30 @@ class ColoredStatusBar(QtWidgets.QStatusBar):
 
     def clearMessage(self):
         self.statusLabel.setText('')
+
+
+class TextDisplayWindow(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Raw Text display')
+        self.setGeometry(100, 50, 500, 700)
+        # self.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        self.text_edit = QtWidgets.QTextEdit(self)
+        self.text_edit.setReadOnly(True)
+        self.text_edit.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
+
+        scroll_bar_policy = Qt.ScrollBarAsNeeded
+        self.text_edit.setVerticalScrollBarPolicy(scroll_bar_policy)
+        self.text_edit.setHorizontalScrollBarPolicy(scroll_bar_policy)
+
+        layout = QtWidgets.QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.text_edit)
+
+        self.setLayout(layout)
+
+    def update_text(self, text, show=False):
+        self.text_edit.setText(text)
+        if show:
+            self.raise_()
