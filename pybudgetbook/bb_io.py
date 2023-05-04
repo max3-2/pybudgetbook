@@ -49,6 +49,20 @@ def _findFilesExt(directory, ext):
                 yield Path(root), basename, Path(filename)
 
 
+def check_file_exists(path):
+    if not path.exists():
+        return path
+
+    name, ext = os.path.splitext(path.name)
+    i = 1
+    while True:
+        new_name = f"{name}_{i}{ext}"
+        new_path = path.with_name(new_name)
+        if not new_path.exists():
+            return new_path
+        i += 1
+
+
 def load_user_match_data(lang):
     """Loads user only match data"""
     user_data = Path(bbconfig.options['data_folder']) / f'item_groups_{lang:s}.json'
