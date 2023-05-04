@@ -212,9 +212,9 @@ class Ui_pybb_MainWindow(object):
 
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(13, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(5, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(7, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(11, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(4, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(6, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -273,6 +273,7 @@ class Ui_pybb_MainWindow(object):
 
         self.checkBox_feedbackMatch = QCheckBox(self.groupBox_saveReceipt)
         self.checkBox_feedbackMatch.setObjectName(u"checkBox_feedbackMatch")
+        self.checkBox_feedbackMatch.setChecked(True)
 
         self.gridLayout_saveReceipt.addWidget(self.checkBox_feedbackMatch, 0, 2, 1, 1)
 
@@ -284,6 +285,8 @@ class Ui_pybb_MainWindow(object):
         sizePolicy4.setHeightForWidth(self.lineEdit_totalAmountReceipt.sizePolicy().hasHeightForWidth())
         self.lineEdit_totalAmountReceipt.setSizePolicy(sizePolicy4)
         self.lineEdit_totalAmountReceipt.setMinimumSize(QSize(100, 0))
+        self.lineEdit_totalAmountReceipt.setCursorPosition(0)
+        self.lineEdit_totalAmountReceipt.setReadOnly(True)
 
         self.gridLayout_saveReceipt.addWidget(self.lineEdit_totalAmountReceipt, 0, 1, 1, 1)
 
