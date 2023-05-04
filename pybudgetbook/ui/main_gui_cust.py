@@ -13,7 +13,7 @@ from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 from pybudgetbook.config.plotting_conf import set_style
 import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
-from pybudgetbook.receipt import Receipt, _BaseReceipt
+from pybudgetbook.receipt import Receipt
 from pybudgetbook import bb_io
 from pybudgetbook.config.config import options
 
@@ -90,6 +90,8 @@ class main_window(Ui_pybb_MainWindow):
 
         # Other configs for fields
         self.label_totalAmountDataValue.setTextFormat(Qt.RichText)
+        self.comboBox_overalCat.addItems(bbconstant._CATEGORIES + ['n.a.'])
+        self.lineEdit_totalAmountReceipt.setText('0.00')
 
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
@@ -97,6 +99,7 @@ class main_window(Ui_pybb_MainWindow):
         self.comboBox_receiptDisplayMode.currentIndexChanged.connect(self.update_rec_plot)
         self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
         self.actionRaw_Text.triggered.connect(self.show_raw_text)
+        self.tableView_pandasViewer.model().dataChanged.connect(self.recompute_diff)
 
     def _about(self):
         """
@@ -154,12 +157,7 @@ class main_window(Ui_pybb_MainWindow):
         if 'hdf' in ptn or 'h5' in ptn or 'hdf5' in ptn:
             logger.info('Loading a parsed receipt')
             try:
-                self._current_data = bb_io.load_with_metadata(file)
-                self.tableView_pandasViewer.model().update_data(
-                    self._current_data.loc[:, bbconstant._VIEWER_COLS]
-                )
-                self.tableView_pandasViewer.resizeColumnsToContents()
-                self.tableView_pandasViewer.scrollToTop()
+                self.set_new_data(bb_io.load_with_metadata(file), has_meta=True)
 
             except Exception as ioe:
                 logger.exception(f"Can't load file: {ioe:s}")
@@ -207,3 +205,58 @@ class main_window(Ui_pybb_MainWindow):
         self.display_receipt()
         self.plot_area_receipts.ax.set_xlim(current_lim[0])
         self.plot_area_receipts.ax.set_ylim(current_lim[1])
+
+    def set_new_data(self, new_data, has_meta=False):
+        self._current_data = new_data
+
+        # Update model
+        self.tableView_pandasViewer.model().update_data(
+                    self._current_data.loc[:, bbconstant._VIEWER_COLS]
+                )
+        self.tableView_pandasViewer.resizeColumnsToContents()
+        self.tableView_pandasViewer.scrollToTop()
+
+        # Update fields
+        if has_meta:
+            self.lineEdit_marketVendor.setText(self._current_data.loc[0, 'Vendor'])
+            total = self._current_data.attrs.get("total_extracted", 0)
+            self.lineEdit_totalAmountReceipt.setText(
+                f'{total:.2f}')
+            self.update_diff(total)
+
+            self.dateEdit_shopDate.setDate(
+                uisupport.convert_date(self._current_data.loc[0, 'Date']))
+
+            if (this_cat := self._current_data.loc[0, 'Category']) in bbconstant._CATEGORIES:
+                self.comboBox_overalCat.setCurrentIndex(
+                    bbconstant._CATEGORIES.index(this_cat))
+            else:
+                self.comboBox_overalCat.setCurrentIndex(
+                    self.comboBox_overalCat.findText('n.a.'))
+
+    def update_diff(self, refval, baseval=None):
+        if baseval is None:
+            if self._current_data is None:
+                return ''
+
+            diff = refval - self._current_data['Price'].sum()
+        else:
+            diff = refval - baseval
+
+        if abs(diff) > 0.05:
+            color = 'red'
+        elif diff == 0:
+            color = 'green'
+        else:
+            color = 'black'
+
+        self.label_totalAmountDataValue.setText(
+            f'<font color="{color:s}">{diff:.2f}</font>')
+
+    def recompute_diff(self, index1, index2, *args):
+        col1, col2 = index1.column(), index2.column()
+        if col1 == 5 or col2 == 5:
+            self.update_diff(
+                float(self.lineEdit_totalAmountReceipt.text()),
+                self.tableView_pandasViewer.model()._data['Price'].sum()
+            )

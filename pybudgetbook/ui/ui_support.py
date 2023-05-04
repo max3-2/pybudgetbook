@@ -7,6 +7,7 @@ import logging
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtCore import Signal, Slot, Qt
 import numpy as np
+import pandas as pd
 
 # TODO make rel
 from pybudgetbook.config.constants import icons
@@ -28,6 +29,14 @@ def _check_numeric(data):
         np.issubdtype(data, np.complex64) or
         np.issubdtype(data, np.complex128)
     )
+
+def convert_date(input_date):
+    if isinstance(input_date, QtCore.QDate):
+        return pd.to_datetime(input_date.toPyDate())
+    elif isinstance(input_date, pd.Timestamp):
+        return QtCore.QDate(input_date.year, input_date.month, input_date.day)
+    else:
+        raise ValueError('Input must be either a QDate or a pandas Timestamp')
 
 # Build icons to reduce IO, only possible after App is started
 def _create_icons():
