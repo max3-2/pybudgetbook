@@ -17,6 +17,8 @@ _TARGET_DPI = 600
 _TESS_OPTIONS = r'--psm 6'
 _MANDATORY_COLS = ('Date', 'Vendor', 'ArtNr', 'Name', 'Units', 'PricePerUnit',
                    'Price', 'TaxClass', 'Group', 'Category')
+_VIEWER_COLS = ('ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass',
+                'Group')
 
 _CATEGORIES = ['Supermarket', 'Small Stores', 'Cars & Gas', 'Clothing', 'Electronics', 'Other']
 

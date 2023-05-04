@@ -13,7 +13,8 @@ from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 from pybudgetbook.config.plotting_conf import set_style
 import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
-from pybudgetbook.receipt import Receipt
+from pybudgetbook.receipt import Receipt, _BaseReceipt
+from pybudgetbook import bb_io
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -36,6 +37,7 @@ class main_window(Ui_pybb_MainWindow):
         # Additional vars
         self.receipt = None
         self.raw_text_window = None
+        self._current_disp_data = None
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
@@ -71,14 +73,8 @@ class main_window(Ui_pybb_MainWindow):
         logger.debug("Created plotting area 2")
 
         # Create data viewer and attach to frame
-        # TODO change Column setup with new constant
-        viewer_cols = list(copy(bbconstant._MANDATORY_COLS))
-        viewer_cols.remove('Vendor')
-        viewer_cols.remove('Date')
-        viewer_cols.remove('Category')
-        init_data_viewer = pd.DataFrame(columns=viewer_cols)
+        init_data_viewer = pd.DataFrame(columns=bbconstant._VIEWER_COLS)
         init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
-
 
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
@@ -139,10 +135,11 @@ class main_window(Ui_pybb_MainWindow):
         self.raw_text_window = None
 
     def load_receipt(self):
-        file, ok = QtWidgets.QFileDialog(self.parent).getOpenFileName(
+        file, ptn = QtWidgets.QFileDialog(self.parent).getOpenFileName(
             caption='Select a receipt file',
             dir=expanduser('~'),
             filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG);;'
+                    'Parsed Receipt (*.h5 *.hdf *.hdf5);;'
                     'FreeForAll (*.*)')
         )
         if file and Path(file).exists():
@@ -151,17 +148,31 @@ class main_window(Ui_pybb_MainWindow):
             self.statusbar.showMessage('Invalid File', 3000, color='red')
             return
 
-        try:
-            self.receipt = Receipt(file)
-            self.receipt.filter_image(
-                unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
-            if self.receipt.type == 'pdf':
-                self.horizontalSliderFilterAmount.setEnabled(False)
-                self.comboBox_receiptDisplayMode.setEnabled(False)
+        if 'hdf' in ptn or 'h5' in ptn or 'hdf5' in ptn:
+            logger.info('Loading a parsed receipt')
+            try:
+                self._current_data = bb_io.load_with_metadata(file)
+                self.tableView_pandasViewer.model().update_data(
+                    self._current_data.loc[:, bbconstant._VIEWER_COLS]
+                )
+                self.tableView_pandasViewer.resizeColumnsToContents()
+                self.tableView_pandasViewer.scrollToTop()
 
-        except (IOError, FileNotFoundError):
-            logger.warning('Invalid file type for a new receipt!')
-            return
+            except Exception as ioe:
+                logger.exception(f"Can't load file: {ioe:s}")
+                return
+        else:
+            try:
+                self.receipt = Receipt(file)
+                self.receipt.filter_image(
+                    unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
+                if self.receipt.type == 'pdf':
+                    self.horizontalSliderFilterAmount.setEnabled(False)
+                    self.comboBox_receiptDisplayMode.setEnabled(False)
+
+            except (IOError, FileNotFoundError):
+                logger.warning('Invalid file type for a new receipt!')
+                return
 
         self.comboBox_receiptDisplayMode.setCurrentIndex(0)
         self.display_receipt()

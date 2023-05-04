@@ -298,7 +298,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def data(self, index, role=Qt.DisplayRole):
         if not index.isValid() or not (0 <= index.row() < self.rowCount()):
             return None
-        row = self._data.loc[index.row()]
+        row = self._data.iloc[index.row()]
         col = index.column()
 
         if role == Qt.DisplayRole:
@@ -348,8 +348,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def insertRows(self, row, count, parent=QtCore.QModelIndex()):
         self.beginInsertRows(parent, row, row + count - 1)
         for i in range(count):
-            self._data.loc[row + i] = [
-                self._data[self._ref_idx].max() + 1, -1,
+            self._data.loc[row + i, :] = [
+                int(self._data[self._ref_idx].max() + 1), -1,
                 'New Article Name', 1, 1, 1, 0, 'none']
         self.endInsertRows()
         return True
@@ -358,6 +358,12 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         self.beginRemoveRows(parent, row, row)
         self._data = self._data.drop(self._data.index[row]).reset_index(drop=True)
         self.endRemoveRows()
+
+    def update_data(self, new_data):
+        self.beginResetModel()
+        self._data = new_data.copy().reset_index(names=self._ref_idx)
+        self._dtypes = self._data.dtypes
+        self.endResetModel()
 
 
 class PandasViewer(QtWidgets.QTableView):
