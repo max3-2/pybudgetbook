@@ -129,27 +129,6 @@
              </property>
              <item>
               <layout class="QGridLayout" name="gridLayout_inputControl">
-               <item row="1" column="1">
-                <widget class="QLabel" name="label_receiptDisplayMode">
-                 <property name="text">
-                  <string>Language:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="2">
-                <widget class="QComboBox" name="comboBox_receiptDisplayMode">
-                 <item>
-                  <property name="text">
-                   <string>Original</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Filtered</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
                <item row="2" column="1">
                 <widget class="QLabel" name="label_baseLang">
                  <property name="text">
@@ -157,17 +136,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="2">
-                <widget class="QComboBox" name="comboBox_baseLang"/>
-               </item>
-               <item row="4" column="4" colspan="2">
-                <widget class="QPushButton" name="pushButton_parseVendor">
+               <item row="1" column="1">
+                <widget class="QLabel" name="label_receiptDisplayMode">
                  <property name="text">
-                  <string>Parse Vendor</string>
+                  <string>Language:</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3" colspan="3">
+               <item row="1" column="3" colspan="2">
                 <spacer name="horizontalSpacer">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -183,14 +159,7 @@
                  </property>
                 </spacer>
                </item>
-               <item row="0" column="2" colspan="4">
-                <widget class="QPushButton" name="pushButton_loadNewReceipt">
-                 <property name="text">
-                  <string>Load Receipt</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="3" colspan="3">
+               <item row="2" column="3" colspan="2">
                 <widget class="SliderWithVal" name="horizontalSliderFilterAmount">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -218,6 +187,30 @@
                  </property>
                  <property name="tickPosition">
                   <enum>QSlider::NoTicks</enum>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QComboBox" name="comboBox_baseLang"/>
+               </item>
+               <item row="2" column="2">
+                <widget class="QComboBox" name="comboBox_receiptDisplayMode">
+                 <item>
+                  <property name="text">
+                   <string>Original</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Filtered</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="0" column="2" colspan="3">
+                <widget class="QPushButton" name="pushButton_loadNewReceipt">
+                 <property name="text">
+                  <string>Load Receipt</string>
                  </property>
                 </widget>
                </item>
@@ -318,7 +311,7 @@
                      <widget class="QLineEdit" name="lineEdit_marketVendor"/>
                     </item>
                     <item row="0" column="3">
-                     <widget class="QPushButton" name="pushButton">
+                     <widget class="QPushButton" name="pushButton_detectVendor">
                       <property name="text">
                        <string>Detect Vendor</string>
                       </property>
@@ -351,7 +344,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>11</hour>
+                        <hour>9</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -361,7 +354,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>4</hour>
+                        <hour>3</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -371,7 +364,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>6</hour>
+                        <hour>5</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>

@@ -91,41 +91,19 @@ class Ui_pybb_MainWindow(object):
         self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_inputControl = QGridLayout()
         self.gridLayout_inputControl.setObjectName(u"gridLayout_inputControl")
-        self.label_receiptDisplayMode = QLabel(self.groupBox_inputControl)
-        self.label_receiptDisplayMode.setObjectName(u"label_receiptDisplayMode")
-
-        self.gridLayout_inputControl.addWidget(self.label_receiptDisplayMode, 1, 1, 1, 1)
-
-        self.comboBox_receiptDisplayMode = QComboBox(self.groupBox_inputControl)
-        self.comboBox_receiptDisplayMode.addItem("")
-        self.comboBox_receiptDisplayMode.addItem("")
-        self.comboBox_receiptDisplayMode.setObjectName(u"comboBox_receiptDisplayMode")
-
-        self.gridLayout_inputControl.addWidget(self.comboBox_receiptDisplayMode, 2, 2, 1, 1)
-
         self.label_baseLang = QLabel(self.groupBox_inputControl)
         self.label_baseLang.setObjectName(u"label_baseLang")
 
         self.gridLayout_inputControl.addWidget(self.label_baseLang, 2, 1, 1, 1)
 
-        self.comboBox_baseLang = QComboBox(self.groupBox_inputControl)
-        self.comboBox_baseLang.setObjectName(u"comboBox_baseLang")
+        self.label_receiptDisplayMode = QLabel(self.groupBox_inputControl)
+        self.label_receiptDisplayMode.setObjectName(u"label_receiptDisplayMode")
 
-        self.gridLayout_inputControl.addWidget(self.comboBox_baseLang, 1, 2, 1, 1)
-
-        self.pushButton_parseVendor = QPushButton(self.groupBox_inputControl)
-        self.pushButton_parseVendor.setObjectName(u"pushButton_parseVendor")
-
-        self.gridLayout_inputControl.addWidget(self.pushButton_parseVendor, 4, 4, 1, 2)
+        self.gridLayout_inputControl.addWidget(self.label_receiptDisplayMode, 1, 1, 1, 1)
 
         self.horizontalSpacer = QSpacerItem(300, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
 
-        self.gridLayout_inputControl.addItem(self.horizontalSpacer, 1, 3, 1, 3)
-
-        self.pushButton_loadNewReceipt = QPushButton(self.groupBox_inputControl)
-        self.pushButton_loadNewReceipt.setObjectName(u"pushButton_loadNewReceipt")
-
-        self.gridLayout_inputControl.addWidget(self.pushButton_loadNewReceipt, 0, 2, 1, 4)
+        self.gridLayout_inputControl.addItem(self.horizontalSpacer, 1, 3, 1, 2)
 
         self.horizontalSliderFilterAmount = SliderWithVal(self.groupBox_inputControl)
         self.horizontalSliderFilterAmount.setObjectName(u"horizontalSliderFilterAmount")
@@ -142,7 +120,24 @@ class Ui_pybb_MainWindow(object):
         self.horizontalSliderFilterAmount.setOrientation(Qt.Horizontal)
         self.horizontalSliderFilterAmount.setTickPosition(QSlider.NoTicks)
 
-        self.gridLayout_inputControl.addWidget(self.horizontalSliderFilterAmount, 2, 3, 1, 3)
+        self.gridLayout_inputControl.addWidget(self.horizontalSliderFilterAmount, 2, 3, 1, 2)
+
+        self.comboBox_baseLang = QComboBox(self.groupBox_inputControl)
+        self.comboBox_baseLang.setObjectName(u"comboBox_baseLang")
+
+        self.gridLayout_inputControl.addWidget(self.comboBox_baseLang, 1, 2, 1, 1)
+
+        self.comboBox_receiptDisplayMode = QComboBox(self.groupBox_inputControl)
+        self.comboBox_receiptDisplayMode.addItem("")
+        self.comboBox_receiptDisplayMode.addItem("")
+        self.comboBox_receiptDisplayMode.setObjectName(u"comboBox_receiptDisplayMode")
+
+        self.gridLayout_inputControl.addWidget(self.comboBox_receiptDisplayMode, 2, 2, 1, 1)
+
+        self.pushButton_loadNewReceipt = QPushButton(self.groupBox_inputControl)
+        self.pushButton_loadNewReceipt.setObjectName(u"pushButton_loadNewReceipt")
+
+        self.gridLayout_inputControl.addWidget(self.pushButton_loadNewReceipt, 0, 2, 1, 3)
 
 
         self.horizontalLayout_7.addLayout(self.gridLayout_inputControl)
@@ -190,10 +185,10 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_additionalData.addWidget(self.lineEdit_marketVendor, 0, 2, 1, 1)
 
-        self.pushButton = QPushButton(self.groupBox_additionalData)
-        self.pushButton.setObjectName(u"pushButton")
+        self.pushButton_detectVendor = QPushButton(self.groupBox_additionalData)
+        self.pushButton_detectVendor.setObjectName(u"pushButton_detectVendor")
 
-        self.gridLayout_additionalData.addWidget(self.pushButton, 0, 3, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.pushButton_detectVendor, 0, 3, 1, 1)
 
         self.tableView_pandasViewer = PandasViewer(self.groupBox_additionalData)
         self.tableView_pandasViewer.setObjectName(u"tableView_pandasViewer")
@@ -212,9 +207,9 @@ class Ui_pybb_MainWindow(object):
 
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(11, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(4, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(6, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(9, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 31), QTime(3, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(5, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -423,15 +418,14 @@ class Ui_pybb_MainWindow(object):
         self.actionAbout.setText(QCoreApplication.translate("pybb_MainWindow", u"About", None))
         self.actionRaw_Text.setText(QCoreApplication.translate("pybb_MainWindow", u"Raw Text", None))
         self.groupBox_inputControl.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Input control", None))
+        self.label_baseLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Show:", None))
         self.label_receiptDisplayMode.setText(QCoreApplication.translate("pybb_MainWindow", u"Language:", None))
         self.comboBox_receiptDisplayMode.setItemText(0, QCoreApplication.translate("pybb_MainWindow", u"Original", None))
         self.comboBox_receiptDisplayMode.setItemText(1, QCoreApplication.translate("pybb_MainWindow", u"Filtered", None))
 
-        self.label_baseLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Show:", None))
-        self.pushButton_parseVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Vendor", None))
         self.pushButton_loadNewReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Load Receipt", None))
         self.groupBox_additionalData.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Receipt Data", None))
-        self.pushButton.setText(QCoreApplication.translate("pybb_MainWindow", u"Detect Vendor", None))
+        self.pushButton_detectVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Detect Vendor", None))
         self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_useDiffParsingLang.setToolTip(QCoreApplication.translate("pybb_MainWindow", u"<html><head/><body><p>This can be used to use a different language to parse the extracted string and group match the data. Examples are parsing a receipt in french or english from a vacation but adding and matching the data to the german patterns. <span style=\" font-weight:700; color:#ca4d69;\">Warning:</span> This can make your patterns slightly obscure!</p></body></html>", None))
