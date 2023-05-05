@@ -105,7 +105,7 @@ def parse_receipt_general(data, pats, pattern, ax=None):
 
         try:
             total_price = float(
-                matcher.search(data.loc[last_line + 1, 'text']).group(0).replace(',', '.').replace('_', ''))
+                matcher.search(data.iloc[last_line + 1]['text']).group(0).replace(',', '.').replace('_', ''))
             print('Found total price: ', total_price)
         except ValueError:
             print('No total price')
@@ -116,7 +116,7 @@ def parse_receipt_general(data, pats, pattern, ax=None):
             pats['total_sum_pattern']).first_valid_index()
 
         if last_line is None:
-            last_line = - 1
+            last_line = data.index[-1]
 
         try:
             total_price = float(
@@ -157,7 +157,7 @@ def parse_receipt_general(data, pats, pattern, ax=None):
             try:
                 amount = float(
                     pats['amount_in_weight'].search(this_line).group(0).replace(',', '.'))
-            except ValueError:
+            except (ValueError, AttributeError):
                 amount = 0
 
             has_weight = True

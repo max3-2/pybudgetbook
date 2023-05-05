@@ -21,6 +21,16 @@ from pybudgetbook import parsers
 logger = logging.getLogger(__package__)
 
 
+def _type_check(data):
+    try:
+        retrieved_data = retrieved_data.astype(
+            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
+    except ValueError:
+        logger.warning('Using float instead of int in some cols due to NaN are left')
+        retrieved_data = retrieved_data.astype(
+            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'float', 'ArtNr': 'int'})
+    return retrieved_data
+
 class _BaseReceipt():
 
     def __init__(self):
@@ -86,7 +96,10 @@ class _BaseReceipt():
     def set_vendor(self, vendor, lang=bbconfig.options['lang']):
         self._vendor = vendor
         self._patident = bbconfig.receipt_types.get(self._vendor, 'gen')
-
+        if self._patident == 'gen':
+            logger.warning(
+                'No vendor found, set to General. Please add for best '
+                'parsing results using Receipt.set_vendor')
         self._patset = parsers.get_patterns(self._patident, lang)
 
         return self._vendor
@@ -105,14 +118,14 @@ class _BaseReceipt():
         retrieved_data, total_price = parsing_func(
             self.valid_data, self._patset, self._patident, self.disp_ax)
 
-        # Type check
-        retrieved_data = retrieved_data.astype(
-            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
-
+        # Fill
         if fill:
-            return parsers.fill_missing_data(retrieved_data), total_price
-        else:
-            return retrieved_data, total_price
+            retrieved_data = parsers.fill_missing_data(retrieved_data)
+
+        # Type check
+        retrieved_data = _type_check(retrieved_data)
+
+        return retrieved_data, total_price
 
     def parse_date(self):
         if 'date_pattern' in self._patset:
