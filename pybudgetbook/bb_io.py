@@ -269,3 +269,4 @@ def load_with_metadata(source):
     receipt.attrs = att_dict
 
     return receipt
+
