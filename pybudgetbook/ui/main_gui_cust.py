@@ -14,7 +14,7 @@ from pybudgetbook.config.plotting_conf import set_style
 import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
 from pybudgetbook.receipt import Receipt
-from pybudgetbook import bb_io
+from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.config.config import options
 
 # This might need to be moved into init...currently it works here!
@@ -38,7 +38,7 @@ class main_window(Ui_pybb_MainWindow):
         # Additional vars
         self.receipt = None
         self.raw_text_window = None
-        self._current_disp_data = None
+        self._current_data = None
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
@@ -80,10 +80,10 @@ class main_window(Ui_pybb_MainWindow):
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
         poss_groups = list(bb_io.load_basic_match_data(options['lang'])[0].keys())
-        self.tableView_pandasViewer.set_combo_column(7, poss_groups)
+        self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
         self.tableView_pandasViewer.model().combo_col = 7
 
-        self.horizontalSliderFilterAmount.custom_setup()
+        self.horizontalSliderFilterAmount.custom_setup(value_change_delay=600)
         self.horizontalSliderFilterAmount.slider.setValue(13)
         # Stop initial timer
         self.horizontalSliderFilterAmount.timer.stop()
@@ -92,6 +92,7 @@ class main_window(Ui_pybb_MainWindow):
         self.label_totalAmountDataValue.setTextFormat(Qt.RichText)
         self.comboBox_overalCat.addItems(bbconstant._CATEGORIES + ['n.a.'])
         self.lineEdit_totalAmountReceipt.setText('0.00')
+        self.lineEdit_totalAmountReceipt.setReadOnly(False)
 
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
@@ -100,6 +101,9 @@ class main_window(Ui_pybb_MainWindow):
         self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
         self.actionRaw_Text.triggered.connect(self.show_raw_text)
         self.tableView_pandasViewer.model().dataChanged.connect(self.recompute_diff)
+        self.pushButton_detectVendor.clicked.connect(self.detect_vendor)
+        self.pushButton_parseData.clicked.connect(self.parse_data)
+        self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
 
     def _about(self):
         """
@@ -176,6 +180,7 @@ class main_window(Ui_pybb_MainWindow):
                 return
 
         self.comboBox_receiptDisplayMode.setCurrentIndex(0)
+        self.receipt.disp_ax = self.plot_area_receipts.ax
         self.display_receipt()
 
     def display_receipt(self):
@@ -235,6 +240,12 @@ class main_window(Ui_pybb_MainWindow):
                     self.comboBox_overalCat.findText('n.a.'))
 
     def update_diff(self, refval, baseval=None):
+        try:
+            refval = float(refval)
+        except ValueError:
+            logger.warning('Cant convert this new total price to float!')
+            return
+
         if baseval is None:
             if self._current_data is None:
                 return ''
@@ -260,3 +271,83 @@ class main_window(Ui_pybb_MainWindow):
                 float(self.lineEdit_totalAmountReceipt.text()),
                 self.tableView_pandasViewer.model()._data['Price'].sum()
             )
+
+    def parse_data(self):
+        if self.receipt is None:
+            msg = 'Please load a receipt first'
+            logger.info(msg)
+            self.statusbar.showMessage(msg, timeout=3000)
+            return
+
+        if self.receipt.vendor is None:
+            if self.lineEdit_marketVendor.text() == '':
+                msg_box = QtWidgets.QMessageBox()
+                msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+                msg_box.setText(
+                    'No vendor in receipt and no vendor added - this will default '
+                    'to a general pattern set - continue?')
+                msg_box.setWindowTitle('Vendor warning')
+                msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+
+                if msg_box.exec() == QtWidgets.QMessageBox.Yes:
+                    # TODO add lang support
+                    self.receipt.set_vendor('General')
+                else:
+                    return
+
+            else:
+                self.receipt.set_vendor(self.lineEdit_marketVendor.text())
+
+        self.detect_date()
+        new_data, total_price = self.receipt.parse_data()
+        new_data = fuzzy_match.find_groups(new_data)
+        self.set_new_data(new_data)
+        self.lineEdit_totalAmountReceipt.setText(f'{total_price:.2f}')
+        self.update_diff(total_price)
+        self.plot_area_receipts.canvas.draw()
+
+    def detect_date(self):
+        if self.receipt is None:
+            msg = 'Please load a receipt first'
+            logger.info(msg)
+            self.statusbar.showMessage(msg, timeout=3000)
+            return
+
+        rec_date = self.receipt.parse_date()
+        if rec_date is None:
+            msg = 'No Date could be extracted'
+            logger.info(msg)
+            self.statusbar.showMessage(msg, timetout=3000)
+            return
+
+        self.dateEdit_shopDate.setDate(uisupport.convert_date(rec_date))
+        self.statusbar.showMessage('Date extracted', timeout=2000, color='green')
+
+    def detect_vendor(self):
+        if self.receipt is None:
+            msg = 'Please load a receipt first'
+            logger.info(msg)
+            self.statusbar.showMessage(msg, timeout=3000)
+            return
+
+        vendor = self.receipt.parse_vendor()
+        self.lineEdit_marketVendor.setText(vendor)
+        self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
+
+    def save_data(self):
+        ...
+        # # TODO add typecheck before
+
+        # retrieved_data['Category'] = 'Cars & Gas'  # 'Supermarket'
+        # retrieved_data['Vendor'] = rec.vendor
+        # if rec_date is None:
+        #     rec_date = pd.to_datetime('13/04/2023', dayfirst=True)
+        # retrieved_data['Date'] = rec_date
+        # metadata = {'tags': 'gas station',
+        #             'total_extracted': total_price}
+        # retrieved_data.attrs = metadata
+        # retrieved_data = bb_io.resort_data(retrieved_data)
+        # fuzzy_match.matcher_feedback(retrieved_data)
+        # TODO Add uniuqe name to config and to save core
+        # bb_io.save_with_metadata(retrieved_data, img_path=rec.file)
