@@ -17,6 +17,8 @@ logger = logging.getLogger(__package__)
 def _check_numeric(data):
     if isinstance(data, str):
         return False
+    if np.isnan(data):
+        return False
 
     return (
         np.issubdtype(data, int) or
@@ -333,7 +335,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
             return str(row[col])
 
         elif role == Qt.EditRole:
-            return row[col]
+            return str(row[col])
 
         elif role == Qt.TextAlignmentRole:
             if _check_numeric(row[col]):
@@ -587,6 +589,7 @@ class ColoredStatusBar(QtWidgets.QStatusBar):
 
 
 class TextDisplayWindow(QtWidgets.QWidget):
+    closed = Signal()
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle('Raw Text display')
@@ -611,3 +614,7 @@ class TextDisplayWindow(QtWidgets.QWidget):
         self.text_edit.setText(text)
         if show:
             self.raise_()
+
+    def closeEvent(self, event):
+        self.closed.emit()
+        event.accept()
