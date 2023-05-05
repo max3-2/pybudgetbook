@@ -25,38 +25,38 @@ _CATEGORIES = ['Supermarket', 'Small Stores', 'Cars & Gas', 'Clothing', 'Electro
 # Maps pattern with lang to set of regexp, general is alwazs used and the
 # rest is updated on top!  -> constants so its closed
 _patterns = {
-    'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3},\d{2})'),
-                'price_with_class': re.compile(r'(\d{1,3},\d{2,3}_[AB12]|AW)'),
-                'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3},\d{2})'),
-                'weight_pattern': re.compile(r'(\d{1,3},\d{1,3}(?=_EUR\/kg))'),
-                'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3},\d{2})))'),
-                'amount_in_weight': re.compile(r'(\b\d{1,2},\d{1,3})'),
+    'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{2})'),
+                'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12]|AW)'),
+                'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3}[,.]\d{2})'),
+                'weight_pattern': re.compile(r'(\d{1,3}[,.]\d{1,3}(?=_EUR\/kg))', re.IGNORECASE),
+                'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
+                'amount_in_weight': re.compile(r'(\b\d{1,2}[,.]\d{1,3})'),
                 'total_sum_pattern': re.compile(
-                    r'((?<=total_eur.)\d{1,3}_*?,_*?\d{2})|'
-                    r'((?<=betrag_eur.)\d{1,3}_*?,_*?\d{2})|'
-                    r'((?<=summe_eur.)\d{1,3}_*?,_*?\d{2})|'
-                    r'((?<=total.)\d{1,3}_*?,_*?\d{2})|'
-                    r'((?<=betrag.)\d{1,3}_*?,_*?\d{2})|'
-                    r'((?<=summe.)\d{1,3}_*?,_*?\d{2})',
+                    r'((?<=total_eur.)\d{1,3}_*?[,.]_*?\d{2})|'
+                    r'((?<=betrag_eur.)\d{1,3}_*?[,.]_*?\d{2})|'
+                    r'((?<=summe_eur.)\d{1,3}_*?[,.]_*?\d{2})|'
+                    r'((?<=total.)\d{1,3}_*?[,.]_*?\d{2})|'
+                    r'((?<=betrag.)\d{1,3}_*?[,.]_*?\d{2})|'
+                    r'((?<=summe.)\d{1,3}_*?[,.]_*?\d{2})',
                     re.IGNORECASE),
                 'date_pattern': re.compile(
                     r'[0-3]\d[,.\/]_*?[0,1]\d[,.\/]_*?(2[0,1]\d{2}|\d{2})'),
                 },
-    'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2},\d{1,3})'),
+    'dm_deu': {'mult_pattern': re.compile(r'(\d{1,4}_*?(?=[xX*]))|((?<=[xX*])_*?\d{1,2}[,.]\d{1,3})'),
                'valid_article_pattern_mult': re.compile(
-                   r'(?=_[a-zA-Z]).*?(?=_\d{1,2},\d{1,3})'),
-               'negative_price': re.compile(r'-\d{1,3},\d{1,2}'),
+                   r'(?=_[a-zA-Z]).*?(?=_\d{1,2}[,.]\d{1,3})'),
+               'negative_price': re.compile(r'-\d{1,3}[,.]\d{1,2}'),
                'total_sum_pattern': re.compile(
-                   r'((?<=\bsumme_eur.)\d{1,3}_*?,_*?\d{2})',
+                   r'((?<=\bsumme_eur.)\d{1,3}_*?[,.]_*?\d{2})',
                    re.IGNORECASE)
                },
     'unverpackt_deu': {
         'article_number': re.compile(r'\d{1,}'),
-        'mult_pattern': re.compile(r'\d{1,2},\d{1,3}'),
-        'total_sum_pattern': re.compile(r'((?<=summe.)\d{1,3}_*?,_*?\d{2})', re.IGNORECASE),
+        'mult_pattern': re.compile(r'\d{1,2}[,.]\d{1,3}'),
+        'total_sum_pattern': re.compile(r'((?<=summe.)\d{1,3}_*?[,.]_*?\d{2})', re.IGNORECASE),
     },
     'real_deu': {},  # inherits all, but the flag is needed for sorting
-    'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3},\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
+    'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3}[,.]\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
                  },
     'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12I\]\[]|AW)'),
                   'mult_pattern': re.compile(r'(\d{1,3}(?=[xX*]))'),
