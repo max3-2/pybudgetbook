@@ -34,7 +34,7 @@ def _check_numeric(data):
 
 def convert_date(input_date):
     if isinstance(input_date, QtCore.QDate):
-        return pd.to_datetime(input_date.toPyDate())
+        return pd.to_datetime(input_date.toPython())
     elif isinstance(input_date, pd.Timestamp):
         return QtCore.QDate(input_date.year, input_date.month, input_date.day)
     else:

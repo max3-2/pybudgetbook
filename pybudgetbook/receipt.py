@@ -21,7 +21,7 @@ from pybudgetbook import parsers
 logger = logging.getLogger(__package__)
 
 
-def _type_check(data):
+def _type_check(retrieved_data):
     try:
         retrieved_data = retrieved_data.astype(
             {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
