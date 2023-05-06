@@ -344,7 +344,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>5</hour>
+                        <hour>3</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -354,7 +354,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>1</hour>
+                        <hour>0</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -364,7 +364,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>3</hour>
+                        <hour>2</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -688,7 +688,7 @@
      <addaction name="actionMove_on_Save"/>
      <addaction name="actionGenerate_Unique_Name"/>
      <addaction name="actionAlways_Ask_for_Image"/>
-     <addaction name="actionUpdate_Groups"/>
+     <addaction name="actionLogger_debug"/>
     </widget>
     <addaction name="menuFlags"/>
     <addaction name="actionData_Directory"/>
@@ -715,6 +715,9 @@
   </widget>
   <widget class="ColoredStatusBar" name="statusbar"/>
   <action name="actionMove_on_Save">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Move on Save</string>
    </property>
@@ -722,7 +725,10 @@
     <string>see_code</string>
    </property>
   </action>
-  <action name="actionUpdate_Groups">
+  <action name="actionLogger_debug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Logger Show Debug</string>
    </property>
@@ -758,11 +764,17 @@
    </property>
   </action>
   <action name="actionAlways_Ask_for_Image">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Always Ask for Image</string>
    </property>
   </action>
   <action name="actionGenerate_Unique_Name">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Generate Unique Name</string>
    </property>
