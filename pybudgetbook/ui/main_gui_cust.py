@@ -75,7 +75,7 @@ class main_window(Ui_pybb_MainWindow):
 
         # Create data viewer and attach to frame
         init_data_viewer = pd.DataFrame(columns=bbconstant._VIEWER_COLS)
-        init_data_viewer.loc[0] = [0, 'New Article Name', 1, 1, 1, 0, 'none']
+        init_data_viewer.loc[0] = [0, 'New Article Name', 1., 1., 1., 0, 'none']
 
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
