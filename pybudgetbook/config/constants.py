@@ -22,6 +22,8 @@ _VIEWER_COLS = ('ArtNr', 'Name', 'Units', 'PricePerUnit', 'Price', 'TaxClass',
 
 _CATEGORIES = ['Supermarket', 'Small Stores', 'Cars & Gas', 'Clothing', 'Electronics', 'Other']
 
+_UI_LANG_SUPPORT = ['deu', 'eng', 'fra']
+
 # Maps pattern with lang to set of regexp, general is alwazs used and the
 # rest is updated on top!  -> constants so its closed
 _patterns = {

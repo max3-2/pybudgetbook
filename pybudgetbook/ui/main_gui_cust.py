@@ -83,8 +83,8 @@ class main_window(Ui_pybb_MainWindow):
         self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
         self.tableView_pandasViewer.model().combo_col = 7
 
-        self.horizontalSliderFilterAmount.custom_setup(value_change_delay=600)
-        self.horizontalSliderFilterAmount.slider.setValue(13)
+        self.horizontalSliderFilterAmount.custom_setup(value_change_delay=500)
+        self.horizontalSliderFilterAmount.slider.setValue(17)
         # Stop initial timer
         self.horizontalSliderFilterAmount.timer.stop()
 
@@ -94,6 +94,13 @@ class main_window(Ui_pybb_MainWindow):
         self.lineEdit_totalAmountReceipt.setText('0.00')
         self.lineEdit_totalAmountReceipt.setReadOnly(False)
         self.dateEdit_shopDate.setDate(QtCore.QDate.currentDate())
+
+        self.comboBox_baseLang.addItems(bbconstant._UI_LANG_SUPPORT)
+        self.comboBox_diffParsingLang.addItems(bbconstant._UI_LANG_SUPPORT)
+        index = self.comboBox_baseLang.findText(options['lang'])
+        if index != -1:
+            self.comboBox_baseLang.setCurrentIndex(index)
+            self.comboBox_diffParsingLang.setCurrentIndex(index)
 
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)

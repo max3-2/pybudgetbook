@@ -10,11 +10,8 @@ _check_config()
 load_config()
 
 # TODO UI
-# Create UI f rom file
-# Change lang input from conf to dropdown and on the fly to functions
-# Add logging
 # Add field for rabatt
-# Add unsharp mask amount slider (delay to update)
+# TODO live language setting from combo and not from options, search options['lang]
 # add rotate mode,  output field, delay to update, auto rotate funcs
 
 # cid = fig.canvas.mpl_connect(
