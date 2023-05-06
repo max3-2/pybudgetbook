@@ -24,16 +24,15 @@ _negative_groups: `dict`
     new items to groups, so some of the clustering is prevented.
 """
 options = {
-    'move_on_parse': True,
     'data_folder': None,
+    'move_on_parse': True,
+    'generate_unique_name': True,
     'lang': 'deu',
+    'show_logger_on_start': False,
+    'logger_popup_level': 20,
+    'logger_show_debug': False,
+    'ask_for_image': True,
 }
-
-# TODO [ux]
-# show_logger_on_start = false
-# logger_popup_level = 20
-# logger_show_debug = false
-# ask_for_image = true  ASK on save if no imae / receipt loaded
 
 # Search aliases for receipts
 receipt_aliases = {
