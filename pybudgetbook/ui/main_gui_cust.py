@@ -13,7 +13,7 @@ from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
 from pybudgetbook.config.plotting_conf import set_style
 import pybudgetbook.config.constants as bbconstant
 from pybudgetbook import __version__ as bbvers
-from pybudgetbook.receipt import Receipt
+from pybudgetbook.receipt import Receipt, _type_check
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.config.config import options
 
@@ -93,6 +93,7 @@ class main_window(Ui_pybb_MainWindow):
         self.comboBox_overalCat.addItems(bbconstant._CATEGORIES + ['n.a.'])
         self.lineEdit_totalAmountReceipt.setText('0.00')
         self.lineEdit_totalAmountReceipt.setReadOnly(False)
+        self.dateEdit_shopDate.setDate(QtCore.QDate.currentDate())
 
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
@@ -104,6 +105,7 @@ class main_window(Ui_pybb_MainWindow):
         self.pushButton_detectVendor.clicked.connect(self.detect_vendor)
         self.pushButton_parseData.clicked.connect(self.parse_data)
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
+        self.pushButton_saveData.clicked.connect(self.save_data)
 
     def _about(self):
         """
@@ -336,18 +338,51 @@ class main_window(Ui_pybb_MainWindow):
         self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
 
     def save_data(self):
-        ...
-        # # TODO add typecheck before
+        if (self.lineEdit_marketVendor.text() == 'General' or
+            self.lineEdit_marketVendor.text() == ''):
+            msg_box = QtWidgets.QMessageBox()
+            msg_box.setIcon(QtWidgets.QMessageBox.Warning)
+            msg_box.setText(
+                'No vendor specified or just General - this is not optimal for'
+                'archiving. It is recommended to add a vendor!')
+            msg_box.setWindowTitle('Vendor warning')
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
+            msg_box.button(QtWidgets.QMessageBox.Yes).setText('Continue')
+            msg_box.button(QtWidgets.QMessageBox.No).setText('Abort')
 
-        # retrieved_data['Category'] = 'Cars & Gas'  # 'Supermarket'
-        # retrieved_data['Vendor'] = rec.vendor
-        # if rec_date is None:
-        #     rec_date = pd.to_datetime('13/04/2023', dayfirst=True)
-        # retrieved_data['Date'] = rec_date
-        # metadata = {'tags': 'gas station',
-        #             'total_extracted': total_price}
-        # retrieved_data.attrs = metadata
-        # retrieved_data = bb_io.resort_data(retrieved_data)
-        # fuzzy_match.matcher_feedback(retrieved_data)
-        # TODO Add uniuqe name to config and to save core
-        # bb_io.save_with_metadata(retrieved_data, img_path=rec.file)
+            if msg_box.exec() == QtWidgets.QMessageBox.No:
+                return
+
+        retrieved_data = self.tableView_pandasViewer.get_final_data()
+        retrieved_data = _type_check(retrieved_data)
+        retrieved_data['Category'] = self.comboBox_overalCat.currentText()
+        retrieved_data['Vendor'] = self.lineEdit_marketVendor.text()
+        retrieved_data['Date'] = uisupport.convert_date(self.dateEdit_shopDate.date())
+        try:
+            total_ext = float(self.lineEdit_totalAmountReceipt.text())
+        except ValueError:
+            total_ext = 0
+        metadata = {'tags': self.lineEdit_tags.text(),
+                    'total_extracted': total_ext}
+        retrieved_data.attrs = metadata
+        retrieved_data = bb_io.resort_data(retrieved_data)
+        if self.checkBox_feedbackMatch.isChecked():
+            fuzzy_match.matcher_feedback(retrieved_data)
+
+        if options['ask_for_image']:
+            if self.receipt is None:
+                file = QtWidgets.QFileDialog().getOpenFileName(
+                    parent=self.parent, caption='Select Image File',
+                    dir=expanduser('~'),
+                    filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG)')
+                )
+                if not file:
+                    logger.error('Cant save without valid image if option is set!')
+                else:
+                    this_img = Path(file)
+        else:
+            this_img = self.receipt.file
+
+        bb_io.save_with_metadata(retrieved_data, img_path=this_img,
+                                 unique_name=options['generate_unique_name'])
