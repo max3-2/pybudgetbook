@@ -46,6 +46,15 @@ def _make_folder_structure(root, template):
     logging.info('New Folder structure created')
 
 
+def _bool_converter(value):
+    if value.lower() == 'true':
+        return True
+    elif value.lower() == 'false':
+        return False
+    else:
+        return value
+
+
 def load_config(cfile=_c_file):
     """Loads the configuration from the given `.ini` file."""
     file = Path(_c_file)
@@ -57,7 +66,7 @@ def load_config(cfile=_c_file):
         for item, val in cparser[section].items():
             if item not in bbconfig.options:
                 logger.info(f'Creating new config item on the fly: {item:s}')
-            bbconfig.options[item] = val
+            bbconfig.options[item] = _bool_converter(val)
 
 
 def location():
