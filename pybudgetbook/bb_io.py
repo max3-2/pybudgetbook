@@ -49,7 +49,7 @@ def _findFilesExt(directory, ext):
                 yield Path(root), basename, Path(filename)
 
 
-def check_file_exists(path):
+def unique_file_name(path):
     if not path.exists():
         return path
 
@@ -211,7 +211,7 @@ def resort_data(data):
     return data
 
 
-def save_with_metadata(dataframe, target=None, img_path=None):
+def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False):
     """
     Target is a path in this case, which will create a new hdf store with the
     pandas dataframe and metadata attached to the dataframe. If img is
@@ -231,6 +231,9 @@ def save_with_metadata(dataframe, target=None, img_path=None):
 
     else:
         data_target = target
+
+    if unique_name and data_target.exists():
+        data_target = unique_file_name(data_target)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
