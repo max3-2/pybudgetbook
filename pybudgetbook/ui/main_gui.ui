@@ -344,7 +344,7 @@
                      <widget class="QDateEdit" name="dateEdit_shopDate">
                       <property name="dateTime">
                        <datetime>
-                        <hour>9</hour>
+                        <hour>5</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2023</year>
@@ -354,7 +354,7 @@
                       </property>
                       <property name="maximumDateTime">
                        <datetime>
-                        <hour>3</hour>
+                        <hour>1</hour>
                         <minute>59</minute>
                         <second>59</second>
                         <year>2222</year>
@@ -364,7 +364,7 @@
                       </property>
                       <property name="minimumDateTime">
                        <datetime>
-                        <hour>5</hour>
+                        <hour>3</hour>
                         <minute>0</minute>
                         <second>0</second>
                         <year>2000</year>
@@ -447,6 +447,7 @@
                  </property>
                  <property name="font">
                   <font>
+                   <bold>false</bold>
                    <underline>false</underline>
                   </font>
                  </property>
@@ -454,7 +455,7 @@
                   <string>Save Receipt</string>
                  </property>
                  <property name="flat">
-                  <bool>true</bool>
+                  <bool>false</bool>
                  </property>
                  <layout class="QHBoxLayout" name="horizontalLayout_6">
                   <property name="leftMargin">
@@ -475,16 +476,6 @@
                      <widget class="QLabel" name="label_totalAmountReceipt">
                       <property name="text">
                        <string>Total amount extracted:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QCheckBox" name="checkBox_feedbackMatch">
-                      <property name="text">
-                       <string>Feedback matching data</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -528,6 +519,23 @@
                      <widget class="QLabel" name="label_totalAmountDataValue">
                       <property name="text">
                        <string/>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QCheckBox" name="checkBox_feedbackMatch">
+                      <property name="text">
+                       <string>Feedback matching data</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2" colspan="2">
+                     <widget class="QLineEdit" name="lineEdit_tags">
+                      <property name="text">
+                       <string>tag1;tag2</string>
                       </property>
                      </widget>
                     </item>
@@ -678,10 +686,14 @@
       <string>Flags</string>
      </property>
      <addaction name="actionMove_on_Save"/>
+     <addaction name="actionGenerate_Unique_Name"/>
+     <addaction name="actionAlways_Ask_for_Image"/>
      <addaction name="actionUpdate_Groups"/>
     </widget>
     <addaction name="menuFlags"/>
     <addaction name="actionData_Directory"/>
+    <addaction name="actionDefault_Language"/>
+    <addaction name="actionLogger_Popup_Level"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -712,7 +724,7 @@
   </action>
   <action name="actionUpdate_Groups">
    <property name="text">
-    <string>Update Groups</string>
+    <string>Logger Show Debug</string>
    </property>
   </action>
   <action name="actionData_Directory">
@@ -733,6 +745,26 @@
   <action name="actionRaw_Text">
    <property name="text">
     <string>Raw Text</string>
+   </property>
+  </action>
+  <action name="actionDefault_Language">
+   <property name="text">
+    <string>Default Language</string>
+   </property>
+  </action>
+  <action name="actionLogger_Popup_Level">
+   <property name="text">
+    <string>Logger Popup Level</string>
+   </property>
+  </action>
+  <action name="actionAlways_Ask_for_Image">
+   <property name="text">
+    <string>Always Ask for Image</string>
+   </property>
+  </action>
+  <action name="actionGenerate_Unique_Name">
+   <property name="text">
+    <string>Generate Unique Name</string>
    </property>
   </action>
  </widget>
