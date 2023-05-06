@@ -343,15 +343,15 @@ class main_window(Ui_pybb_MainWindow):
             msg_box = QtWidgets.QMessageBox()
             msg_box.setIcon(QtWidgets.QMessageBox.Warning)
             msg_box.setText(
-                'No vendor specified or just General - this is not optimal for'
+                'No vendor specified or just General - this is not optimal for '
                 'archiving. It is recommended to add a vendor!')
             msg_box.setWindowTitle('Vendor warning')
-            msg_box.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
-            msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
-            msg_box.button(QtWidgets.QMessageBox.Yes).setText('Continue')
-            msg_box.button(QtWidgets.QMessageBox.No).setText('Abort')
-
-            if msg_box.exec() == QtWidgets.QMessageBox.No:
+            continueButton = QtWidgets.QPushButton("Continue")
+            abortButton = QtWidgets.QPushButton("Abort")
+            msg_box.addButton(continueButton, QtWidgets.QMessageBox.YesRole)
+            msg_box.addButton(abortButton, QtWidgets.QMessageBox.NoRole)
+            choice = msg_box.exec()
+            if choice == QtWidgets.QMessageBox.NoRole.value:
                 return
 
         retrieved_data = self.tableView_pandasViewer.get_final_data()
@@ -370,17 +370,20 @@ class main_window(Ui_pybb_MainWindow):
         if self.checkBox_feedbackMatch.isChecked():
             fuzzy_match.matcher_feedback(retrieved_data)
 
-        if options['ask_for_image']:
-            if self.receipt is None:
-                file = QtWidgets.QFileDialog().getOpenFileName(
+        if self.receipt is None:
+            if options['ask_for_image']:
+                file, _ = QtWidgets.QFileDialog().getOpenFileName(
                     parent=self.parent, caption='Select Image File',
                     dir=expanduser('~'),
                     filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG)')
                 )
                 if not file:
                     logger.error('Cant save without valid image if option is set!')
+                    return
                 else:
                     this_img = Path(file)
+            else:
+                this_img = None
         else:
             this_img = self.receipt.file
 
