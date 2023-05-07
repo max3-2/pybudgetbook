@@ -10,7 +10,9 @@ import numpy as np
 import pandas as pd
 
 # TODO make rel
+from pybudgetbook.config.config import options
 from pybudgetbook.config.constants import icons
+from pybudgetbook.config.config_tools import set_option
 
 logger = logging.getLogger(__package__)
 
@@ -44,6 +46,42 @@ def convert_date(input_date):
 def _create_icons():
     return {key: QtGui.QIcon(value) for key, value in icons.items()}
 
+
+def set_new_conf_val(parent, name, valtype):
+    """
+    Opens a dialog to get a new config value and converts it for the use in a
+    config.ini file type. Writes to config file and options.
+    """
+    try:
+        curr_val = options[name]
+    except KeyError:
+        error = f'Configuration option "{name}" does not exist.'
+        logger.error(error)
+        raise LookupError(error)
+
+    if valtype == 'int':
+        retval, oked = QtWidgets.QInputDialog.getInt(
+            parent, 'Specify new config value', 'Enter Int type config value',
+            value=curr_val, step=1
+        )
+    elif valtype == 'str':
+        retval, oked = QtWidgets.QInputDialog.getText(
+            parent, 'Specify new config value', 'Enter string type config value',
+            text=curr_val,
+        )
+    elif valtype == 'dir':
+        retval = QtWidgets.QFileDialog.getExistingDirectory(
+            parent, 'Select new data directory', curr_val)
+        oked = True
+        if not retval:
+            oked = False
+    else:
+        raise ValueError('Unsupported config value type')
+
+    if not oked:
+        return
+
+    set_option(name, retval)
 
 class _LogSignalProxies(QtCore.QObject):
     """

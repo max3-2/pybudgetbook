@@ -108,6 +108,18 @@ class main_window(Ui_pybb_MainWindow):
         self.actionAlways_Ask_for_Image.setChecked(options['ask_for_image'])
         self.actionShow_Logger_on_Start.setChecked(options['show_logger_on_start'])
         self.actionLogger_debug.setChecked(options['logger_show_debug'])
+        self.actionLogger_Popup_Level.triggered.connect(
+            lambda _: uisupport.set_new_conf_val(
+            self.parent, 'logger_popup_level', 'int')
+        )
+        self.actionData_Directory.triggered.connect(
+            lambda _: uisupport.set_new_conf_val(
+            self.parent, 'data_folder', 'dir')
+        )
+        self.actionDefault_Language.triggered.connect(
+            lambda _: uisupport.set_new_conf_val(
+            self.parent, 'lang', 'str')
+        )
 
         # Attach menu handlers
         self.actionMove_on_Save.toggled.connect(
