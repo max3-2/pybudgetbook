@@ -12,7 +12,7 @@ import pandas as pd
 # TODO make rel
 from pybudgetbook.config.config import options
 from pybudgetbook.config.constants import icons
-from pybudgetbook.config.config_tools import set_option
+from pybudgetbook.config.config_tools import set_option, set_data_dir
 
 logger = logging.getLogger(__package__)
 
@@ -81,7 +81,10 @@ def set_new_conf_val(parent, name, valtype):
     if not oked:
         return
 
-    set_option(name, retval)
+    if name == 'data_folder':
+        set_data_dir(retval)
+    else:
+        set_option(name, retval)
 
 class _LogSignalProxies(QtCore.QObject):
     """
