@@ -1,1 +1,1 @@
-__name__ = 'config_tools'
+__name__ = 'config'

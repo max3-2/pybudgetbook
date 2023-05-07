@@ -1,7 +1,6 @@
 """pybudgetbook main init"""
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __name__ = 'pybudgetbook'
-
 
 from pybudgetbook.config.config_tools import _check_config, load_config
 
@@ -9,11 +8,8 @@ from pybudgetbook.config.config_tools import _check_config, load_config
 _check_config()
 load_config()
 
-# TODO UI
-# Add field for rabatt
 
 # add rotate mode,  output field, delay to update, auto rotate funcs
-
 # cid = fig.canvas.mpl_connect(
 #     'key_press_event', lambda event: rot_event(ax[1], event))
 # TODO Rotation is the most important factor to get a good ocr! Build a UI

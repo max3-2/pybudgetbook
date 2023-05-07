@@ -378,9 +378,11 @@ def Receipt(file):
         raise FileNotFoundError(error)
 
     if imghdr.what(file) is not None:
+        logger.debug('Creating Image based receipt')
         return ImgReceipt(file)
 
     elif file.suffix == '.pdf':
+        logger.debug('Creating PDF based receipt')
         return PdfReceipt(file)
 
     else:

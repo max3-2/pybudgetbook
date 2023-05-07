@@ -1,14 +1,10 @@
 """
-@author: Max
-@date: 2023-04-07
-
-Prototyping the receipt recognition
+A small helper that shows how to use a manual script to build a data entry.
+This will be adapted as soon as a stable API is finalized!
 """
 import logging
-
 import pandas as pd
 
-# TODO make relative imports
 import pybudgetbook.config.constants as bbconstants
 import pybudgetbook.config.config as bbconfig
 from pybudgetbook import bb_io, fuzzy_match
@@ -19,9 +15,11 @@ logger = logging.getLogger(__name__)
 retrieved_data = pd.DataFrame(columns=bbconstants._MANDATORY_COLS)
 total_price = 0.
 
-# %% Add Data here
+# %% Add Data here, this can be used as template!
 # retrieved_data.loc[0] = [0, 0, -1, "Name", 1, 1, 1, 1, '', '']
 # total_price = 0.
+
+# %% Then edit and adapt data as needed...
 
 # %% Now match the groups
 retrieved_data = fuzzy_match.find_groups(retrieved_data)
@@ -32,10 +30,10 @@ retrieved_data = fuzzy_match.find_groups(retrieved_data)
 # manual
 retrieved_data['Category'] = 'Small Stores'
 
-retrieved_data['Vendor'] = 'Schaufenster'
-retrieved_data['Date'] = pd.to_datetime('21/04/2023', dayfirst=True)
+retrieved_data['Vendor'] = 'Store name'
+retrieved_data['Date'] = pd.to_datetime('05/05/2023', dayfirst=True)
 
-metadata = {'tags': 'other;sweets',
+metadata = {'tags': 'other;tag2',
             'total_extracted': total_price}
 
 retrieved_data.attrs = metadata
@@ -53,4 +51,7 @@ print(f'Price differece total to analyzed: {diff:.2f}')
 fuzzy_match.matcher_feedback(retrieved_data)
 
 # %% And then save with metadata
-bb_io.save_with_metadata(retrieved_data)
+# Add an image please
+imp = Path()
+bb_io.save_with_metadata(retrieved_data, img_path=imp,
+                         unique_name=True, move_on_save=True)
