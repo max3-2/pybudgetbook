@@ -33,16 +33,16 @@ def _match_group(data, reference_groups, use_fuzzy=False):
         return result[np.array([match[1] for match in result]).argmax()][0]
 
 
-def matcher_feedback(retrieved_data):
+def matcher_feedback(retrieved_data, lang=bbconfig.options['lang']):
     """
     Feedback the data new to the matcher dict. This is pretty much brute force
     and there will be a certain overlap in basic and user data since matching
     works more generous than feedback. Anything else would be too complicated
     and since the data is fairly small its better to have more!
     """
-    user_match_data, user_match_file = bb_io.load_user_match_data(bbconfig.options['lang'])
-    basic_match_data, _ = bb_io.load_basic_match_data(bbconfig.options['lang'])
-    neg_match_data = bb_io.load_negative_match_data(bbconfig.options['lang'])
+    user_match_data, user_match_file = bb_io.load_user_match_data(lang)
+    basic_match_data, _ = bb_io.load_basic_match_data(lang)
+    neg_match_data = bb_io.load_negative_match_data(lang)
 
     remove_trash = re.compile(r'[^a-z0-9 äöü]', re.IGNORECASE)
     remove_weight = re.compile(r'\d{1,4}_*?[km]*?[gl]', re.IGNORECASE)
@@ -83,8 +83,8 @@ def matcher_feedback(retrieved_data):
     bb_io._save_user_match_data(user_match_data, user_match_file)
 
 
-def find_groups(retrieved_data):
-    match_data = bb_io.load_group_match_data(bbconfig.options['lang'])
+def find_groups(retrieved_data, lang=bbconfig.options['lang']):
+    match_data = bb_io.load_group_match_data(lang)
 
     retrieved_data['Group'] = retrieved_data.apply(
         lambda data: _match_group(data, match_data), axis=1)

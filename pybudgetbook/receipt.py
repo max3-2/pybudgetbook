@@ -320,8 +320,11 @@ class PdfReceipt(_BaseReceipt):
 
         return self
 
-    def extract_data(self, page=0, show=False):
-        """Extracts text **and** converts to data"""
+    def extract_data(self, page=0, lang=None):
+        """
+        Extracts text **and** converts to data. lang is unused here and just
+        is used for standardization of patterns.
+        """
         # Split line-wise
         pdf = pdfium.PdfDocument(self._file)
         pagedata = pdf.get_page(page)

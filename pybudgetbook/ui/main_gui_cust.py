@@ -222,7 +222,8 @@ class main_window(Ui_pybb_MainWindow):
             try:
                 self.receipt = Receipt(file)
                 self.receipt.filter_image(
-                    unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
+                    unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
+                    lang=self.comboBox_baseLang.currentText())
                 if self.receipt.type == 'pdf':
                     self.horizontalSliderFilterAmount.setEnabled(False)
                     self.comboBox_receiptDisplayMode.setEnabled(False)
@@ -251,7 +252,8 @@ class main_window(Ui_pybb_MainWindow):
         if self.receipt is None:
             return
         self.receipt.filter_image(
-            unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data()
+            unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
+            lang=self.comboBox_baseLang.currentText())
         self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
         self.update_rec_plot()
 
@@ -331,6 +333,12 @@ class main_window(Ui_pybb_MainWindow):
             self.statusbar.showMessage(msg, timeout=3000)
             return
 
+        # Get the reference lang.
+        if self.checkBox_useDiffParsingLang.isChecked():
+                        lang = self.comboBox_diffParsingLang.currentText()
+        else:
+            lang = self.comboBox_baseLang.currentText()
+
         if self.receipt.vendor is None:
             if self.lineEdit_marketVendor.text() == '':
                 msg_box = QtWidgets.QMessageBox()
@@ -343,17 +351,22 @@ class main_window(Ui_pybb_MainWindow):
                 msg_box.setDefaultButton(QtWidgets.QMessageBox.No)
 
                 if msg_box.exec() == QtWidgets.QMessageBox.Yes:
-                    # TODO add lang support
-                    self.receipt.set_vendor('General')
+                    self.receipt.set_vendor('General', lang)
                 else:
                     return
 
             else:
-                self.receipt.set_vendor(self.lineEdit_marketVendor.text())
+                self.receipt.set_vendor(self.lineEdit_marketVendor.text(), lang)
 
         self.detect_date()
         new_data, total_price = self.receipt.parse_data()
-        new_data = fuzzy_match.find_groups(new_data)
+
+        if self.checkBox_useDiffParsingLang.isChecked():
+            lang = self.comboBox_diffParsingLang.currentText()
+        else:
+            lang = self.comboBox_baseLang.currentText()
+        new_data = fuzzy_match.find_groups(new_data, lang=lang)
+
         self.set_new_data(new_data)
         self.lineEdit_totalAmountReceipt.setText(f'{total_price:.2f}')
         self.update_diff(total_price)
@@ -383,7 +396,12 @@ class main_window(Ui_pybb_MainWindow):
             self.statusbar.showMessage(msg, timeout=3000)
             return
 
-        vendor = self.receipt.parse_vendor()
+        if self.checkBox_useDiffParsingLang.isChecked():
+            lang = self.comboBox_diffParsingLang.currentText()
+        else:
+            lang = self.comboBox_baseLang.currentText()
+
+        vendor = self.receipt.parse_vendor(lang)
         self.lineEdit_marketVendor.setText(vendor)
         self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
 
@@ -417,7 +435,12 @@ class main_window(Ui_pybb_MainWindow):
                     'total_extracted': total_ext}
         retrieved_data.attrs = metadata
         retrieved_data = bb_io.resort_data(retrieved_data)
+
         if self.checkBox_feedbackMatch.isChecked():
+            if self.checkBox_useDiffParsingLang.isChecked():
+                lang = self.comboBox_diffParsingLang.currentText()
+            else:
+                lang = self.comboBox_baseLang.currentText()
             fuzzy_match.matcher_feedback(retrieved_data)
 
         if self.receipt is None:

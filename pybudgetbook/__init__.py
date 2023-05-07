@@ -11,7 +11,7 @@ load_config()
 
 # TODO UI
 # Add field for rabatt
-# TODO live language setting from combo and not from options, search options['lang]
+
 # add rotate mode,  output field, delay to update, auto rotate funcs
 
 # cid = fig.canvas.mpl_connect(
