@@ -23,6 +23,7 @@ _negative_groups: `dict`
     MHolds lang. spec. lists of small words and patterns to trash when adding
     new items to groups, so some of the clustering is prevented.
 """
+# TODO update docu values
 options = {
     'data_folder': None,
     'move_on_save': True,

@@ -37,10 +37,16 @@ Source = 'todo'
 Homepage = 'todo'
 
 dependencies = [
+    'PySide6'
     'numpy',
     'appdirs',
     'matplotlib > 3.7',
     'h5py > 3.0',
+    'pandas > 1.5',
+    'scikit-image',
+    'Pillow',
+    'pytesseract',
+    'pypdfium2',
     ]
 
 [project.optional-dependencies]

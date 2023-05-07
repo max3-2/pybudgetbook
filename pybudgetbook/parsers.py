@@ -1,7 +1,6 @@
 """Contains all text parsing functions which extract data"""
 import re
 import pandas as pd
-import numpy as np
 import logging
 
 # TODO make relative
