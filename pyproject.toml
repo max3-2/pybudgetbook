@@ -31,13 +31,8 @@ license = {file = 'LICENSE.txt'}
 
 dynamic = ['version']
 
-[project.urls]
-Documentation = 'todo'
-Source = 'todo'
-Homepage = 'todo'
-
 dependencies = [
-    'PySide6'
+    'PySide6',
     'numpy',
     'appdirs',
     'matplotlib > 3.7',
@@ -51,3 +46,8 @@ dependencies = [
 
 [project.optional-dependencies]
 doc = ['Sphinx', 'Furo', 'MyST-parser']
+
+[project.urls]
+# Documentation = 'OnlyReadMe'
+Source = 'https://github.com/max3-2/pybudgetbook'
+Homepage = 'https://github.com/max3-2/pybudgetbook'
