@@ -68,7 +68,7 @@ _patterns = {
             },
 }
 
-_icon_root = Path('pybudgetbook/img/groups')
+_icon_root = Path('img/groups')
 icons = {
     'Grundnahrungsmittel': str(_icon_root / 'general.png'),
     'Milchprodukte': str(_icon_root / 'dairy.png'),

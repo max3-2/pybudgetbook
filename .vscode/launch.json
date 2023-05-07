@@ -9,6 +9,7 @@
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/pybudgetbook/ui/start_gui.py",
+            "cwd": "${workspaceFolder}/pybudgetbook/",
             "console": "externalTerminal",
             "justMyCode": true
         }
