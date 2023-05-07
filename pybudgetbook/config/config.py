@@ -25,7 +25,7 @@ _negative_groups: `dict`
 """
 options = {
     'data_folder': None,
-    'move_on_parse': True,
+    'move_on_save': True,
     'generate_unique_name': True,
     'lang': 'deu',
     'show_logger_on_start': False,

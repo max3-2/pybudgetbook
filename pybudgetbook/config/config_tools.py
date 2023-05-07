@@ -115,27 +115,26 @@ def set_data_dir(new_dir):
     copy_group_templates()
 
 
+def set_option(name, value, persistent=True):
+    """
+    Sets the value of a configuration option.
+    """
+    if name not in bbconfig.options:
+        error = f'Configuration option "{name}" does not exist.'
+        logger.error(error)
+        raise LookupError(error)
 
+    bbconfig.options[name] = value
+    if persistent:
+        file = Path(_c_file)
+        cparser = configparser.ConfigParser()
+        _ = cparser.read(file)
 
+        for section_name in cparser.sections():
+            if name in cparser[section_name]:
+                cparser.set(section_name, name, str(value))
+                break
 
-# TODO add general flag changer
-# def option(section=None, name=None, value=None):
-#     """
-#     Sets or returns the value of a configuration option.
+        with open(file, 'w') as configfile:
+            cparser.write(configfile)
 
-#     If called without arguments, returns all configuration options as
-#     a dictionary. Returns an option's value if only called with the
-#     option's `name`. Otherwise sets the option to the given `value`.
-#     """
-#     if name is None:
-#         return options
-
-#     if name not in options:
-#         error = f'Configuration option "{name}" does not exist.'
-#         log.error(error)
-#         raise LookupError(error)
-
-#     if value is None:
-#         return options[name]
-#     else:
-#         options[name] = value

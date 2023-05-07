@@ -16,6 +16,7 @@ from pybudgetbook import __version__ as bbvers
 from pybudgetbook.receipt import Receipt, _type_check
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.config.config import options
+from pybudgetbook.config.config_tools import set_option
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -48,7 +49,6 @@ class main_window(Ui_pybb_MainWindow):
         self.qt_logstream.popup_lvl = logging.WARNING
         self.qt_logstream.signals.log_record_signal.connect(self.qt_log_window.catch_message)
         self.qt_log_window.new_level_signal.connect(self.qt_logstream.set_new_loglvl)
-        self.qt_log_window.set_show_debug(False)
         self.qt_logstream.signals.show_log_window.connect(self.qt_log_window.show_logging_window)
 
         # The warnings reroute handler is added here..
@@ -102,6 +102,30 @@ class main_window(Ui_pybb_MainWindow):
             self.comboBox_baseLang.setCurrentIndex(index)
             self.comboBox_diffParsingLang.setCurrentIndex(index)
 
+        # Set all values from the persistent config to UI checks
+        self.actionMove_on_Save.setChecked(options['move_on_save'])
+        self.actionGenerate_Unique_Name.setChecked(options['generate_unique_name'])
+        self.actionAlways_Ask_for_Image.setChecked(options['ask_for_image'])
+        self.actionShow_Logger_on_Start.setChecked(options['show_logger_on_start'])
+        self.actionLogger_debug.setChecked(options['logger_show_debug'])
+
+        # Attach menu handlers
+        self.actionMove_on_Save.toggled.connect(
+            lambda new_val: set_option('move_on_save', new_val)
+        )
+        self.actionGenerate_Unique_Name.toggled.connect(
+            lambda new_val: set_option('generate_unique_name', new_val)
+        )
+        self.actionAlways_Ask_for_Image.toggled.connect(
+            lambda new_val: set_option('ask_for_image', new_val)
+        )
+        self.actionShow_Logger_on_Start.toggled.connect(
+            lambda new_val: set_option('show_logger_on_start', new_val)
+        )
+        self.actionLogger_debug.toggled.connect(
+            lambda new_val: set_option('logger_show_debug', new_val)
+        )
+
         # Attach all the handlers for custom functions
         self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
         self.horizontalSliderFilterAmount.set_timer_callback(self.refilter_and_display)
@@ -113,6 +137,12 @@ class main_window(Ui_pybb_MainWindow):
         self.pushButton_parseData.clicked.connect(self.parse_data)
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
         self.pushButton_saveData.clicked.connect(self.save_data)
+
+        # Do some post init stuff
+        self.qt_log_window.debug_state_toggle.setChecked(
+            options['logger_show_debug'])
+        if options['show_logger_on_start']:
+            self.qt_log_window.show()
 
     def _about(self):
         """

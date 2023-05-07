@@ -139,10 +139,11 @@ class QLoggingWindow(QtWidgets.QDialog):
         super().__init__(parent)
         self._show_debug = False
         self.create_logging_dialog()
+        self.debug_state_toggle.setChecked(False)
         self.console.setReadOnly(True)
         self.hide()
 
-    def set_show_debug(self, new_val):
+    def _set_show_debug(self, new_val):
         self._show_debug = new_val
         if new_val:
             self.new_level_signal.emit(logging.DEBUG)
@@ -223,16 +224,16 @@ class QLoggingWindow(QtWidgets.QDialog):
         clearButton.setText('Clear')
         clearButton.clicked.connect(self.console.clear)
 
-        stateToggle = QtWidgets.QCheckBox()
-        stateToggle.setChecked(self._show_debug)
-        stateToggle.stateChanged.connect(self.set_show_debug)
+        self.debug_state_toggle = QtWidgets.QCheckBox()
+        self.debug_state_toggle.setChecked(self._show_debug)
+        self.debug_state_toggle.stateChanged.connect(self._set_show_debug)
 
         # Assemble window
         self.console.show()
         self.move_to_end()
 
         mainLayout.addWidget(label1, 0, 0, 1, 1, QtCore.Qt.AlignRight)
-        mainLayout.addWidget(stateToggle, 0, 1, 1, 1, QtCore.Qt.AlignLeft)
+        mainLayout.addWidget(self.debug_state_toggle, 0, 1, 1, 1, QtCore.Qt.AlignLeft)
         mainLayout.addWidget(clearButton, 0, 2, 1, 1, QtCore.Qt.AlignRight)
         mainLayout.addWidget(self.console, 1, 0, 1, 3)
         mainLayout.setContentsMargins(2, 5, 2, 0)
