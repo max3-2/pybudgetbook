@@ -234,12 +234,13 @@ class ImgReceipt(_BaseReceipt):
         """Extracts text **and** converts to data"""
         tess_in = Image.fromarray(self.bin_img)
         tess_in.format = 'TIFF'
+        # TODO Sub packages log wrong this might be resolved with package build
+        logger.warning('I am a test!')
         try:
             data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
                                      config=bbconstants._TESS_OPTIONS).dropna(
                 subset=['text']).reset_index()
         except (ocr.TesseractError, ocr.TesseractNotFoundError) as tess_e:
-            # TODO Sub packages log wrong this might be resolved with package build
             logger.exception(
                 'Tesseract nor found or failure. This has to be '
                 f'resolved on system level: {tess_e}')

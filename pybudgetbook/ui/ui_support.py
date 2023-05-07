@@ -105,6 +105,13 @@ class MplCanvas(FigureCanvas):
     """
 
     def __init__(self, parent=None, *args, **kwargs):
+        """_summary_
+
+        Parameters
+        ----------
+        parent : _type_, optional
+            _description_, by default None
+        """
         self.qt_parent = parent  # Can't overload parent from FigureCanvas
 
         self.fig, self.ax = subplots(*args, **kwargs)
