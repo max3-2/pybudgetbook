@@ -155,6 +155,7 @@ class main_window(Ui_pybb_MainWindow):
             options['logger_show_debug'])
         if options['show_logger_on_start']:
             self.qt_log_window.show()
+        self.qt_logstream.popup_lvl = options['logger_popup_level']
 
     def _about(self):
         """
@@ -437,4 +438,5 @@ class main_window(Ui_pybb_MainWindow):
             this_img = self.receipt.file
 
         bb_io.save_with_metadata(retrieved_data, img_path=this_img,
-                                 unique_name=options['generate_unique_name'])
+                                 unique_name=options['generate_unique_name'],
+                                 move_on_save=options['move_on_save'])

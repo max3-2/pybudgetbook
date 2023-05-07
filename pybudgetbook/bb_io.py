@@ -211,7 +211,8 @@ def resort_data(data):
     return data
 
 
-def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False):
+def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
+                       move_on_save=False):
     """
     Target is a path in this case, which will create a new hdf store with the
     pandas dataframe and metadata attached to the dataframe. If img is
@@ -251,7 +252,7 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False)
         if not img_target.parent.exists() or not img_target.parent.is_dir():
             img_target.parent.mkdir(parents=True, exist_ok=True)
 
-        if bbconfig.options['move_on_parse']:
+        if move_on_save:
             _ = shutil.move(img_path, img_target)
         else:
             _ = shutil.copy2(img_path, img_target)
