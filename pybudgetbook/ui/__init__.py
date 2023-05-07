@@ -1,1 +1,1 @@
-name = 'ui'
+__name__ = 'ui'
