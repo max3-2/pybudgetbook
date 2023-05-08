@@ -36,6 +36,11 @@ class main_window(Ui_pybb_MainWindow):
         self.parent = parent
         self.setupUi(self.parent)
 
+        # Setup splitter default
+        c_wi = self.tabWidgetPage1.width()
+        self.splitter_mainPage.setSizes(
+            [int(c_wi * 1/3), int(c_wi * 2/3)])
+
         # Additional vars
         self.receipt = None
         self.raw_text_window = None
