@@ -22,8 +22,7 @@ def start_main_ui(sys_argv=[]):
     else:
         logger.warning('Tray icon file missing')
 
-    qt_main_window = QtWidgets.QMainWindow()
-    _ = main_window(qt_main_window)
+    qt_main_window = main_window()
 
     qt_main_window.show()
     sys.exit(app.exec())

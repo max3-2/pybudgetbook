@@ -27,14 +27,14 @@ logger = logging.getLogger(__package__)
 logger.setLevel(logging.DEBUG)
 set_style()
 
-class main_window(Ui_pybb_MainWindow):
+class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
     """
     Todo
     """
 
-    def __init__(self, parent):
-        self.parent = parent
-        self.setupUi(self.parent)
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
 
         # Setup splitter default
         c_wi = self.tabWidgetPage1.width()
@@ -47,7 +47,7 @@ class main_window(Ui_pybb_MainWindow):
         self._current_data = None
         self._rotate_event = None
         self._focus_event = None
-        self.rotate_timer = QtCore.QTimer(self.parent)
+        self.rotate_timer = QtCore.QTimer(self)
         self.rotate_timer.setInterval(3000)
         self.rotate_timer.setSingleShot(True)
         self.rotate_timer.stop()
@@ -56,7 +56,7 @@ class main_window(Ui_pybb_MainWindow):
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
-        self.qt_log_window = uisupport.QLoggingWindow(self.parent)
+        self.qt_log_window = uisupport.QLoggingWindow(self)
 
         self.qt_logstream.setFormatter(_log_formatter)
         self.qt_logstream.popup_lvl = logging.WARNING
@@ -123,15 +123,15 @@ class main_window(Ui_pybb_MainWindow):
         self.actionLogger_debug.setChecked(options['logger_show_debug'])
         self.actionLogger_Popup_Level.triggered.connect(
             lambda _: uisupport.set_new_conf_val(
-            self.parent, 'logger_popup_level', 'int')
+            self, 'logger_popup_level', 'int')
         )
         self.actionData_Directory.triggered.connect(
             lambda _: uisupport.set_new_conf_val(
-            self.parent, 'data_folder', 'dir')
+            self, 'data_folder', 'dir')
         )
         self.actionDefault_Language.triggered.connect(
             lambda _: uisupport.set_new_conf_val(
-            self.parent, 'lang', 'str')
+            self, 'lang', 'str')
         )
 
         # Attach menu handlers
@@ -169,6 +169,14 @@ class main_window(Ui_pybb_MainWindow):
         if options['show_logger_on_start']:
             self.qt_log_window.show()
         self.qt_logstream.popup_lvl = options['logger_popup_level']
+
+    def closeEvent(self, event):
+        """Handle additional open windows"""
+        if self.raw_text_window is not None:
+            self.raw_text_window.close()
+            self.raw_text_window = None
+
+        super().closeEvent(event) # call parent class's closeEvent method
 
     def _about(self):
         """
@@ -210,7 +218,7 @@ class main_window(Ui_pybb_MainWindow):
         self.raw_text_window = None
 
     def load_receipt(self):
-        file, ptn = QtWidgets.QFileDialog(self.parent).getOpenFileName(
+        file, ptn = QtWidgets.QFileDialog(self).getOpenFileName(
             caption='Select a receipt file',
             dir=expanduser('~'),
             filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG);;'
@@ -499,7 +507,7 @@ class main_window(Ui_pybb_MainWindow):
         if self.receipt is None:
             if options['ask_for_image']:
                 file, _ = QtWidgets.QFileDialog().getOpenFileName(
-                    parent=self.parent, caption='Select Image File',
+                    parent=self, caption='Select Image File',
                     dir=expanduser('~'),
                     filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG)')
                 )
