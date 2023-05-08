@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import pytesseract as ocr
 import pypdfium2 as pdfium
 from skimage.color import rgb2gray
+from skimage.transform import rotate
 
 # TODO make rel
 from pybudgetbook import image_filters
@@ -186,6 +187,14 @@ class ImgReceipt(_BaseReceipt):
             return None
         return self._rotation
 
+    @rotation.setter
+    def rotation(self, inc):
+        self._rotation += inc
+        self._has_rotation = True
+
+        if self._rotation == 0:
+            self._has_rotation + False
+
     @property
     def valid_filter(self):
         return self._is_filtered
@@ -194,9 +203,14 @@ class ImgReceipt(_BaseReceipt):
     def image(self):
         if not self._is_filtered:
             logger.warning('Image is not filtered - using base grayscale')
-            return self._gs_image
+            ref_img = self._gs_image
         else:
-            return self._proc_img
+            ref_img = self._proc_img
+
+        if self._has_rotation:
+            return rotate(ref_img, self._rotation, resize=True)
+        else:
+            return ref_img
 
     @property
     def bin_img(self):
@@ -205,7 +219,10 @@ class ImgReceipt(_BaseReceipt):
             logger.error(error)
             raise RuntimeError(error)
 
-        return self._bin_img
+        if self._has_rotation:
+            return rotate(self._bin_img, self._rotation, resize=True)
+        else:
+            return self._bin_img
 
     def filter_image(self, **kwargs):
         self._proc_img, self._bin_img = image_filters.preprocess_image(
@@ -232,7 +249,7 @@ class ImgReceipt(_BaseReceipt):
 
     def extract_data(self, lang=bbconfig.options['lang']):
         """Extracts text **and** converts to data"""
-        tess_in = Image.fromarray(self.bin_img)
+        tess_in = Image.fromarray(self.bin_img.astype(bool))
         tess_in.format = 'TIFF'
         # TODO Sub packages log wrong this might be resolved with package build
         logger.warning('I am a test!')
@@ -271,6 +288,10 @@ class ImgReceipt(_BaseReceipt):
 
         # Chaining support
         return self
+
+    def reset_rotation(self):
+        self._rotation = 0
+        self._has_rotation = False
 
 
 class PdfReceipt(_BaseReceipt):

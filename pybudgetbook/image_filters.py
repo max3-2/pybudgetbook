@@ -61,3 +61,7 @@ def preprocess_image(grayscale, otsu='global',
     bin_img = np.pad(bin_img, ((50, 50), (50, 50)), constant_values=1)
 
     return proc_img, bin_img
+
+
+def detect_rotation(image):
+    ...

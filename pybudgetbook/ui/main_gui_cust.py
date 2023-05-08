@@ -45,6 +45,14 @@ class main_window(Ui_pybb_MainWindow):
         self.receipt = None
         self.raw_text_window = None
         self._current_data = None
+        self._rotate_event = None
+        self._focus_event = None
+        self.rotate_timer = QtCore.QTimer(self.parent)
+        self.rotate_timer.setInterval(3000)
+        self.rotate_timer.setSingleShot(True)
+        self.rotate_timer.stop()
+        self.rotate_timer.timeout.connect(
+            lambda: self.refilter_and_display(keep_lim=False))
 
         # Logger setup
         self.qt_logstream = uisupport.QLoggingThread()
@@ -229,7 +237,24 @@ class main_window(Ui_pybb_MainWindow):
                 self.receipt.filter_image(
                     unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
                     lang=self.comboBox_baseLang.currentText())
-                if self.receipt.type == 'pdf':
+
+                # Reset events on new load
+                if self._rotate_event is not None:
+                    self.plot_area_receipts.fig.canvas.mpl_disconnect(self._rotate_event)
+                    self.frame_plotReceipt.setFocusPolicy(Qt.NoFocus)
+                    self.plot_area_receipts.fig.canvas.mpl_disconnect(self._focus_event)
+
+                # Set rotate and focus events
+                if self.receipt.type == 'img':
+                    self._rotate_event =  self.plot_area_receipts.fig.canvas.mpl_connect(
+                        'key_press_event', self.rotate_event)
+                    self._focus_event =  self.plot_area_receipts.fig.canvas.mpl_connect(
+                        'axes_enter_event', lambda event: self.plot_area_receipts.setFocus())
+
+                    self.frame_plotReceipt.setFocusPolicy(Qt.StrongFocus)
+                    self.plot_area_receipts.setFocus()
+
+                elif self.receipt.type == 'pdf':
                     self.horizontalSliderFilterAmount.setEnabled(False)
                     self.comboBox_receiptDisplayMode.setEnabled(False)
 
@@ -253,22 +278,45 @@ class main_window(Ui_pybb_MainWindow):
         if self.raw_text_window is not None:
             self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
 
-    def refilter_and_display(self):
+    def refilter_and_display(self, keep_lim=True):
         if self.receipt is None:
             return
         self.receipt.filter_image(
             unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
             lang=self.comboBox_baseLang.currentText())
         self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
-        self.update_rec_plot()
+        self.update_rec_plot(keep_lim)
 
-    def update_rec_plot(self):
+    def update_rec_plot(self, keep_lim=True):
         current_lim = (
             self.plot_area_receipts.ax.get_xlim(),
             self.plot_area_receipts.ax.get_ylim())
         self.display_receipt()
-        self.plot_area_receipts.ax.set_xlim(current_lim[0])
-        self.plot_area_receipts.ax.set_ylim(current_lim[1])
+        if keep_lim:
+            self.plot_area_receipts.ax.set_xlim(current_lim[0])
+            self.plot_area_receipts.ax.set_ylim(current_lim[1])
+
+    def rotate_event(self, event, minor_step=0.1, major_step=0.5):
+        if event.inaxes is self.plot_area_receipts.ax:
+            if event.key == 'right':
+                self.receipt.rotation = -minor_step
+            elif event.key == 'left':
+                self.receipt.rotation = minor_step
+            elif event.key == 'shift+right':
+                self.receipt.rotation = -major_step
+            elif event.key == 'shift+left':
+                self.receipt.rotation = major_step
+            elif event.key == 'r':
+                self.receipt.reset_rotation()
+                self.update_rec_plot(False)
+            else:
+                ...
+
+        if self.receipt.rotation is not None:
+            self.comboBox_receiptDisplayMode.setCurrentIndex(0)
+            self.update_rec_plot(False)
+            self.rotate_timer.start()
+
 
     def set_new_data(self, new_data, has_meta=False):
         self._current_data = new_data
