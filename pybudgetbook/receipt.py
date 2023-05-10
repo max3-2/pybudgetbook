@@ -180,7 +180,6 @@ class ImgReceipt(_BaseReceipt):
         self._is_filtered = False
         self._patset = None
 
-    # Get but no manual set - use the functions (TODO)
     @property
     def rotation(self):
         if not self._has_rotation:
