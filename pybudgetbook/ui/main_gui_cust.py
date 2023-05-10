@@ -369,10 +369,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             return
 
         if baseval is None:
-            if self._current_data is None:
-                return ''
+            try:
+                diff = refval - self._current_data['Price'].sum()
+            except Exception as compute_exc:
+                logger.exception(f'{compute_exc}')
 
-            diff = refval - self._current_data['Price'].sum()
         else:
             diff = refval - baseval
 
@@ -539,4 +540,4 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                                  move_on_save=options['move_on_save'])
 
         logger.info('Save successful')
-        self.set_new_data(_default_data)
+        self.set_new_data(_default_data())
