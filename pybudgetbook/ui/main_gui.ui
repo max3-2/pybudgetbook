@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>17</hour>
+                       <hour>13</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>19</hour>
+                       <hour>17</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>21</hour>
+                       <hour>19</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -446,13 +446,6 @@
                    <item row="0" column="2">
                     <widget class="QLineEdit" name="lineEdit_marketVendor"/>
                    </item>
-                   <item row="4" column="3">
-                    <widget class="QPushButton" name="pushButton_parseData">
-                     <property name="text">
-                      <string>Parse Data</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="0" column="1">
                     <widget class="QLabel" name="label_marketVendor">
                      <property name="text">
@@ -494,6 +487,20 @@
                      </property>
                      <property name="text">
                       <string>Use different lang. for data parsing</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="3">
+                    <widget class="QPushButton" name="pushButton_parseData">
+                     <property name="text">
+                      <string>Parse Data</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="3">
+                    <widget class="QPushButton" name="pushButton_reClassify">
+                     <property name="text">
+                      <string>Classify Data</string>
                      </property>
                     </widget>
                    </item>

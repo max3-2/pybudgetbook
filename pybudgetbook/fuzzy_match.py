@@ -40,6 +40,9 @@ def matcher_feedback(retrieved_data, lang=bbconfig.options['lang']):
     works more generous than feedback. Anything else would be too complicated
     and since the data is fairly small its better to have more!
     """
+    logger.debug(f'Running matcher feedback with lang: {lang}')
+    print(f'Running matcher feedback with lang: {lang}')  # TODO remove if loggin in package
+
     user_match_data, user_match_file = bb_io.load_user_match_data(lang)
     basic_match_data, _ = bb_io.load_basic_match_data(lang)
     neg_match_data = bb_io.load_negative_match_data(lang)

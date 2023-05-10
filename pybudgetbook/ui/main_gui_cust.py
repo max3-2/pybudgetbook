@@ -27,6 +27,13 @@ logger = logging.getLogger(__package__)
 logger.setLevel(logging.DEBUG)
 set_style()
 
+
+def _default_data():
+    init_data_viewer = pd.DataFrame(columns=bbconstant._VIEWER_COLS)
+    init_data_viewer.loc[0] = [-1, 'New Article Name', 1., 1., 1., 0, 'none']
+    return init_data_viewer
+
+
 class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
     """
     Todo
@@ -87,8 +94,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         logger.debug("Created plotting area 2")
 
         # Create data viewer and attach to frame
-        init_data_viewer = pd.DataFrame(columns=bbconstant._VIEWER_COLS)
-        init_data_viewer.loc[0] = [0, 'New Article Name', 1., 1., 1., 0, 'none']
+        init_data_viewer = _default_data()
 
         table_model = uisupport.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
@@ -161,6 +167,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.pushButton_detectVendor.clicked.connect(self.detect_vendor)
         self.pushButton_parseData.clicked.connect(self.parse_data)
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
+        self.pushButton_reClassify.clicked.connect(self.re_match_data)
         self.pushButton_saveData.clicked.connect(self.save_data)
 
         # Do some post init stuff
@@ -466,6 +473,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.lineEdit_marketVendor.setText(vendor)
         self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
 
+    def re_match_data(self):
+        if self.tableView_pandasViewer.model().rowCount() > 0:
+            data = self.tableView_pandasViewer.get_final_data()
+            data = fuzzy_match.find_groups(data)
+            self.set_new_data(data)
+
     def save_data(self):
         if (self.lineEdit_marketVendor.text() == 'General' or
             self.lineEdit_marketVendor.text() == ''):
@@ -502,7 +515,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 lang = self.comboBox_diffParsingLang.currentText()
             else:
                 lang = self.comboBox_baseLang.currentText()
-            fuzzy_match.matcher_feedback(retrieved_data)
+            fuzzy_match.matcher_feedback(retrieved_data, lang)
 
         if self.receipt is None:
             if options['ask_for_image']:
@@ -524,3 +537,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         bb_io.save_with_metadata(retrieved_data, img_path=this_img,
                                  unique_name=options['generate_unique_name'],
                                  move_on_save=options['move_on_save'])
+
+        logger.info('Save successful')
+        self.set_new_data(_default_data)
