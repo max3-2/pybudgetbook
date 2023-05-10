@@ -131,6 +131,10 @@ class MplCanvas(FigureCanvas):
         self.layout.addWidget(self)
         self.canvas = self.fig.canvas
 
+    def draw_blit(self):
+        self.fig.canvas.blit()
+        self.fig.canvas.draw()
+
 
 class QLoggingThread(QtCore.QThread, logging.StreamHandler):
     """

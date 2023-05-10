@@ -76,14 +76,14 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.plot_area_receipts = uisupport.MplCanvas(
             self.frame_plotReceipt, 1, constrained_layout=True)
 
-        self.plot_area_receipts.draw()
+        self.plot_area_receipts.draw_blit()
         logger.debug("Created plotting area 1")
 
         # Setup plot area, 2
         self.plot_area_data = uisupport.MplCanvas(
             self.frame_dataAnalysis, 2, 1, constrained_layout=False)
 
-        self.plot_area_data.draw()
+        self.plot_area_data.draw_blit()
         logger.debug("Created plotting area 2")
 
         # Create data viewer and attach to frame
@@ -248,15 +248,15 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
                 # Reset events on new load
                 if self._rotate_event is not None:
-                    self.plot_area_receipts.fig.canvas.mpl_disconnect(self._rotate_event)
+                    self.plot_area_receipts.canvas.mpl_disconnect(self._rotate_event)
                     self.frame_plotReceipt.setFocusPolicy(Qt.NoFocus)
-                    self.plot_area_receipts.fig.canvas.mpl_disconnect(self._focus_event)
+                    self.plot_area_receipts.canvas.mpl_disconnect(self._focus_event)
 
                 # Set rotate and focus events
                 if self.receipt.type == 'img':
-                    self._rotate_event =  self.plot_area_receipts.fig.canvas.mpl_connect(
+                    self._rotate_event =  self.plot_area_receipts.canvas.mpl_connect(
                         'key_press_event', self.rotate_event)
-                    self._focus_event =  self.plot_area_receipts.fig.canvas.mpl_connect(
+                    self._focus_event =  self.plot_area_receipts.canvas.mpl_connect(
                         'axes_enter_event', lambda event: self.plot_area_receipts.setFocus())
 
                     self.frame_plotReceipt.setFocusPolicy(Qt.StrongFocus)
@@ -282,7 +282,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         else:
             self.plot_area_receipts.ax.imshow(self.receipt.bin_img)
 
-        self.plot_area_receipts.canvas.draw()
+        self.plot_area_receipts.canvas.draw_blit()
         if self.raw_text_window is not None:
             self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
 
@@ -431,7 +431,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.set_new_data(new_data)
         self.lineEdit_totalAmountReceipt.setText(f'{total_price:.2f}')
         self.update_diff(total_price)
-        self.plot_area_receipts.canvas.draw()
+        self.plot_area_receipts.canvas.draw_blit()
 
     def detect_date(self):
         if self.receipt is None:
