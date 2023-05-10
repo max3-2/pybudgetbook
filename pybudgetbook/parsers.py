@@ -95,7 +95,6 @@ def parse_receipt_general(data, pats, pattern, ax=None):
         last_line = data['text'].str.extract(
             r'(zu.*?zahlender.*?betrag)', re.IGNORECASE).first_valid_index()
         if last_line is not None:
-            last_line = last_line - 1
             matcher = re.compile(r'\d{1,3},\d{2,3}', re.IGNORECASE)
         else:
             last_line = data['text'].str.extract(
@@ -104,7 +103,7 @@ def parse_receipt_general(data, pats, pattern, ax=None):
 
         try:
             total_price = float(
-                matcher.search(data.iloc[last_line + 1]['text']).group(0).replace(',', '.').replace('_', ''))
+                matcher.search(data.iloc[last_line]['text']).group(0).replace(',', '.').replace('_', ''))
             print('Found total price: ', total_price)
         except ValueError:
             print('No total price')
