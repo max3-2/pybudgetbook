@@ -458,6 +458,9 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
                 }, index=[0])],
                 ignore_index=True)
 
+        if add_data and 'left' in group and ax is not None:
+            default_rect(group, ax)
+
         if (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
             try:
                 total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
