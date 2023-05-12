@@ -40,6 +40,7 @@ class _BaseReceipt():
         self._data_extracted = False
         self._raw_text = ''
         self._data = None
+        self._lang = 'deu'
 
         self._vendor = None
         self._patident = None
@@ -85,14 +86,7 @@ class _BaseReceipt():
 
     def parse_vendor(self, lang=bbconfig.options['lang']):
         self._vendor, self._patident = parsers.get_vendor(self.raw_text)
-        if self._vendor == 'General':
-            logger.warning(
-                'No vendor found, set to General. Please add for best '
-                'parsing results using Receipt.set_vendor')
-
-        self._patset = parsers.get_patterns(self._patident, lang)
-
-        return self._vendor
+        self.set_vendor(self._vendor, lang)
 
     def set_vendor(self, vendor, lang=bbconfig.options['lang']):
         self._vendor = vendor
@@ -101,8 +95,9 @@ class _BaseReceipt():
             logger.warning(
                 'No vendor found, set to General. Please add for best '
                 'parsing results using Receipt.set_vendor')
-        self._patset = parsers.get_patterns(self._patident, lang)
 
+        self._patset = parsers.get_patterns(self._patident, lang)
+        self._lang = lang
         return self._vendor
 
     def parse_data(self, fill=True):
@@ -114,7 +109,7 @@ class _BaseReceipt():
             logger.info('Please set a vendor first')
             return None
 
-        parsing_func = parsers.select_parser(self._patident)
+        parsing_func = parsers.select_parser(self._patident, lang=self._lang)
 
         retrieved_data, total_price = parsing_func(
             self.valid_data, self._patset, self._patident, self.disp_ax)
@@ -252,6 +247,7 @@ class ImgReceipt(_BaseReceipt):
         tess_in.format = 'TIFF'
         # TODO Sub packages log wrong this might be resolved with package build
         logger.warning('I am a test!')
+        logger.warning(f'Tess with lang: {lang}')
         try:
             data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
                                      config=bbconstants._TESS_OPTIONS).dropna(

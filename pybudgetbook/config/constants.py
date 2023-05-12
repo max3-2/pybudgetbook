@@ -65,7 +65,17 @@ _patterns = {
                   'mult_price': re.compile(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})'),
                   'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
                   'total_sum_pattern': re.compile(r'((?<=summe.))_*?\d{1,3}_*?[,.]_*?\d{2}', re.IGNORECASE),
-            },
+                  },
+    'gen_fra': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{1,2}(?=€)?)'),
+                'valid_article_pattern': re.compile(r'(^\d(?!\d))(?:[_])*([^_].*?[^_])(?:_)*(\d{1,3}[,.]\d{1,2}(?=€)?)'),
+                'amount_pattern': re.compile(r'\d{1,2}(?=_[xX]_)'),
+                'total_sum_pattern': re.compile(
+                    r'((?<=payer.)\d{1,3}_*?[,.]_*?\d{1,2})|'
+                    r'((?<=total . payer.)\d{1,3}_*?[,.]_*?\d{1,2})',
+                    re.IGNORECASE),
+                'date_pattern': re.compile(
+                    r'[0-3]\d[,.\/]_*?[0,1]\d[,.\/]_*?(2[0,1]\d{2}|\d{2})'),
+                },
 }
 
 _icon_root = Path('img/groups')

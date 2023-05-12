@@ -1,6 +1,7 @@
 """Contains all text parsing functions which extract data"""
 import re
 import pandas as pd
+import numpy as np
 import logging
 
 # TODO make relative
@@ -80,7 +81,7 @@ def fill_missing_data(retrieved_data):
 ##################
 # Parser, selection dict at the end
 ##################
-def parse_receipt_general(data, pats, pattern, ax=None):
+def parse_receipt_general_deu(data, pats, pattern, ax=None):
     retrieved_data = _retrieved_data_template.copy()
     # First item is usually first price, if not let it 0 so get everything
     first_item = 0
@@ -383,7 +384,6 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
             name = name[start:].replace('_', ' ').strip()
         return name
 
-
     retrieved_data = _retrieved_data_template.copy()
     total_price = 0
     line_buffer = []
@@ -472,15 +472,108 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
     return retrieved_data, total_price
 
 
+def parse_receipt_general_fra(data, pats, pattern, ax=None):
+    """
+    A very simple baseline that at least works! Will be improved with data
+    input!
+    """
+    retrieved_data = _retrieved_data_template.copy()
+    # First item is usually first price, if not let it 0 so get everything
+    first_item = 0
+    first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
+
+    # Find the last row, before so this can be better applied with different
+    # vendors. Extract final price. DM is very annoying with different discount
+    # types and totals.
+    total_price = 0
+
+    last_line = data['text'].str.extract(
+        pats['total_sum_pattern']).first_valid_index()
+
+    if last_line is None:
+        last_line = data.index[-1]
+
+    try:
+        total_price = float(
+            pats['total_sum_pattern'].search(data.loc[last_line, 'text']
+                                             ).group(0).replace(',', '.').replace('_', ''))
+        print('Found total price @ line: ', total_price, '@', last_line)
+    except (ValueError, AttributeError):  # Either no match or no valid conversion
+        print('No total price')
+
+    # Parse line by line and see what can be classified
+    print(f' Searching from line {first_item:d} to {last_line:d}')
+    for _, group in data[first_item:last_line].iterrows():
+        this_line = group['text']
+        print('Analyzing: ', this_line)
+
+        # Skip sub totals
+        if 'total' in this_line.lower():
+            print('Skipping Subtotal')
+            continue
+
+        # is there a mult?
+        if (re_res := pats['amount_pattern'].search(this_line)) is not None:
+            try:
+                amount = float(re_res.group(0).replace(',', '.'))
+            except ValueError:
+                amount = np.nan
+
+            try:
+                price_per_unit = float(pats['simple_price_pattern'].search(this_line).group(0).replace(',', '.'))
+            except ValueError:
+                price_per_unit = np.nan
+
+            print('multiplier found:', amount, price_per_unit)
+            retrieved_data.loc[
+                retrieved_data.index[-1], ['Units']] = amount
+            retrieved_data.loc[
+                retrieved_data.index[-1], ['PricePerUnit']] = price_per_unit
+            continue
+
+        # Is this a valid line?
+        if (re_res := pats['valid_article_pattern'].search(this_line)) is not None:
+
+            try:
+                price = float(re_res.group(3).replace(',', '.'))
+            except ValueError:
+                price = 0.
+
+            try:
+                tax_class = int(re_res.group(1))
+            except ValueError:
+                tax_class = 0
+
+            art_name = re_res.group(2).replace('_', ' ').strip()
+
+            print('Normal item: ', art_name, price, tax_class)
+            retrieved_data = pd.concat(
+                [retrieved_data, pd.DataFrame({
+                    'ArtNr': -1,
+                    'Name': art_name,
+                    'Price': price,
+                    'TaxClass': tax_class,
+                    'PricePerUnit': np.nan,
+                    'Units': 1
+                }, index=[0])],
+                ignore_index=True)
+
+            if 'left' in group and ax is not None:
+                default_rect(group, ax)
+
+    return retrieved_data, total_price
+
+
 _av_parser = {
     'unverpackt': parse_receipt_unverpackt,
-    'general': parse_receipt_general,
     'raiff': parse_receipt_raiff,
+    'gen_deu': parse_receipt_general_deu,
+    'gen_fra': parse_receipt_general_fra,
 }
 
 
-def select_parser(patident):
+def select_parser(patident, lang):
     if patident in _av_parser:
         return _av_parser[patident]
     else:
-        return _av_parser['general']
+        return _av_parser[f'gen_{lang}']
