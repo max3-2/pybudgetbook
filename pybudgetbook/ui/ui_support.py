@@ -671,3 +671,38 @@ class TextDisplayWindow(QtWidgets.QWidget):
     def closeEvent(self, event):
         self.closed.emit()
         event.accept()
+
+
+class FadingWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None, text='default',
+                 iconimg=QtWidgets.QStyle.SP_DialogOkButton):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        self.icon_label = QtWidgets.QLabel(self)
+        pixmap = self.style().standardPixmap(iconimg)
+        self.icon_label.setPixmap(pixmap)
+        self.icon_label.setAlignment(Qt.AlignCenter)
+
+        self.text_label = QtWidgets.QLabel(text, self)
+        self.text_label.setAlignment(Qt.AlignCenter)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(self.icon_label)
+        layout.addWidget(self.text_label)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        self.opacity = 1.0
+        self.fade_out_timer = QtCore.QTimer(self)
+        self.fade_out_timer.setInterval(35)
+        self.fade_out_timer.timeout.connect(self.fade_out)
+        self.fade_out_timer.start()
+
+    def fade_out(self):
+        self.opacity -= 0.01
+        self.setWindowOpacity(self.opacity)
+        self.repaint()
+        if self.opacity <= 0.0:
+            self.fade_out_timer.stop()
+            self.close()

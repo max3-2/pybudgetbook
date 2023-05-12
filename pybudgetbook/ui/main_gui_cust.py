@@ -540,5 +540,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                                  unique_name=options['generate_unique_name'],
                                  move_on_save=options['move_on_save'])
 
-        logger.info('Save successful')
+        fading_widget = uisupport.FadingWidget(text='Receipt Saved Successful')
+        fading_widget.raise_()
+
         self.set_new_data(_default_data())
