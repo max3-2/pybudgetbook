@@ -32,6 +32,7 @@ def _type_check(retrieved_data):
             {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'float', 'ArtNr': 'int'})
     return retrieved_data
 
+
 class _BaseReceipt():
 
     def __init__(self):
@@ -86,16 +87,16 @@ class _BaseReceipt():
 
     def parse_vendor(self, lang=bbconfig.options['lang']):
         self._vendor, self._patident = parsers.get_vendor(self.raw_text)
-        self.set_vendor(self._vendor, lang)
-
-    def set_vendor(self, vendor, lang=bbconfig.options['lang']):
-        self._vendor = vendor
-        self._patident = bbconfig.receipt_types.get(self._vendor, 'gen')
-        if self._patident == 'gen':
+        if self._vendor == 'General':
             logger.warning(
                 'No vendor found, set to General. Please add for best '
                 'parsing results using Receipt.set_vendor')
 
+        return self.set_vendor(self._vendor, lang)
+
+    def set_vendor(self, vendor, lang=bbconfig.options['lang']):
+        self._vendor = vendor
+        self._patident = bbconfig.receipt_types.get(self._vendor, 'gen')
         self._patset = parsers.get_patterns(self._patident, lang)
         self._lang = lang
         return self._vendor
