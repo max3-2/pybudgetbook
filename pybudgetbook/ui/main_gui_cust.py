@@ -169,6 +169,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
         self.pushButton_reClassify.clicked.connect(self.re_match_data)
         self.pushButton_saveData.clicked.connect(self.save_data)
+        self.comboBox_baseLang.currentTextChanged.connect(self.refilter_and_display)
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
