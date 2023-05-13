@@ -46,6 +46,13 @@ Future
 - Continous UX improvements
 
 
+## A Note on Language Settings
+Grouping may error, just set lang and rerun
+Dont feedback to prevent chaos
+
+New language: see contributing. Patterns (at least gen), default groups (may be empty)
+
+
 ## Tutorial
 To get started, you will need a receipt from a supermarket. A main criterion in
 the current state is that the items have a price with a tax class connected,
