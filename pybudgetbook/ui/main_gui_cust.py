@@ -435,7 +435,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lang = self.comboBox_diffParsingLang.currentText()
         else:
             lang = self.comboBox_baseLang.currentText()
-        new_data = fuzzy_match.find_groups(new_data, lang=lang)
+
+        try:
+            new_data = fuzzy_match.find_groups(new_data, lang=lang)
+        except FileNotFoundError as missing_data:
+            logger.error(f'{missing_data}')
+            new_data['Group'] = 'none'
 
         self.set_new_data(new_data)
         self.lineEdit_totalAmountReceipt.setText(f'{total_price:.2f}')
@@ -478,8 +483,22 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
     def re_match_data(self):
         if self.tableView_pandasViewer.model().rowCount() > 0:
             data = self.tableView_pandasViewer.get_final_data()
-            data = fuzzy_match.find_groups(data)
-            self.set_new_data(data)
+
+        else:
+            return
+
+        if self.checkBox_useDiffParsingLang.isChecked():
+            lang = self.comboBox_diffParsingLang.currentText()
+        else:
+            lang = self.comboBox_baseLang.currentText()
+
+        try:
+            data = fuzzy_match.find_groups(data, lang=lang)
+        except FileNotFoundError as missing_data:
+            logger.error(f'{missing_data}')
+            data['Group'] = 'none'
+
+        self.set_new_data(data)
 
     def save_data(self):
         if (self.lineEdit_marketVendor.text() == 'General' or
