@@ -673,36 +673,42 @@ class TextDisplayWindow(QtWidgets.QWidget):
         event.accept()
 
 
-class FadingWidget(QtWidgets.QWidget):
-    def __init__(self, parent=None, text='default',
-                 iconimg=QtWidgets.QStyle.SP_DialogOkButton):
+class CustomFadeDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None, text='Confirmation message'):
         super().__init__(parent)
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
 
-        self.icon_label = QtWidgets.QLabel(self)
-        pixmap = self.style().standardPixmap(iconimg)
-        self.icon_label.setPixmap(pixmap)
-        self.icon_label.setAlignment(Qt.AlignCenter)
-
-        self.text_label = QtWidgets.QLabel(text, self)
-        self.text_label.setAlignment(Qt.AlignCenter)
-
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Dialog)
         layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self.icon_label)
-        layout.addWidget(self.text_label)
-        layout.setContentsMargins(0, 0, 0, 0)
 
-        self.opacity = 1.0
-        self.fade_out_timer = QtCore.QTimer(self)
-        self.fade_out_timer.setInterval(35)
-        self.fade_out_timer.timeout.connect(self.fade_out)
-        self.fade_out_timer.start()
+        # Create and center-align the custom icon
+        icon_label = QtWidgets.QLabel(self)
+        style = self.style()
+        pixmap = style.standardPixmap(QtWidgets.QStyle.SP_DialogOkButton)
+        icon_label.setPixmap(pixmap)
+        icon_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(icon_label)
 
-    def fade_out(self):
-        self.opacity -= 0.01
-        self.setWindowOpacity(self.opacity)
-        self.repaint()
-        if self.opacity <= 0.0:
-            self.fade_out_timer.stop()
-            self.close()
+        # Create and center-align the text
+        text_label = QtWidgets.QLabel(text, self)
+        text_label.setAlignment(Qt.AlignCenter)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        font.setBold(True)
+        text_label.setFont(font)
+        layout.addWidget(text_label)
+
+        self.setLayout(layout)
+
+        self.fade_out_dialog()
+
+    def fade_out_dialog(self):
+        # Create a fade-out animation for the dialog
+        self.animation = QtCore.QPropertyAnimation(self, b'windowOpacity')
+        self.animation.setDuration(3000)
+        self.animation.setStartValue(1.0)
+        self.animation.setEndValue(0.0)
+        self.animation.setEasingCurve(QtCore.QEasingCurve.InOutQuad)
+        self.animation.finished.connect(self.close)
+
+        # Start the animation
+        self.animation.start()

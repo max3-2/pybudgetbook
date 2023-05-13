@@ -46,7 +46,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         # Setup splitter default
         c_wi = self.tabWidgetPage1.width()
         self.splitter_mainPage.setSizes(
-            [int(c_wi * 1/3), int(c_wi * 2/3)])
+            [int(c_wi * 1/4), int(c_wi * 3/4)])
 
         # Additional vars
         self.receipt = None
@@ -540,7 +540,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                                  unique_name=options['generate_unique_name'],
                                  move_on_save=options['move_on_save'])
 
-        fading_widget = uisupport.FadingWidget(text='Receipt Saved Successful')
-        fading_widget.raise_()
+        dialog = uisupport.CustomFadeDialog(self, text='Receipt Saved Successful')
+        dialog.show()
 
         self.set_new_data(_default_data())
