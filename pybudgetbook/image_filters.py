@@ -18,7 +18,7 @@ def load_image(imgpath):
 
 
 def preprocess_image(grayscale, otsu='global',
-                     rescale_image=True, unsharp_ma=(5, 0.85), final_er_dil=1,
+                     rescale_image=True, unsharp_ma=(5, 1.15), final_er_dil=1,
                      remove_border_art=True, receipt_width=80, show=False):
     """
     Assumes portrait mode. Filter factors are designed after scaling!

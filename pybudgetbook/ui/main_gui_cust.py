@@ -103,7 +103,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.tableView_pandasViewer.model().combo_col = 7
 
         self.horizontalSliderFilterAmount.custom_setup(value_change_delay=500)
-        self.horizontalSliderFilterAmount.slider.setValue(17)
+        self.horizontalSliderFilterAmount.slider.setValue(23)
         # Stop initial timer
         self.horizontalSliderFilterAmount.timer.stop()
 
