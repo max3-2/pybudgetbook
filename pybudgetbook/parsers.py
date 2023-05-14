@@ -31,7 +31,7 @@ def get_vendor(raw_text):
 
         if this_check:
             patterns = config.receipt_types[rec_t]
-            logger.debug('Vendor found: ', rec_t)
+            logger.debug(f'Vendor found: {rec_t}')
             return rec_t, patterns
 
     logger.debug('No vendor found, using general')

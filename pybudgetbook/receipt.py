@@ -246,9 +246,7 @@ class ImgReceipt(_BaseReceipt):
         """Extracts text **and** converts to data"""
         tess_in = Image.fromarray(self.bin_img.astype(bool))
         tess_in.format = 'TIFF'
-        # TODO Sub packages log wrong this might be resolved with package build
-        logger.warning('I am a test!')
-        logger.warning(f'Tess with lang: {lang}')
+        logger.debug(f'Tesseract with lang: {lang}')
         try:
             data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
                                      config=constants._TESS_OPTIONS).dropna(
