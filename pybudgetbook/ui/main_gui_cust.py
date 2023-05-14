@@ -9,13 +9,14 @@ from os.path import expanduser
 from .. import __version__ as bbvers
 from . import ui_support
 from .main_gui import Ui_pybb_MainWindow
-from .configs.plotting_conf import set_style
-from .configs import constants
 
-from .receipt import Receipt, _type_check
-from . import bb_io, fuzzy_match
-from .configs.config import options
-from .configs.config_tools import set_option
+from ..configs.plotting_conf import set_style
+from ..configs import constants
+from ..configs.config import options
+from ..configs.config_tools import set_option
+
+from ..receipt import Receipt, _type_check
+from .. import bb_io, fuzzy_match
 
 
 # This might need to be moved into init...currently it works here!

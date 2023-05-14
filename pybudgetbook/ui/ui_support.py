@@ -9,9 +9,9 @@ from PySide6.QtCore import Signal, Slot, Qt
 import numpy as np
 import pandas as pd
 
-from .configs.config import options
-from .configs.constants import icons
-from .configs.config_tools import set_option, set_data_dir
+from ..configs.config import options
+from ..configs.constants import icons
+from ..configs.config_tools import set_option, set_data_dir
 
 
 logger = logging.getLogger(__package__)

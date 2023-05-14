@@ -4,7 +4,7 @@ import numpy as np
 import re
 from difflib import get_close_matches
 
-from configs import config
+from .configs import config
 from . import bb_io
 
 
