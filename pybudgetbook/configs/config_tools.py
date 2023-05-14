@@ -8,12 +8,12 @@ import json
 
 from . import config
 from . import constants
-
+from .. import _top_package
 
 logger = logging.getLogger(__package__)
 
 
-_config_path = Path(appdirs.user_config_dir(appname=__package__))
+_config_path = Path(appdirs.user_config_dir(appname=_top_package))
 _c_file = _config_path / 'pybb_conf.ini'
 
 
