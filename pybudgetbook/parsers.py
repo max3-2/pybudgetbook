@@ -9,12 +9,16 @@ from .configs import constants
 from .configs.plotting_conf import default_rect
 
 """
-The module begings with common and utility funtions. At the end, the main
+The module begings with common and utility functions. At the end, the main
 parsing functions follow, which will be loaded by a detection routine and
-called automated. They will all need the same API, currently this is:
+called automated. They all need the same API, currently this is:
     ```
     retrieved_data, total_price = parse_receipt_NAME(data, pats, pattern, ax=None)
     ```
+where `data` is extracted data returned from the receipt class, `pats` is a
+dict with a set of regexp parsing patterns, `pattern` is the `str` identifier
+of the current patternset and `ax` is optional matplotlib axes used for
+displaying rectangles.
 """
 logger = logging.getLogger(__package__)
 
@@ -24,6 +28,20 @@ _retrieved_data_template = pd.DataFrame(
 
 
 def get_vendor(raw_text):
+    """
+    Extracts vendor information from raw text.
+
+    Parameters
+    ----------
+    raw_text : `str`
+        Tesseract raw text
+
+    Returns
+    -------
+    `tuple`
+        Tuple with literal vendor name and the best fiitin set of parsing
+        patterns.
+    """
     for rec_t in config.receipt_types.keys():
         check_strings = [rec_t] + config.receipt_aliases.get(rec_t, [])
         this_check = any([re.search(rf'([\b_]*?{cs:s}|{cs:s}[_\b])', raw_text, re.IGNORECASE) is not None
@@ -39,7 +57,21 @@ def get_vendor(raw_text):
 
 
 def get_date(raw_text, pattern):
-    """TODO"""
+    """
+    Extracts date from tesseract raw text.
+
+    Parameters
+    ----------
+    raw_text : `str`
+        Tesseract raw text
+    pattern : `re.compile`
+        Precompiled pattern to detect a valid date.
+
+    Returns
+    -------
+    `pd.Datetime`
+        Date or `None` if no date was found.
+    """
     date = pattern.search(raw_text)
     if date is not None:
         date = date.group(0).replace('_', '').replace('/', '.')
@@ -52,6 +84,22 @@ def get_date(raw_text, pattern):
 
 
 def get_patterns(pattern, lang):
+    """
+    Combines language general and vendor specific patterns, prioritizing the
+    latter, into a single pattern set.
+
+    Parameters
+    ----------
+    pattern : `str`
+        Vendor pattern identifier
+    lang : `str`
+        Pattern language
+
+    Returns
+    -------
+    `dict`
+        Patterns in a dict which are all `re.compile()` objects
+    """
     pats = constants._patterns['gen' + '_' + lang]
     try:
         pats.update(constants._patterns[pattern + '_' + lang])
@@ -61,7 +109,19 @@ def get_patterns(pattern, lang):
 
 
 def fill_missing_data(retrieved_data):
-    """Do some logic steps to fill holes in the data"""
+    """
+    Fills misssing elements in a dataset using basic math.
+
+    Parameters
+    ----------
+    retrieved_data : `pd.DataFrame`
+        The input dataframe, parsed data from a parser.
+
+    Returns
+    -------
+    `pd.DataFrame`
+        Input data with nans replaced if possible.
+    """
     units_nan = retrieved_data['Units'].isna()
     retrieved_data.loc[units_nan, 'Units'] = (
         retrieved_data.loc[units_nan, 'Price'] /
@@ -81,6 +141,7 @@ def fill_missing_data(retrieved_data):
 # Parser, selection dict at the end
 ##################
 def parse_receipt_general_deu(data, pats, pattern, ax=None):
+    """Basic general application parser for *deu*, signature see at the top"""
     retrieved_data = _retrieved_data_template.copy()
     # First item is usually first price, if not let it 0 so get everything
     first_item = 0
@@ -304,6 +365,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
 
 def parse_receipt_unverpackt(data, pats, pattern, ax=None):
+    """Parser for *deu* and store *Unverpackt*, signature see at the top"""
     retrieved_data = _retrieved_data_template.copy()
     total_price = 0
     line_buffer = []
@@ -372,6 +434,7 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
 
 
 def parse_receipt_raiff(data, pats, pattern, ax=None):
+    """Parser for *deu* and store *Raiffeisen*, signature see at the top"""
     def _clear_name(this_line):
         start = this_line.find('(ST)')
         if start != -1:
@@ -472,10 +535,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
 
 
 def parse_receipt_general_fra(data, pats, pattern, ax=None):
-    """
-    A very simple baseline that at least works! Will be improved with data
-    input!
-    """
+    """Basic general application parser for *fra*, signature see at the top"""
     retrieved_data = _retrieved_data_template.copy()
     # First item is usually first price, if not let it 0 so get everything
     first_item = 0
@@ -572,6 +632,10 @@ _av_parser = {
 
 
 def select_parser(patident, lang):
+    """
+    Returns the best fitting parser for a given pattern identifier and a
+    selected language.
+    """
     if patident in _av_parser:
         return _av_parser[patident]
     else:
