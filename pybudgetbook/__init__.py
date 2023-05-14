@@ -2,6 +2,8 @@
 __version__ = '0.2.0'
 __name__ = 'pybudgetbook'
 
+_top_package = __package__
+
 from .configs.config_tools import _check_config, load_config
 
 # On init, check config

@@ -6,21 +6,21 @@ from PySide6 import QtWidgets
 from PySide6.QtGui import QIcon
 
 from .main_gui_cust import main_window
+from .. import _top_package
 
+logger = logging.getLogger(_top_package)
 
-logger = logging.getLogger(__package__)
-
+_icon_loc = Path(__file__).parent.parent / 'img' / 'tray_icon.svg'
 
 def start_main_ui(sys_argv=[]):
     app = QtWidgets.QApplication(sys_argv)
     app.setStyle('Light')
 
-    icon = Path('img/tray_icon.svg')
-    if icon.exists():
-        tray_icon = QIcon(str(icon))
+    if _icon_loc.exists():
+        tray_icon = QIcon(str(_icon_loc))
         app.setWindowIcon(tray_icon)
     else:
-        logger.warning('Tray icon file missing')
+        logger.warning(f'Tray icon file missing at: {_icon_loc}')
 
     qt_main_window = main_window()
 

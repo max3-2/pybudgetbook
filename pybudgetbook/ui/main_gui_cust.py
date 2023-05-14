@@ -17,14 +17,15 @@ from ..configs.config_tools import set_option
 
 from ..receipt import Receipt, _type_check
 from .. import bb_io, fuzzy_match
-
+from .. import _top_package
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
     '%(asctime)s,%(msecs)d %(levelname)-8s [%(name)s:%(filename)s:%(lineno)d] %(message)s',
     datefmt='%Y-%m-%d_%H:%M:%S')
 
-logger = logging.getLogger(__package__)
+
+logger = logging.getLogger(_top_package)
 logger.setLevel(logging.DEBUG)
 
 set_style()
