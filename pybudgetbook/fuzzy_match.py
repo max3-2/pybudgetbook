@@ -4,9 +4,8 @@ import numpy as np
 import re
 from difflib import get_close_matches
 
-# TODO relative
-import pybudgetbook.config.config as bbconfig
-from pybudgetbook import bb_io
+from configs import config
+from . import bb_io
 
 
 logger = logging.getLogger(__package__)
@@ -33,7 +32,7 @@ def _match_group(data, reference_groups, use_fuzzy=False):
         return result[np.array([match[1] for match in result]).argmax()][0]
 
 
-def matcher_feedback(retrieved_data, lang=bbconfig.options['lang']):
+def matcher_feedback(retrieved_data, lang=config.options['lang']):
     """
     Feedback the data new to the matcher dict. This is pretty much brute force
     and there will be a certain overlap in basic and user data since matching
@@ -43,8 +42,8 @@ def matcher_feedback(retrieved_data, lang=bbconfig.options['lang']):
     logger.debug(f'Running matcher feedback with lang: {lang}')
     print(f'Running matcher feedback with lang: {lang}')  # TODO remove if loggin in package
 
-    user_match_data, user_match_file = bb_io.load_user_match_data(lang)
-    basic_match_data, _ = bb_io.load_basic_match_data(lang)
+    user_match_data, user_match_file = bb_io.l_oad_user_match_data(lang)
+    basic_match_data, _ = bb_io._load_basic_match_data(lang)
     neg_match_data = bb_io.load_negative_match_data(lang)
 
     remove_trash = re.compile(r'[^a-z0-9 äöü]', re.IGNORECASE)
@@ -86,7 +85,7 @@ def matcher_feedback(retrieved_data, lang=bbconfig.options['lang']):
     bb_io._save_user_match_data(user_match_data, user_match_file)
 
 
-def find_groups(retrieved_data, lang=bbconfig.options['lang']):
+def find_groups(retrieved_data, lang=config.options['lang']):
     print(f'Matching groups with language {lang}')
     match_data = bb_io.load_group_match_data(lang)
 

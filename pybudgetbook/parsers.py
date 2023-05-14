@@ -4,10 +4,9 @@ import pandas as pd
 import numpy as np
 import logging
 
-# TODO make relative
-import pybudgetbook.config.config as bbconfig
-import pybudgetbook.config.constants as bbconstants
-from pybudgetbook.config.plotting_conf import default_rect
+from .configs import config
+from .configs import constants
+from .configs.plotting_conf import default_rect
 
 """
 The module begings with common and utility funtions. At the end, the main
@@ -21,17 +20,17 @@ logger = logging.getLogger(__package__)
 
 
 _retrieved_data_template = pd.DataFrame(
-    columns=bbconstants._MANDATORY_COLS)
+    columns=constants._MANDATORY_COLS)
 
 
 def get_vendor(raw_text):
-    for rec_t in bbconfig.receipt_types.keys():
-        check_strings = [rec_t] + bbconfig.receipt_aliases.get(rec_t, [])
+    for rec_t in config.receipt_types.keys():
+        check_strings = [rec_t] + config.receipt_aliases.get(rec_t, [])
         this_check = any([re.search(rf'([\b_]*?{cs:s}|{cs:s}[_\b])', raw_text, re.IGNORECASE) is not None
                           for cs in check_strings])
 
         if this_check:
-            patterns = bbconfig.receipt_types[rec_t]
+            patterns = config.receipt_types[rec_t]
             logger.debug('Vendor found: ', rec_t)
             return rec_t, patterns
 
@@ -53,9 +52,9 @@ def get_date(raw_text, pattern):
 
 
 def get_patterns(pattern, lang):
-    pats = bbconstants._patterns['gen' + '_' + lang]
+    pats = constants._patterns['gen' + '_' + lang]
     try:
-        pats.update(bbconstants._patterns[pattern + '_' + lang])
+        pats.update(constants._patterns[pattern + '_' + lang])
     except KeyError:
         logger.info('No additional patterns found for {pattern:s}')
     return pats

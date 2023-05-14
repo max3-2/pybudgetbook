@@ -4,19 +4,19 @@ from pathlib import Path
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 import pandas as pd
-from copy import copy
 from os.path import expanduser
 
-# TODO relative and change plot import
-import pybudgetbook.ui.ui_support as uisupport
-from pybudgetbook.ui.main_gui import Ui_pybb_MainWindow
-from pybudgetbook.config.plotting_conf import set_style
-import pybudgetbook.config.constants as bbconstant
-from pybudgetbook import __version__ as bbvers
-from pybudgetbook.receipt import Receipt, _type_check
-from pybudgetbook import bb_io, fuzzy_match
-from pybudgetbook.config.config import options
-from pybudgetbook.config.config_tools import set_option
+from .. import __version__ as bbvers
+from . import ui_support
+from .main_gui import Ui_pybb_MainWindow
+from .configs.plotting_conf import set_style
+from .configs import constants
+
+from .receipt import Receipt, _type_check
+from . import bb_io, fuzzy_match
+from .configs.config import options
+from .configs.config_tools import set_option
+
 
 # This might need to be moved into init...currently it works here!
 _log_formatter = logging.Formatter(
@@ -25,28 +25,28 @@ _log_formatter = logging.Formatter(
 
 logger = logging.getLogger(__package__)
 logger.setLevel(logging.DEBUG)
+
 set_style()
 
 
 def _default_data():
-    init_data_viewer = pd.DataFrame(columns=bbconstant._VIEWER_COLS)
+    init_data_viewer = pd.DataFrame(columns=constants._VIEWER_COLS)
     init_data_viewer.loc[0] = [-1, 'New Article Name', 1., 1., 1., 0, 'none']
     return init_data_viewer
 
 
 class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
-    """
-    Todo
-    """
-
     def __init__(self):
+        """
+        Todo
+        """
         super().__init__()
         self.setupUi(self)
 
         # Setup splitter default
         c_wi = self.tabWidgetPage1.width()
         self.splitter_mainPage.setSizes(
-            [int(c_wi * 1/4), int(c_wi * 3/4)])
+            [int(c_wi * 1 / 4), int(c_wi * 3 / 4)])
 
         # Additional vars
         self.receipt = None
@@ -62,8 +62,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lambda: self.refilter_and_display(keep_lim=False))
 
         # Logger setup
-        self.qt_logstream = uisupport.QLoggingThread()
-        self.qt_log_window = uisupport.QLoggingWindow(self)
+        self.qt_logstream = ui_support.QLoggingThread()
+        self.qt_log_window = ui_support.QLoggingWindow(self)
 
         self.qt_logstream.setFormatter(_log_formatter)
         self.qt_logstream.popup_lvl = logging.WARNING
@@ -80,14 +80,14 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.actionShow_Logger.triggered.connect(self.qt_log_window.show_logging_window)
 
         # Setup plot area, 1
-        self.plot_area_receipts = uisupport.MplCanvas(
+        self.plot_area_receipts = ui_support.MplCanvas(
             self.frame_plotReceipt, 1, constrained_layout=True)
 
         self.plot_area_receipts.draw_blit()
         logger.debug("Created plotting area 1")
 
         # Setup plot area, 2
-        self.plot_area_data = uisupport.MplCanvas(
+        self.plot_area_data = ui_support.MplCanvas(
             self.frame_dataAnalysis, 2, 1, constrained_layout=False)
 
         self.plot_area_data.draw_blit()
@@ -96,9 +96,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         # Create data viewer and attach to frame
         init_data_viewer = _default_data()
 
-        table_model = uisupport.PandasTableModel(data=init_data_viewer)
+        table_model = ui_support.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
-        poss_groups = list(bb_io.load_basic_match_data(options['lang'])[0].keys())
+        poss_groups = list(bb_io._load_basic_match_data(options['lang'])[0].keys())
         self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
         self.tableView_pandasViewer.model().combo_col = 7
 
@@ -109,13 +109,13 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         # Other configs for fields
         self.label_totalAmountDataValue.setTextFormat(Qt.RichText)
-        self.comboBox_overalCat.addItems(bbconstant._CATEGORIES + ['n.a.'])
+        self.comboBox_overalCat.addItems(constants._CATEGORIES + ['n.a.'])
         self.lineEdit_totalAmountReceipt.setText('0.00')
         self.lineEdit_totalAmountReceipt.setReadOnly(False)
         self.dateEdit_shopDate.setDate(QtCore.QDate.currentDate())
 
-        self.comboBox_baseLang.addItems(bbconstant._UI_LANG_SUPPORT)
-        self.comboBox_diffParsingLang.addItems(bbconstant._UI_LANG_SUPPORT)
+        self.comboBox_baseLang.addItems(constants._UI_LANG_SUPPORT)
+        self.comboBox_diffParsingLang.addItems(constants._UI_LANG_SUPPORT)
         index = self.comboBox_baseLang.findText(options['lang'])
         if index != -1:
             self.comboBox_baseLang.setCurrentIndex(index)
@@ -128,16 +128,16 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.actionShow_Logger_on_Start.setChecked(options['show_logger_on_start'])
         self.actionLogger_debug.setChecked(options['logger_show_debug'])
         self.actionLogger_Popup_Level.triggered.connect(
-            lambda _: uisupport.set_new_conf_val(
-            self, 'logger_popup_level', 'int')
+            lambda _: ui_support.set_new_conf_val(
+                self, 'logger_popup_level', 'int')
         )
         self.actionData_Directory.triggered.connect(
-            lambda _: uisupport.set_new_conf_val(
-            self, 'data_folder', 'dir')
+            lambda _: ui_support.set_new_conf_val(
+                self, 'data_folder', 'dir')
         )
         self.actionDefault_Language.triggered.connect(
-            lambda _: uisupport.set_new_conf_val(
-            self, 'lang', 'str')
+            lambda _: ui_support.set_new_conf_val(
+                self, 'lang', 'str')
         )
 
         # Attach menu handlers
@@ -184,7 +184,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.raw_text_window.close()
             self.raw_text_window = None
 
-        super().closeEvent(event) # call parent class's closeEvent method
+        super().closeEvent(event)
 
     def _about(self):
         """
@@ -193,7 +193,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.about_box = QtWidgets.QMessageBox()
         self.about_box.setIcon(QtWidgets.QMessageBox.Information)
 
-        # TODO Add dynamic version
         about_main = ('PyBudgetbook UI. Use to scan and categorize your '
                       'receipts.')
         about_sub = (
@@ -211,7 +210,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
     def show_raw_text(self):
         if self.raw_text_window is None:
-            self.raw_text_window = uisupport.TextDisplayWindow()
+            self.raw_text_window = ui_support.TextDisplayWindow()
 
         if self.receipt is None:
             self.raw_text_window.update_text('')
@@ -262,9 +261,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
                 # Set rotate and focus events
                 if self.receipt.type == 'img':
-                    self._rotate_event =  self.plot_area_receipts.canvas.mpl_connect(
+                    self._rotate_event = self.plot_area_receipts.canvas.mpl_connect(
                         'key_press_event', self.rotate_event)
-                    self._focus_event =  self.plot_area_receipts.canvas.mpl_connect(
+                    self._focus_event = self.plot_area_receipts.canvas.mpl_connect(
                         'axes_enter_event', lambda event: self.plot_area_receipts.setFocus())
 
                     self.frame_plotReceipt.setFocusPolicy(Qt.StrongFocus)
@@ -333,14 +332,13 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.update_rec_plot(False)
             self.rotate_timer.start()
 
-
     def set_new_data(self, new_data, has_meta=False):
         self._current_data = new_data
 
         # Update model
         self.tableView_pandasViewer.model().update_data(
-                    self._current_data.loc[:, bbconstant._VIEWER_COLS]
-                )
+            self._current_data.loc[:, constants._VIEWER_COLS]
+        )
         self.tableView_pandasViewer.resizeColumnsToContents()
         self.tableView_pandasViewer.scrollToTop()
 
@@ -353,11 +351,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.update_diff(total)
 
             self.dateEdit_shopDate.setDate(
-                uisupport.convert_date(self._current_data.loc[0, 'Date']))
+                ui_support.convert_date(self._current_data.loc[0, 'Date']))
 
-            if (this_cat := self._current_data.loc[0, 'Category']) in bbconstant._CATEGORIES:
+            if (this_cat := self._current_data.loc[0, 'Category']) in constants._CATEGORIES:
                 self.comboBox_overalCat.setCurrentIndex(
-                    bbconstant._CATEGORIES.index(this_cat))
+                    constants._CATEGORIES.index(this_cat))
             else:
                 self.comboBox_overalCat.setCurrentIndex(
                     self.comboBox_overalCat.findText('n.a.'))
@@ -405,7 +403,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         # Get the reference lang.
         if self.checkBox_useDiffParsingLang.isChecked():
-                        lang = self.comboBox_diffParsingLang.currentText()
+            lang = self.comboBox_diffParsingLang.currentText()
         else:
             lang = self.comboBox_baseLang.currentText()
 
@@ -461,7 +459,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.statusbar.showMessage(msg, timetout=3000)
             return
 
-        self.dateEdit_shopDate.setDate(uisupport.convert_date(rec_date))
+        self.dateEdit_shopDate.setDate(ui_support.convert_date(rec_date))
         self.statusbar.showMessage('Date extracted', timeout=2000, color='green')
 
     def detect_vendor(self):
@@ -502,7 +500,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
     def save_data(self):
         if (self.lineEdit_marketVendor.text() == 'General' or
-            self.lineEdit_marketVendor.text() == ''):
+                self.lineEdit_marketVendor.text() == ''):
             msg_box = QtWidgets.QMessageBox()
             msg_box.setIcon(QtWidgets.QMessageBox.Warning)
             msg_box.setText(
@@ -521,7 +519,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         retrieved_data = _type_check(retrieved_data)
         retrieved_data['Category'] = self.comboBox_overalCat.currentText()
         retrieved_data['Vendor'] = self.lineEdit_marketVendor.text()
-        retrieved_data['Date'] = uisupport.convert_date(self.dateEdit_shopDate.date())
+        retrieved_data['Date'] = ui_support.convert_date(self.dateEdit_shopDate.date())
         try:
             total_ext = float(self.lineEdit_totalAmountReceipt.text())
         except ValueError:
@@ -559,7 +557,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                                  unique_name=options['generate_unique_name'],
                                  move_on_save=options['move_on_save'])
 
-        dialog = uisupport.CustomFadeDialog(self, text='Receipt Saved Successful')
+        dialog = ui_support.CustomFadeDialog(self, text='Receipt Saved Successful')
         dialog.show()
 
         self.set_new_data(_default_data())

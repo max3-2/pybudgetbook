@@ -5,11 +5,11 @@ from pathlib import Path
 from PySide6 import QtWidgets
 from PySide6.QtGui import QIcon
 
-# TODO make package
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from pybudgetbook.ui.main_gui_cust import main_window
+from .main_gui_cust import main_window
+
 
 logger = logging.getLogger(__package__)
+
 
 def start_main_ui(sys_argv=[]):
     app = QtWidgets.QApplication(sys_argv)

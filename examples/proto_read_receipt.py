@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QCoreApplication
 import pandas as pd
 
-from pybudgetbook.config.plotting_conf import set_style
+from pybudgetbook.configs.plotting_conf import set_style
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.receipt import Receipt
 
@@ -17,11 +17,11 @@ if QCoreApplication.instance() is None:
 receipt_file = QFileDialog().getOpenFileName(caption='Select receipt')[0]
 
 rec = Receipt(receipt_file)
-rec.filter_image(unsharp_ma=(5, 1.2)).extract_data(lang='fra')
+rec.filter_image(unsharp_ma=(5, 1.)).extract_data()
 rec.show_receipt()
 raw_text = rec.raw_text
 
-_ = rec.parse_vendor(lang='fra')
+_ = rec.parse_vendor()
 
 retrieved_data, total_price = rec.parse_data()
 rec_date = rec.parse_date()

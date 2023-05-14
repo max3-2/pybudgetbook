@@ -13,11 +13,11 @@ import pypdfium2 as pdfium
 from skimage.color import rgb2gray
 from skimage.transform import rotate
 
-# TODO make rel
-from pybudgetbook import image_filters
-import pybudgetbook.config.constants as bbconstants
-import pybudgetbook.config.config as bbconfig
-from pybudgetbook import parsers
+from . import image_filters
+from .configs import config
+from .configs import constants
+from . import parsers
+
 
 logger = logging.getLogger(__package__)
 
@@ -85,7 +85,7 @@ class _BaseReceipt():
     def _create_figure(self):
         self._fig, self._ax = plt.subplots(1, 2, sharex=True, sharey=True)
 
-    def parse_vendor(self, lang=bbconfig.options['lang']):
+    def parse_vendor(self, lang=config.options['lang']):
         self._vendor, self._patident = parsers.get_vendor(self.raw_text)
         if self._vendor == 'General':
             logger.warning(
@@ -94,9 +94,9 @@ class _BaseReceipt():
 
         return self.set_vendor(self._vendor, lang)
 
-    def set_vendor(self, vendor, lang=bbconfig.options['lang']):
+    def set_vendor(self, vendor, lang=config.options['lang']):
         self._vendor = vendor
-        self._patident = bbconfig.receipt_types.get(self._vendor, 'gen')
+        self._patident = config.receipt_types.get(self._vendor, 'gen')
         self._patset = parsers.get_patterns(self._patident, lang)
         self._lang = lang
         return self._vendor
@@ -242,7 +242,7 @@ class ImgReceipt(_BaseReceipt):
         # Chaining support
         return self
 
-    def extract_data(self, lang=bbconfig.options['lang']):
+    def extract_data(self, lang=config.options['lang']):
         """Extracts text **and** converts to data"""
         tess_in = Image.fromarray(self.bin_img.astype(bool))
         tess_in.format = 'TIFF'
@@ -251,7 +251,7 @@ class ImgReceipt(_BaseReceipt):
         logger.warning(f'Tess with lang: {lang}')
         try:
             data = ocr.image_to_data(tess_in, lang=lang, output_type='data.frame',
-                                     config=bbconstants._TESS_OPTIONS).dropna(
+                                     config=constants._TESS_OPTIONS).dropna(
                 subset=['text']).reset_index()
         except (ocr.TesseractError, ocr.TesseractNotFoundError) as tess_e:
             logger.exception(
@@ -363,7 +363,7 @@ class PdfReceipt(_BaseReceipt):
         data['text'] = txt
         data['line_num'] = [i + 1 for i in range(len(txt))]
 
-        scale = bbconstants._TARGET_DPI / pagedata.get_width() * (80 / 25.4)
+        scale = constants._TARGET_DPI / pagedata.get_width() * (80 / 25.4)
         ref_img = rgb2gray(pagedata.render(scale=scale).to_numpy())
 
         # Text BB
