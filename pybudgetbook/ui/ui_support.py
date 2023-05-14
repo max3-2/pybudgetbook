@@ -9,12 +9,13 @@ from PySide6.QtCore import Signal, Slot, Qt
 import numpy as np
 import pandas as pd
 
-# TODO make rel
-from pybudgetbook.config.config import options
-from pybudgetbook.config.constants import icons
-from pybudgetbook.config.config_tools import set_option, set_data_dir
+from ..configs.config import options
+from ..configs.constants import icons
+from ..configs.config_tools import set_option, set_data_dir
+
 
 logger = logging.getLogger(__package__)
+
 
 def _check_numeric(data):
     if isinstance(data, str):
@@ -34,6 +35,7 @@ def _check_numeric(data):
         np.issubdtype(data, np.complex128)
     )
 
+
 def convert_date(input_date):
     if isinstance(input_date, QtCore.QDate):
         return pd.to_datetime(input_date.toPython())
@@ -41,6 +43,7 @@ def convert_date(input_date):
         return QtCore.QDate(input_date.year, input_date.month, input_date.day)
     else:
         raise ValueError('Input must be either a QDate or a pandas Timestamp')
+
 
 # Build icons to reduce IO, only possible after App is started
 def _create_icons():
@@ -86,6 +89,7 @@ def set_new_conf_val(parent, name, valtype):
     else:
         set_option(name, retval)
 
+
 class _LogSignalProxies(QtCore.QObject):
     """
     Signal namespace protection with logging emit calls - else there will be
@@ -100,11 +104,10 @@ class _LogSignalProxies(QtCore.QObject):
 
 
 class MplCanvas(FigureCanvas):
-    """
-    TODO
-    """
-
     def __init__(self, parent=None, *args, **kwargs):
+        """
+        TODO
+        """
         """_summary_
 
         Parameters
@@ -433,7 +436,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 elif np.issubdtype(self._dtypes[index.column()], int):
                     value = int(value)
             except ValueError:
-                print("Wrong dtype")
+                logger.debug("Wrong dtype in tableview column")
                 return False
 
             self._data.iat[index.row(), index.column()] = value
@@ -643,6 +646,7 @@ class ColoredStatusBar(QtWidgets.QStatusBar):
 
 class TextDisplayWindow(QtWidgets.QWidget):
     closed = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle('Raw Text display')

@@ -9,8 +9,8 @@ from skimage.segmentation import clear_border
 from skimage.morphology import disk, diamond, binary_erosion
 from skimage.util import img_as_ubyte
 
-#TODO relative
-import pybudgetbook.config.constants as bbconstants
+
+from .configs import constants
 
 
 def load_image(imgpath):
@@ -26,7 +26,7 @@ def preprocess_image(grayscale, otsu='global',
     width in mm
     """
     if rescale_image:
-        scale = bbconstants._TARGET_DPI / grayscale.shape[1] * (80 / 25.4)
+        scale = constants._TARGET_DPI / grayscale.shape[1] * (80 / 25.4)
         proc_img = rescale(grayscale, scale)
 
     if not any(param is None for param in unsharp_ma):

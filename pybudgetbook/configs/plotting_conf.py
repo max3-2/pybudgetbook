@@ -2,6 +2,7 @@
 import matplotlib as mpl
 from matplotlib.patches import Rectangle
 
+
 _def_style = {
     'figure.constrained_layout.use': True,
 

@@ -2,11 +2,7 @@
 import re
 from pathlib import Path
 
-"""
-ALL CAPS consider constants which are most likely fixed and will stay in this
-location. Small caps are constants which might get changed and even moved to
-a better location in the future
-"""
+
 _MODULE_ROOT = Path(__file__).parent.parent
 _FOLDER_STRUCT = {'data': None,
                   'backup': None,
@@ -78,7 +74,7 @@ _patterns = {
                 },
 }
 
-_icon_root = Path('img/groups')
+_icon_root = Path(__file__).parent.parent / 'img' / 'groups'
 icons = {
     'Grundnahrungsmittel': str(_icon_root / 'general.png'),
     'Milchprodukte': str(_icon_root / 'dairy.png'),

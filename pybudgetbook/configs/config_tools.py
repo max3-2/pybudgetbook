@@ -6,15 +6,14 @@ import logging
 import configparser
 import json
 
-# TODO rel. import
-import pybudgetbook.config.config as bbconfig
-import pybudgetbook.config.constants as bbconstants
-
+from . import config
+from . import constants
+from .. import _top_package
 
 logger = logging.getLogger(__package__)
-# TODO package if its a package, else this wont work
-# _config_path = Path(appdirs.user_config_dir(appname=__package__))
-_config_path = Path(appdirs.user_config_dir(appname='pybudgetbook'))
+
+
+_config_path = Path(appdirs.user_config_dir(appname=_top_package))
 _c_file = _config_path / 'pybb_conf.ini'
 
 
@@ -67,9 +66,9 @@ def load_config(cfile=_c_file):
 
     for section in cparser.sections():
         for item, val in cparser[section].items():
-            if item not in bbconfig.options:
+            if item not in config.options:
                 logger.info(f'Creating new config item on the fly: {item:s}')
-            bbconfig.options[item] = _intelligent_converter(val)
+            config.options[item] = _intelligent_converter(val)
 
 
 def location():
@@ -78,10 +77,10 @@ def location():
 
 
 def copy_group_templates(force=False):
-    assert bbconfig.options['data_folder'] != 'none', 'Data directory invalid'
+    assert config.options['data_folder'] != 'none', 'Data directory invalid'
     # Get all files avaiable
     templates = (Path(__file__).parent.parent / 'group_templates/').glob('*.json')
-    target = Path(bbconfig.options['data_folder'])
+    target = Path(config.options['data_folder'])
     for template in templates:
         if (target / template.name).exists() and not force:
             logger.info(f'Skipping file {str(template.name):s} - already available')
@@ -113,8 +112,8 @@ def set_data_dir(new_dir):
     with open(_c_file, 'w') as configfile:
         cparser.write(configfile)
 
-    bbconfig.options['data_folder'] = str(new_dir)
-    _make_folder_structure(new_dir, bbconstants._FOLDER_STRUCT)
+    config.options['data_folder'] = str(new_dir)
+    _make_folder_structure(new_dir, constants._FOLDER_STRUCT)
     copy_group_templates()
 
 
@@ -122,12 +121,12 @@ def set_option(name, value, persistent=True):
     """
     Sets the value of a configuration option.
     """
-    if name not in bbconfig.options:
+    if name not in config.options:
         error = f'Configuration option "{name}" does not exist.'
         logger.error(error)
         raise LookupError(error)
 
-    bbconfig.options[name] = value
+    config.options[name] = value
     if persistent:
         file = Path(_c_file)
         cparser = configparser.ConfigParser()
@@ -140,4 +139,3 @@ def set_option(name, value, persistent=True):
 
         with open(file, 'w') as configfile:
             cparser.write(configfile)
-

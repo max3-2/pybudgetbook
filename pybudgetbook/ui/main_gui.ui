@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>13</hour>
+                       <hour>11</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>17</hour>
+                       <hour>16</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>19</hour>
+                       <hour>18</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -845,17 +845,17 @@
   <customwidget>
    <class>SliderWithVal</class>
    <extends>QSlider</extends>
-   <header>pybudgetbook.ui.ui_support</header>
+   <header>.ui_support</header>
   </customwidget>
   <customwidget>
    <class>PandasViewer</class>
    <extends>QTableView</extends>
-   <header>pybudgetbook.ui.ui_support</header>
+   <header>.ui_support</header>
   </customwidget>
   <customwidget>
    <class>ColoredStatusBar</class>
    <extends>QStatusBar</extends>
-   <header>pybudgetbook.ui.ui_support</header>
+   <header>.ui_support</header>
   </customwidget>
  </customwidgets>
  <resources/>

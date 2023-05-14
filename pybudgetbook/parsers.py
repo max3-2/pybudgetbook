@@ -4,10 +4,9 @@ import pandas as pd
 import numpy as np
 import logging
 
-# TODO make relative
-import pybudgetbook.config.config as bbconfig
-import pybudgetbook.config.constants as bbconstants
-from pybudgetbook.config.plotting_conf import default_rect
+from .configs import config
+from .configs import constants
+from .configs.plotting_conf import default_rect
 
 """
 The module begings with common and utility funtions. At the end, the main
@@ -21,18 +20,18 @@ logger = logging.getLogger(__package__)
 
 
 _retrieved_data_template = pd.DataFrame(
-    columns=bbconstants._MANDATORY_COLS)
+    columns=constants._MANDATORY_COLS)
 
 
 def get_vendor(raw_text):
-    for rec_t in bbconfig.receipt_types.keys():
-        check_strings = [rec_t] + bbconfig.receipt_aliases.get(rec_t, [])
+    for rec_t in config.receipt_types.keys():
+        check_strings = [rec_t] + config.receipt_aliases.get(rec_t, [])
         this_check = any([re.search(rf'([\b_]*?{cs:s}|{cs:s}[_\b])', raw_text, re.IGNORECASE) is not None
                           for cs in check_strings])
 
         if this_check:
-            patterns = bbconfig.receipt_types[rec_t]
-            logger.debug('Vendor found: ', rec_t)
+            patterns = config.receipt_types[rec_t]
+            logger.debug(f'Vendor found: {rec_t}')
             return rec_t, patterns
 
     logger.debug('No vendor found, using general')
@@ -53,9 +52,9 @@ def get_date(raw_text, pattern):
 
 
 def get_patterns(pattern, lang):
-    pats = bbconstants._patterns['gen' + '_' + lang]
+    pats = constants._patterns['gen' + '_' + lang]
     try:
-        pats.update(bbconstants._patterns[pattern + '_' + lang])
+        pats.update(constants._patterns[pattern + '_' + lang])
     except KeyError:
         logger.info('No additional patterns found for {pattern:s}')
     return pats
@@ -105,9 +104,9 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
         try:
             total_price = float(
                 matcher.search(data.iloc[last_line]['text']).group(0).replace(',', '.').replace('_', ''))
-            print('Found total price: ', total_price)
+            logger.debug(f'Found total price: {total_price:.f}')
         except ValueError:
-            print('No total price')
+            logger.warning('No total price detected')
 
     # This works for the general case
     else:
@@ -121,9 +120,9 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
             total_price = float(
                 pats['total_sum_pattern'].search(data.loc[last_line, 'text']
                                                  ).group(0).replace(',', '.').replace('_', ''))
-            print('Found total price @ line: ', total_price, '@', last_line)
+            logger.debug(f'Found total price @ line: {total_price:.2f} @ {last_line:d}')
         except (ValueError, AttributeError):  # Either no match or no valid conversion
-            print('No total price')
+            logger.warning('No total price')
 
     # Initialize variables
     this_row_exists = False
@@ -131,11 +130,11 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
     unused_lines = []
 
     # Parse line by line and see what can be classified
-    print(f' Searching from line {first_item:d} to {last_line:d}')
+    logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
     for _, group in data[first_item:last_line].iterrows():
         has_price, has_weight, has_mult = False, False, False
         this_line = group['text']
-        print('Analyzing: ', this_line)
+        logger.debug(f'Analyzing: {this_line:s}')
 
         # Is there a price with tax class?
         if (re_res := pats['price_with_class'].search(this_line)) is not None:
@@ -148,7 +147,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
             tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2'))
             has_price = True
-            print('Normal item: ', this_line, price, tax_class)
+            logger.debug(f'Normal item price @ tax class {price:.2f} @ {tax_class:d}')
 
         # Is there a kg price, e.g. weight multiplier (then skip normal mult.)
         if (re_res := pats['weight_pattern'].search(this_line)) is not None:
@@ -160,7 +159,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
                 amount = 0
 
             has_weight = True
-            print('Found weight: ', amount, price_per_unit)
+            logger.debug(f'Found weight: {amount:.3f} x {price_per_unit:.2f}')
 
         # If no weight, is there a multiplier?
         elif (re_res := pats['mult_pattern'].search(this_line)) is not None:
@@ -176,7 +175,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
                         price_per_unit = 0
 
                     has_mult = True
-                    print('Found mult: ', price_per_unit, ' Amount: ', amount)
+                    logger.debug(f'Found weight: {amount:.3f} x {price_per_unit:.2f}')
 
             # And the general case
             else:
@@ -186,7 +185,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
                     price_per_unit = 0
 
                 has_mult = True
-                print('Found mult: ', price_per_unit)
+                logger.debug(f'Found mult: {price_per_unit:.2f}')
 
         # Match discounts, currently only DM since there are a lot of coupons!
         if pattern == 'dm':
@@ -194,7 +193,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
                 try:
                     discount += float(re_res.group(0).replace(',', '.'))
                 except ValueError:
-                    print('Cant convert discount')
+                    logger.warning("Can't convert discount in DM receipt")
                 continue
 
         # Analysis done, now extract and sort the data, this is the most
@@ -208,7 +207,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
         # Real places mult after item: look behind
         if has_mult and not has_price:
             if pattern == 'real':
-                print('Debug: Real look behind')
+                logger.debug('Real look behind')
                 retrieved_data.loc[
                     retrieved_data.index[-1], ['PricePerUnit']] = price_per_unit
             else:
@@ -264,7 +263,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
             else:
                 article_number = -1
                 article_name = ' '.join(article_data).strip().lower().title()
-            print('Final: ', article_number, article_name)
+            logger.debug(f'Final article: {article_number:d}, {article_name:s}')
 
             # Lookahead from before if price was missing for a mult line
             if this_row_exists:
@@ -289,7 +288,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
     # Add a discount
     if discount != 0:
-        print('Discount: ', discount)
+        logger.debug(f'Discount: {discount:.2f}')
         retrieved_data = pd.concat(
             [retrieved_data, pd.DataFrame({
                 'ArtNr': -1,
@@ -314,7 +313,7 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
     first_item = max(0, first_item - 2)
     for _, group in data[first_item:].iterrows():
         this_line = group['text']
-        print('Analyzing: ', this_line)
+        logger.debug(f'Analyzing: {this_line:s}')
 
         # Is there a price with tax class? Then the line before is ArtNr
         # and the one before that name
@@ -330,7 +329,8 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
             article_number = int(pats['article_number'].search(line_buffer[-1]).group(0))
             article_name = line_buffer[-2].replace('_', ' ')
 
-            print('Item: ', article_number, article_name, price, tax_class)
+            logger.debug(
+                f'Item: {article_number:d}, {article_name:s}, {price:.2f} @ {tax_class:d}')
 
             # extract units and price per unit
             weight_info = pats['mult_pattern'].findall(this_line)
@@ -338,7 +338,6 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
                 amount = float(weight_info[0].replace(',', '.'))
                 price_per_unit = float(weight_info[1].replace(',', '.'))
             except ValueError:
-                print("Add this to logger")
                 amount = 0
                 price_per_unit = 0
 
@@ -364,10 +363,10 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
         if (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
             try:
                 total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
-                print('Found total price: ', total_price)
+                logger.debug(f'Found total price: {total_price:.2f}')
                 break
             except ValueError:
-                ...
+                logger.warning('No Total Price found!')
 
     return retrieved_data, total_price
 
@@ -394,7 +393,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
     for _, group in data[first_item:].iterrows():
         this_line = group['text']
         has_mult, has_price, add_data = False, False, False
-        print('Analyzing: ', this_line)
+        logger.debug(f'Analyzing: {this_line:s}')
         # Is there a price with tax class? Is the amount 1?
         if (re_res := pats['price_with_class'].search(this_line)) is not None:
             price, tax_class = re_res.group(0).split('_')
@@ -407,7 +406,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
             tax_class = int(tax_class.upper().replace('A', '1').replace('B', '2').replace('I', '1'))
 
             has_price = True
-            print(price, tax_class)
+            logger.debug(f'Article: {price:.2f} @ {tax_class:d}')
 
             # Now get the count if there, else this is a sum line
             if (re_res := re.search(r'^[I\d]{1,2}_*?[xX]', this_line)) is not None:
@@ -430,7 +429,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
                             ...
 
                 has_mult = True
-                print(amount, ppu)
+                logger.debug(f'Multiplier pattern: {amount:d} x {ppu:.2f}')
 
         # normal line
         if has_price and not has_mult:
@@ -464,10 +463,10 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
         if (re_res := pats['total_sum_pattern'].search(this_line)) is not None:
             try:
                 total_price = float(re_res.group(0).replace(',', '.').replace('_', ''))
-                print('Found total price: ', total_price)
+                logger.debug(f'Found total price: {total_price:.2f}')
                 break
             except ValueError:
-                ...
+                logger.warning('No total price detected')
 
     return retrieved_data, total_price
 
@@ -497,19 +496,19 @@ def parse_receipt_general_fra(data, pats, pattern, ax=None):
         total_price = float(
             pats['total_sum_pattern'].search(data.loc[last_line, 'text']
                                              ).group(0).replace(',', '.').replace('_', ''))
-        print('Found total price @ line: ', total_price, '@', last_line)
+        logger.debug(f'Found total price @ line: {total_price:.2f} @ {last_line:d}')
     except (ValueError, AttributeError):  # Either no match or no valid conversion
-        print('No total price')
+        logger.warning('No total price detected')
 
     # Parse line by line and see what can be classified
-    print(f' Searching from line {first_item:d} to {last_line:d}')
+    logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
     for _, group in data[first_item:last_line].iterrows():
         this_line = group['text']
-        print('Analyzing: ', this_line)
+        logger.debug(f'Analyzing: {this_line:s}')
 
         # Skip sub totals
         if 'total' in this_line.lower():
-            print('Skipping Subtotal')
+            logger.debug('Skipping Subtotal Item')
             continue
 
         # is there a mult?
@@ -524,7 +523,7 @@ def parse_receipt_general_fra(data, pats, pattern, ax=None):
             except ValueError:
                 price_per_unit = np.nan
 
-            print('multiplier found:', amount, price_per_unit)
+            logger.debug(f'Multiplier found: {amount:.2f} x {price_per_unit:.2f}')
             retrieved_data.loc[
                 retrieved_data.index[-1], ['Units']] = amount
             retrieved_data.loc[
@@ -546,7 +545,7 @@ def parse_receipt_general_fra(data, pats, pattern, ax=None):
 
             art_name = re_res.group(2).replace('_', ' ').strip()
 
-            print('Normal item: ', art_name, price, tax_class)
+            logger.debug(f'Normal item: {art_name:s}, {price:.2f} @ {tax_class:d}')
             retrieved_data = pd.concat(
                 [retrieved_data, pd.DataFrame({
                     'ArtNr': -1,

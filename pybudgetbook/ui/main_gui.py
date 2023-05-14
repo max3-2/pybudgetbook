@@ -23,7 +23,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QSizePolicy, QSlider, QSpacerItem, QSplitter,
     QTabWidget, QVBoxLayout, QWidget)
 
-from pybudgetbook.ui.ui_support import (ColoredStatusBar, PandasViewer, SliderWithVal)
+from .ui_support import (ColoredStatusBar, PandasViewer, SliderWithVal)
 
 class Ui_pybb_MainWindow(object):
     def setupUi(self, pybb_MainWindow):
@@ -228,9 +228,9 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(13, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(17, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(19, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(11, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(16, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(18, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)

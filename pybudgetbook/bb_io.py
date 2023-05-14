@@ -8,9 +8,8 @@ import h5py
 import warnings
 import shutil
 
-# TODO MAKE RELATIVE
-import pybudgetbook.config.config as bbconfig
-import pybudgetbook.config.constants as bbconstant
+from .configs import config
+from .configs import constants
 
 logger = logging.getLogger(__package__)
 
@@ -49,7 +48,7 @@ def _findFilesExt(directory, ext):
                 yield Path(root), basename, Path(filename)
 
 
-def unique_file_name(path):
+def _unique_file_name(path):
     if not path.exists():
         return path
 
@@ -63,9 +62,9 @@ def unique_file_name(path):
         i += 1
 
 
-def load_user_match_data(lang):
+def _load_user_match_data(lang):
     """Loads user only match data"""
-    user_data = Path(bbconfig.options['data_folder']) / f'item_groups_{lang:s}.json'
+    user_data = Path(config.options['data_folder']) / f'item_groups_{lang:s}.json'
 
     if not user_data.is_file():
         error = (f'No matching data for {lang:s} in user folder, please '
@@ -90,7 +89,7 @@ def _save_user_match_data(data, target):
         json.dump(data, udd, indent=4, ensure_ascii=False)
 
 
-def load_basic_match_data(lang):
+def _load_basic_match_data(lang):
     """Loads basic only match data"""
     basic_data = Path(__file__).parent / 'group_templates' / f'item_groups_{lang:s}.json'
 
@@ -109,7 +108,7 @@ def load_basic_match_data(lang):
 
 def load_negative_match_data(lang):
     """Loads negative group match data for a given language"""
-    neg_data = Path(bbconfig.options['data_folder']) / f'negative_match_{lang:s}.json'
+    neg_data = Path(config.options['data_folder']) / f'negative_match_{lang:s}.json'
 
     if not neg_data.is_file():
         error = (f'No negative match data found for {lang:s}, please check '
@@ -145,7 +144,7 @@ def load_group_match_data(lang):
 
     """
     basic_data = Path(__file__).parent / 'group_templates' / f'item_groups_{lang:s}.json'
-    user_data = Path(bbconfig.options['data_folder']) / f'item_groups_{lang:s}.json'
+    user_data = Path(config.options['data_folder']) / f'item_groups_{lang:s}.json'
 
     if not basic_data.is_file() and not user_data.is_file():
         error = ('Neither basic package matching data nor user matching data '
@@ -188,13 +187,13 @@ def load_concatenad_data(work_dir=None):
     Loads main dataset (eg concatenated data)
     """
     if work_dir is None:
-        data_files = Path(bbconfig.options['data_folder'])
+        data_files = Path(config.options['data_folder'])
     else:
         data_files = Path(work_dir)
 
     data_files = _findFilesExt(data_files, '.hdf5')
 
-    conc_data = pd.DataFrame(columns=bbconstant._MANDATORY_COLS)
+    conc_data = pd.DataFrame(columns=constants._MANDATORY_COLS)
 
     for _, _, file in data_files:
         this_dataset = load_with_metadata(file)
@@ -206,8 +205,8 @@ def load_concatenad_data(work_dir=None):
 def resort_data(data):
     """Ensures the correct column order and that all needed columns exists"""
     additional_cols = tuple(
-        set(data.columns).difference(set(bbconstant._MANDATORY_COLS)))
-    data = data[list(bbconstant._MANDATORY_COLS + additional_cols)]
+        set(data.columns).difference(set(constants._MANDATORY_COLS)))
+    data = data[list(constants._MANDATORY_COLS + additional_cols)]
     return data
 
 
@@ -221,7 +220,7 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
     year = dataframe.loc[0, 'Date'].strftime('%Y')
     mon_day = dataframe.loc[0, 'Date'].strftime('%m_%d')
     if target is None:
-        target = Path(bbconfig.options['data_folder']) / 'data' / year
+        target = Path(config.options['data_folder']) / 'data' / year
         if not target.exists() or not target.is_dir():
             target.mkdir(parents=True, exist_ok=True)
 
@@ -234,7 +233,7 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
         data_target = target
 
     if unique_name and data_target.exists():
-        data_target = unique_file_name(data_target)
+        data_target = _unique_file_name(data_target)
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
@@ -273,4 +272,3 @@ def load_with_metadata(source):
     receipt.attrs = att_dict
 
     return receipt
-

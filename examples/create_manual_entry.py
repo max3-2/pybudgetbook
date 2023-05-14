@@ -5,8 +5,7 @@ This will be adapted as soon as a stable API is finalized!
 import logging
 import pandas as pd
 
-import pybudgetbook.config.constants as bbconstants
-import pybudgetbook.config.config as bbconfig
+import pybudgetbook.configs.constants as bbconstants
 from pybudgetbook import bb_io, fuzzy_match
 
 logger = logging.getLogger(__name__)

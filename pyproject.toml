@@ -47,6 +47,9 @@ dependencies = [
 [project.optional-dependencies]
 doc = ['Sphinx', 'Furo', 'MyST-parser']
 
+[project.scripts]
+pybudgetbook = "pybudgetbook.ui.start_gui:start_main_ui"
+
 [project.urls]
 # Documentation = 'OnlyReadMe'
 Source = 'https://github.com/max3-2/pybudgetbook'
