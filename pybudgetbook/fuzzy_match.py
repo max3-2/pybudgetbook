@@ -85,7 +85,7 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
 
 
 def find_groups(retrieved_data, lang=config.options['lang']):
-    print(f'Matching groups with language {lang}')
+    logger.debug(f'Matching groups with language {lang}')
     match_data = bb_io.load_group_match_data(lang)
 
     retrieved_data['Group'] = retrieved_data.apply(

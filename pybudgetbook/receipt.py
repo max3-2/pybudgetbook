@@ -128,7 +128,7 @@ class _BaseReceipt():
         if 'date_pattern' in self._patset:
             date = parsers.get_date(self._raw_text, self._patset['date_pattern'])
         else:
-            print('Warn: No date matching pattern')
+            logger.warning('No date matching pattern available')
             date = None
 
         return date

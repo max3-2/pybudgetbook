@@ -436,7 +436,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 elif np.issubdtype(self._dtypes[index.column()], int):
                     value = int(value)
             except ValueError:
-                print("Wrong dtype")
+                logger.debug("Wrong dtype in tableview column")
                 return False
 
             self._data.iat[index.row(), index.column()] = value
