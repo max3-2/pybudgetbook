@@ -41,7 +41,7 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
     """
     logger.debug(f'Running matcher feedback with lang: {lang}')
 
-    user_match_data, user_match_file = bb_io.l_oad_user_match_data(lang)
+    user_match_data, user_match_file = bb_io._load_user_match_data(lang)
     basic_match_data, _ = bb_io._load_basic_match_data(lang)
     neg_match_data = bb_io.load_negative_match_data(lang)
 

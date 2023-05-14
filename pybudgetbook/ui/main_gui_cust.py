@@ -373,7 +373,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             try:
                 diff = refval - self._current_data['Price'].sum()
             except Exception as compute_exc:
-                logger.exception(f'{compute_exc}')
+                diff = refval - self.tableView_pandasViewer.get_final_data()['Price'].sum()
 
         else:
             diff = refval - baseval
