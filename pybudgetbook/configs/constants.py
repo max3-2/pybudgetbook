@@ -74,7 +74,7 @@ _patterns = {
                 },
 }
 
-_icon_root = Path('img/groups')
+_icon_root = Path(__file__).parent.parent / 'img' / 'groups'
 icons = {
     'Grundnahrungsmittel': str(_icon_root / 'general.png'),
     'Milchprodukte': str(_icon_root / 'dairy.png'),
