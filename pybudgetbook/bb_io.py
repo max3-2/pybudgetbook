@@ -49,6 +49,19 @@ def _findFilesExt(directory, ext):
 
 
 def _unique_file_name(path):
+    """
+    Generates a unique file name adding numbers until a free name is found.
+
+    Parameters
+    ----------
+    path : `Path`
+        Inital file name to try
+
+    Returns
+    -------
+    `Path`
+        File name of a non-existing file.
+    """
     if not path.exists():
         return path
 
@@ -63,7 +76,7 @@ def _unique_file_name(path):
 
 
 def _load_user_match_data(lang):
-    """Loads user only match data"""
+    """Loads user only match data for given language `lang`"""
     user_data = Path(config.options['data_folder']) / f'item_groups_{lang:s}.json'
 
     if not user_data.is_file():
@@ -79,18 +92,8 @@ def _load_user_match_data(lang):
     return result, user_data
 
 
-def _save_user_match_data(data, target):
-    """Saves user match data"""
-    if not target.is_file():
-        logger.info('No matching data for in user folder, new file '
-                    'will be created.')
-
-    with open(target, 'w') as udd:
-        json.dump(data, udd, indent=4, ensure_ascii=False)
-
-
 def _load_basic_match_data(lang):
-    """Loads basic only match data"""
+    """Loads package only match data for given language `lang`"""
     basic_data = Path(__file__).parent / 'group_templates' / f'item_groups_{lang:s}.json'
 
     if not basic_data.is_file():
@@ -106,8 +109,24 @@ def _load_basic_match_data(lang):
     return result, basic_data
 
 
+def _save_user_match_data(data, target):
+    """
+    Small wrapper aroung `json.dump()` to save user match data in the correct
+    file.
+    """
+    if not target.is_file():
+        logger.info('No matching data for in user folder, new file '
+                    'will be created.')
+
+    with open(target, 'w') as udd:
+        json.dump(data, udd, indent=4, ensure_ascii=False)
+
+
 def load_negative_match_data(lang):
-    """Loads negative group match data for a given language"""
+    """
+    Loads negative group match data for a given language `lang`. This data is
+    used to clean up matcher feedback with some very common words.
+    """
     neg_data = Path(config.options['data_folder']) / f'negative_match_{lang:s}.json'
 
     if not neg_data.is_file():
@@ -125,23 +144,19 @@ def load_negative_match_data(lang):
 
 def load_group_match_data(lang):
     """
-    Load and merge match data from different locations.
+    Load and merge match data from different locations for a given language.
+    Currently, a package wide location and a user specific (that is data folder
+    specific) location are implemented.
 
     Parameters
     ----------
-    lang : TYPE
-        DESCRIPTION.
-
-    Raises
-    ------
-    FileNotFoundError
-        DESCRIPTION.
+    lang : `str`
+        The language setting to use for loading.
 
     Returns
     -------
-    result : TYPE
-        DESCRIPTION.
-
+    result : `dict`
+        Concatenated match data from user and package space.
     """
     basic_data = Path(__file__).parent / 'group_templates' / f'item_groups_{lang:s}.json'
     user_data = Path(config.options['data_folder']) / f'item_groups_{lang:s}.json'
@@ -184,7 +199,19 @@ def load_group_match_data(lang):
 
 def load_concatenad_data(work_dir=None):
     """
-    Loads main dataset (eg concatenated data)
+    Loads all data files from work dir and creates a concatenated dataset that
+    checks that all mandatory columns are present.
+
+    Parameters
+    ----------
+    work_dir : `Path`, optional
+        Path to load the data from, by default None which chooses the data
+        folder from the config.
+
+    Returns
+    -------
+    `pd.DataFrame`
+        Concatenated data from all datasets present in the folder.
     """
     if work_dir is None:
         data_files = Path(config.options['data_folder'])
@@ -203,7 +230,10 @@ def load_concatenad_data(work_dir=None):
 
 
 def resort_data(data):
-    """Ensures the correct column order and that all needed columns exists"""
+    """
+    Ensures the correct column order and that all needed columns exists. Needed
+    columns are defined in `constants`.
+    """
     additional_cols = tuple(
         set(data.columns).difference(set(constants._MANDATORY_COLS)))
     data = data[list(constants._MANDATORY_COLS + additional_cols)]
@@ -213,9 +243,23 @@ def resort_data(data):
 def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
                        move_on_save=False):
     """
-    Target is a path in this case, which will create a new hdf store with the
-    pandas dataframe and metadata attached to the dataframe. If img is
-    specified, it will be moved to data folder (or copied)
+    Saves a dataframe to hdf conserving possible attributes that are added to
+    the dataframe. If img is specified, it will be moved to data folder (or
+    copied)
+
+    Parameters
+    ----------
+    dataframe : `pd.DataFrame`
+        Data to save
+    target : `Path`, optional
+        Save target, by default None which creates a meaningful name from data
+    img_path : `Path`, optional
+        Image to copy / move and rename to the same name, by default None
+    unique_name : `bool`, optional
+        Generate a unique name to prevent override of existing files, by
+        default False
+    move_on_save : `bool`, optional
+        Decides if the image is moved or copied, by default False
     """
     year = dataframe.loc[0, 'Date'].strftime('%Y')
     mon_day = dataframe.loc[0, 'Date'].strftime('%m_%d')
@@ -259,8 +303,18 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
 
 def load_with_metadata(source):
     """
-    Source is a path in this case, which will load the hdf store with the
-    pandas dataframe and metadata and attach the metadata to the dataframe.
+    Loads a pandas written h5 dataset and tries to retrieve any attributes that
+    have been added to the dataset by the save function.
+
+    Parameters
+    ----------
+    source : `Path`
+        Location of file to load
+
+    Returns
+    -------
+    `pd.DataFrame`
+        Loaded data
     """
     receipt = pd.read_hdf(source)
     with h5py.File(source) as hdfstore:
