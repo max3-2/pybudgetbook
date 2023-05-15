@@ -1,34 +1,50 @@
 """
 Package-wide config options which are synced with the config file on start.
 To have a good sync, the ones accessed by the file are kept in a dict. The ones
-which are not in a dict are not handled by the file and currenly must be set
-individually using the API.
+which are not in a dict are not supposed to be edited!
+
+data_folder: `Path`, defaults to None
+    Folder with data of the parsed and loaded receipts, incl. archive data.
 
 move_on_parse: `bool`, defaults to `True`
     Move images to datafolder on parse. If false, images are copied.
-data_folder: `Path`, defaults to None
-    Folder with data of the parsed and loaded receipts, incl. archive data.
+
 lang: `str`, defaults to `deu`
     Main language for pattern matching and tesseract, can be changed on the
     fly, this is just the preset.
+
+generate_unique_name
+
+show_logger_on_start
+
+logger_popup_level
+
+logger_show_debug
+
+ask_for_image
+
+
+The following values should only be edited if you know what you are doing
+
 receipt_aliases: `dict`
     Coontains aliases of strngs found in the specific receipts to identify
     the vendor.
+
 receipt_types: `dict`
     Maps vendors found by aliases or vendor.lower() pattern matching to a
     receipt type. This type then determines the pattern used for matching.
     Patterns are defined in constants, only change if you know what you are
     doing!
-_negative_groups: `dict`
-    MHolds lang. spec. lists of small words and patterns to trash when adding
-    new items to groups, so some of the clustering is prevented.
+
+needs_tax_switch: `dict`
+
 """
 # TODO update docu values
 options = {
     'data_folder': None,
     'move_on_save': True,
-    'generate_unique_name': True,
     'lang': 'deu',
+    'generate_unique_name': True,
     'show_logger_on_start': False,
     'logger_popup_level': 20,
     'logger_show_debug': False,
@@ -56,4 +72,9 @@ receipt_types = {
     'Tankstelle': 'tank',
     'Raiffeisen': 'raiff',
     'General': 'gen',
+}
+
+# Maps from -> to if tax switching is needed for a vendor.
+needs_tax_switch = {
+    'Aldi': (1, 2),
 }

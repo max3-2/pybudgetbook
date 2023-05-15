@@ -23,6 +23,33 @@ _retrieved_data_template = pd.DataFrame(
     columns=constants._MANDATORY_COLS)
 
 
+def _flip_tax_class(retrieved_data, tc_inp1=1, tc_inp2=2):
+    """
+    Flips tax class, usually from 1 to 2 which is the way that is needed for
+    `ger` receipts, especiallly ALDI.
+
+    Parameters
+    ----------
+    retrieved_data : `pd.DataFrame`
+        Input df.
+    tc_inp1 : `int`, optional
+        Switch value 1. The default is 1.
+    tc_inp2 : `int`, optional
+        Switch value 2. The default is 2.
+
+    Returns
+    -------
+    retrieved_data : `pd.DataFrame`
+        Output df with switched tax.
+    """
+    is_from = retrieved_data['TaxClass'] == tc_inp1
+    is_to = retrieved_data['TaxClass'] == tc_inp2
+    retrieved_data.loc[is_from, 'TaxClass'] = tc_inp2
+    retrieved_data.loc[is_to, 'TaxClass'] = tc_inp1
+
+    return retrieved_data
+
+
 def get_vendor(raw_text):
     for rec_t in config.receipt_types.keys():
         check_strings = [rec_t] + config.receipt_aliases.get(rec_t, [])

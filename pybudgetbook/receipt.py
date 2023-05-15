@@ -122,6 +122,13 @@ class _BaseReceipt():
         # Type check
         retrieved_data = _type_check(retrieved_data)
 
+        # Tax Class corrections
+        if self.vendor in config.needs_tax_switch.keys():
+            sw_a, sw_b = config.needs_tax_switch[self.vendor]
+            logger.info(f'Switching Tax Classes {sw_a} and {sw_b}')
+            retrieved_data = parsers._flip_tax_class(
+                retrieved_data, sw_a, sw_b)
+
         return retrieved_data, total_price
 
     def parse_date(self):

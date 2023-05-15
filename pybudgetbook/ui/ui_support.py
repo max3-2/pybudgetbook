@@ -18,7 +18,7 @@ logger = logging.getLogger(__package__)
 
 
 def _check_numeric(data):
-    if isinstance(data, str):
+    if isinstance(data, (str, bool)):
         return False
     if np.isnan(data):
         return False
