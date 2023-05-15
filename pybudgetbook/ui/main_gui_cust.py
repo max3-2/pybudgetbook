@@ -291,8 +291,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 return
 
         self.comboBox_receiptDisplayMode.setCurrentIndex(0)
-        self.receipt.disp_ax = self.plot_area_receipts.ax
-        self.display_receipt()
+        if self.receipt is not None:
+            self.receipt.disp_ax = self.plot_area_receipts.ax
+            self.display_receipt()
 
     def display_receipt(self):
         """Displays the receipt in the plot window."""
@@ -598,7 +599,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
             retrieved_data = bb_io.resort_data(retrieved_data)
             retrieved_data.to_csv(data_target)
-            logger.info('Exported data to csv')
+            logger.info(f'Exported data to csv: {str(data_target.name)}')
             return
 
         try:
