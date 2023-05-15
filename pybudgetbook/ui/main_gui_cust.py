@@ -174,6 +174,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.pushButton_reClassify.clicked.connect(self.re_match_data)
         self.pushButton_saveData.clicked.connect(self.save_data)
         self.comboBox_baseLang.currentTextChanged.connect(self.refilter_and_display)
+        self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -588,7 +589,16 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         retrieved_data['Date'] = ui_support.convert_date(self.dateEdit_shopDate.date())
 
         if target == 'csv':
-            ...
+            year = retrieved_data.loc[0, 'Date'].strftime('%Y')
+            mon_day = retrieved_data.loc[0, 'Date'].strftime('%m_%d')
+            target = Path(options['data_folder']) / 'export'
+
+            data_target = bb_io._unique_file_name(
+                Path(target) / f'{year}_{mon_day:s}_{retrieved_data.loc[0, "Vendor"]:s}.csv')
+
+            retrieved_data = bb_io.resort_data(retrieved_data)
+            retrieved_data.to_csv(data_target)
+            logger.info('Exported data to csv')
             return
 
         try:

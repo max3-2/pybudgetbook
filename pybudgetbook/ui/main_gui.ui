@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>11</hour>
+                       <hour>9</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>16</hour>
+                       <hour>15</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>18</hour>
+                       <hour>17</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -728,6 +728,8 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionExport_to_CSV"/>
+    <addaction name="actionCreate_data_backup"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -838,6 +840,16 @@
    </property>
    <property name="text">
     <string>Show Logger on Start</string>
+   </property>
+  </action>
+  <action name="actionExport_to_CSV">
+   <property name="text">
+    <string>Export to CSV</string>
+   </property>
+  </action>
+  <action name="actionCreate_data_backup">
+   <property name="text">
+    <string>Create data backup</string>
    </property>
   </action>
  </widget>
