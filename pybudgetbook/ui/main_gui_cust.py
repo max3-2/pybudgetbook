@@ -32,16 +32,18 @@ set_style()
 
 
 def _default_data():
+    """Default data for first row in data viewer and new row template."""
     init_data_viewer = pd.DataFrame(columns=constants._VIEWER_COLS)
     init_data_viewer.loc[0] = [-1, 'New Article Name', 1., 1., 1., 0, 'none']
     return init_data_viewer
 
 
 class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
+    """
+    Creates the main window that handles all UI tasks. The window design is
+    created in designer and the inherited as base class.
+    """
     def __init__(self):
-        """
-        Todo
-        """
         super().__init__()
         self.setupUi(self)
 
@@ -189,9 +191,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         super().closeEvent(event)
 
     def _about(self):
-        """
-        Build and display about box
-        """
+        """Build and display about box with dynamic version info"""
         self.about_box = QtWidgets.QMessageBox()
         self.about_box.setIcon(QtWidgets.QMessageBox.Information)
 
@@ -211,6 +211,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.about_box.exec()
 
     def show_raw_text(self):
+        """
+        Builds and displays the raw text window if a receipt with raw data is
+        successfully loaded.
+        """
         if self.raw_text_window is None:
             self.raw_text_window = ui_support.TextDisplayWindow()
 
@@ -224,9 +228,15 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.raw_text_window.closed.connect(self.on_text_window_closed)
 
     def on_text_window_closed(self):
+        """Destroy reference"""
         self.raw_text_window = None
 
     def load_receipt(self):
+        """
+        Tries to load a new receipt for processing. If a receipt is loaded,
+        tries to reset everything. Filters and displays the new receipt if
+        loading was successful.
+        """
         file, ptn = QtWidgets.QFileDialog(self).getOpenFileName(
             caption='Select a receipt file',
             dir=expanduser('~'),
@@ -284,6 +294,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.display_receipt()
 
     def display_receipt(self):
+        """Displays the receipt in the plot window."""
         if self.receipt is None:
             return
         if self.comboBox_receiptDisplayMode.currentIndex() == 0:
@@ -296,6 +307,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.raw_text_window.update_text(self.receipt.raw_text.replace('_', ' '))
 
     def refilter_and_display(self, keep_lim=True):
+        """Reapplies filters with updated settings and calls the display routine"""
         if self.receipt is None:
             return
         self.receipt.filter_image(
@@ -305,6 +317,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.update_rec_plot(keep_lim)
 
     def update_rec_plot(self, keep_lim=True):
+        """
+        Updates the core plot with possible same limits, used to update filter
+        params without destroying the current zoom view.
+        """
         current_lim = (
             self.plot_area_receipts.ax.get_xlim(),
             self.plot_area_receipts.ax.get_ylim())
@@ -314,6 +330,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.plot_area_receipts.ax.set_ylim(current_lim[1])
 
     def rotate_event(self, event, minor_step=0.1, major_step=0.5):
+        """
+        Event that adds a rotation to the receipt. Left and right are switched
+        due to the usual positive definition of mathematical rotation.
+        """
         if event.inaxes is self.plot_area_receipts.ax:
             if event.key == 'right':
                 self.receipt.rotation = -minor_step
@@ -335,6 +355,18 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.rotate_timer.start()
 
     def set_new_data(self, new_data, has_meta=False):
+        """
+        Sets new data to the UI elements, in case of loading a parsed receipt
+        or adding the data manually(?)
+
+        Parameters
+        ----------
+        new_data : `pd.DataFrame`
+            New data, must have the default format
+        has_meta : `bool`, optional
+            If meta is expected in the data, then update all meta fields. By
+            default False
+        """
         self._current_data = new_data
 
         # Update model
@@ -363,6 +395,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                     self.comboBox_overalCat.findText('n.a.'))
 
     def update_diff(self, refval, baseval=None):
+        """
+        Updates the difference display between total value and current data
+        sum.
+        """
         try:
             refval = float(refval)
         except ValueError:
@@ -389,6 +425,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             f'<font color="{color:s}">{diff:.2f}</font>')
 
     def recompute_diff(self, index1, index2, *args):
+        """
+        Recomputes the difference value if data in the numeric columns
+        containing the price data is changed. Column number is hard coded,
+        **CAREFUL**!
+        """
         col1, col2 = index1.column(), index2.column()
         if col1 == 5 or col2 == 5:
             self.update_diff(
@@ -397,6 +438,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             )
 
     def parse_data(self):
+        """
+        Parses a loaded receipt and displays the extracted data in the table
+        view. Since all the core functions are implemented in the `Receipt`
+        class this is just a wrapper handling UI settings and data display.
+        """
         if self.receipt is None:
             msg = 'Please load a receipt first'
             logger.info(msg)
@@ -448,6 +494,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.plot_area_receipts.canvas.draw_blit()
 
     def detect_date(self):
+        """Parses date from receipt, converts it and sets the date selector."""
         if self.receipt is None:
             msg = 'Please load a receipt first'
             logger.info(msg)
@@ -465,6 +512,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.statusbar.showMessage('Date extracted', timeout=2000, color='green')
 
     def detect_vendor(self):
+        """Parses vendor and sets the vendor text."""
         if self.receipt is None:
             msg = 'Please load a receipt first'
             logger.info(msg)
@@ -481,6 +529,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
 
     def re_match_data(self):
+        """
+        Re-Runs the group matcher if data has been changed or on manual request,
+        e. g. with manual data entered by the user.
+        """
         if self.tableView_pandasViewer.model().rowCount() > 0:
             data = self.tableView_pandasViewer.get_final_data()
 
@@ -500,7 +552,19 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         self.set_new_data(data)
 
-    def save_data(self):
+    def save_data(self, target='hdf'):
+        """
+        Saves the data currently displayed in the metadata fields and the
+        table view. Has a hook to export data to a simple format, currently
+        only `csv`.
+
+        Parameters
+        ----------
+        target : `str`, optional
+            Hook to write the data to a simple format (export data), currently
+            supports `csv` only. By default 'hdf' which creates the default
+            files.
+        """
         if (self.lineEdit_marketVendor.text() == 'General' or
                 self.lineEdit_marketVendor.text() == ''):
             msg_box = QtWidgets.QMessageBox()
@@ -522,6 +586,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         retrieved_data['Category'] = self.comboBox_overalCat.currentText()
         retrieved_data['Vendor'] = self.lineEdit_marketVendor.text()
         retrieved_data['Date'] = ui_support.convert_date(self.dateEdit_shopDate.date())
+
+        if target == 'csv':
+            ...
+            return
+
         try:
             total_ext = float(self.lineEdit_totalAmountReceipt.text())
         except ValueError:

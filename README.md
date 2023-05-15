@@ -23,9 +23,9 @@ reader / parser!
 <u>Reason 3: Data Analysis</u>
 
 The data is saved in `hdf`-files for `pandas` and can be easily exported to
-`csv` or any other format manually. So analysis is not limited to simple plots
-over time (even though the initial version does just that. Feel free to add
-ideas and improvements!)
+`csv` or any other format manually (ADD NOTE THAT READING IN HDF IS SUPPROTED!).
+So analysis is not limited to simple plots over time (even though the initial
+version does just that. Feel free to add ideas and improvements!)
 
 Uses some icons from [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/)
 
@@ -35,6 +35,7 @@ Add openmoji icons for buttons?
 ## Current State of Functionality and Roadmap
 
 - Prepare receipt images for `tesseract`
+- Rotation
 - Parse receipts from german supermarkets and read items
 - Correct items, add important metadata
 - Save items it a dedicated folder
