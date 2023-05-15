@@ -12,6 +12,15 @@
             "cwd": "${workspaceFolder}/pybudgetbook/",
             "console": "externalTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Python: Main UI Script",
+            "type": "python",
+            "request": "launch",
+            "program": "pybudgetbook",
+            "cwd": "${userHome}",
+            "console": "externalTerminal",
+            "justMyCode": true
         }
     ]
 }
