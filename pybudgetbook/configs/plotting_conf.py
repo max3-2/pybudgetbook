@@ -17,6 +17,17 @@ _def_style = {
 
 
 def default_rect(group, ax):
+    """
+    Creates a rectangle with default style from a group `Series` that holds
+    the geometric parameters.
+
+    Parameters
+    ----------
+    group : `pd.Series`
+        Rectangle parameters
+    ax : `mpl.axis`
+        Target axis to plot the rectangle to
+    """
     text_rec = Rectangle((group['left'], group['top']), group['width'], group['height'],
                          ec='green', fc='none', lw=0.6)
 
@@ -24,4 +35,5 @@ def default_rect(group, ax):
 
 
 def set_style():
+    """Sets a default style for good receipt plotting."""
     mpl.rcParams.update(_def_style)

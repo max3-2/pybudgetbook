@@ -20,8 +20,9 @@ _CATEGORIES = ['Supermarket', 'Small Stores', 'Cars & Gas', 'Clothing', 'Electro
 
 _UI_LANG_SUPPORT = ['deu', 'eng', 'fra']
 
-# Maps pattern with lang to set of regexp, general is alwazs used and the
-# rest is updated on top!  -> constants so its closed
+# Maps pattern with lang to set of regexp, general is always used (lang
+# specific) and the rest is updated using `dict` update. Patterns are fairly
+# complex and thus are not included in user config space.
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{2})'),
                 'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12]|AW)'),
@@ -74,6 +75,8 @@ _patterns = {
                 },
 }
 
+# Icons to use fro group display, currently only based on german group names -
+# this might need adaption if new language come in
 _icon_root = Path(__file__).parent.parent / 'img' / 'groups'
 icons = {
     'Grundnahrungsmittel': str(_icon_root / 'general.png'),

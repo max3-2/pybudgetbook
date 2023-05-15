@@ -18,6 +18,14 @@ _c_file = _config_path / 'pybb_conf.ini'
 
 
 def _check_config():
+    """
+    Checks if the config exists in user location, if not create and re-checks
+    if it finally exists.
+
+    Raises
+    ------
+    FileNotFoundError
+    """
     if not _c_file.parent.is_dir():
         _ = _c_file.parent.mkdir(parents=True)
         logger.info(f'Created new config dir at {_c_file.parent}')
@@ -33,6 +41,10 @@ def _check_config():
 
 
 def _make_folder_structure(root, template):
+    """
+    Creates the default data directory folder structure at `root` using the
+    `template` specified (in constants, as a `dict`)
+    """
     def one_directory(dic, path):
         for name, info in dic.items():
             next_path = path / Path(name)
@@ -46,6 +58,20 @@ def _make_folder_structure(root, template):
 
 
 def _intelligent_converter(value):
+    """
+    *Intelligent* converter to load from config file using the `configparser`.
+    Very simple type conversion.
+
+    Parameters
+    ----------
+    value
+        Config value to check and convert
+
+    Returns
+    -------
+    `mult.`
+        Converted value
+    """
     if value.lower() == 'true':
         return True
     elif value.lower() == 'false':
@@ -58,7 +84,11 @@ def _intelligent_converter(value):
 
 
 def load_config(cfile=_c_file):
-    """Loads the configuration from the given `.ini` file."""
+    """
+    Loads the configuration from the given `.ini` file. This is by default the
+    user configuration file handled by the package. Only change if absolutely
+    needed or for debug.
+    """
     file = Path(_c_file)
     logger.debug(f'Loading configuration from "{file}".')
     cparser = configparser.ConfigParser()
@@ -72,11 +102,21 @@ def load_config(cfile=_c_file):
 
 
 def location():
-    """Returns the default location of the configuration file."""
+    """Returns the default location of the user configuration file."""
     return _c_file
 
 
 def copy_group_templates(force=False):
+    """
+    Copies group templates for all available languages into the user folder.
+    Force is sued to override if you really want to reset. **ATTENTION** this
+    will lead to loss of any previously matched data!
+
+    Parameters
+    ----------
+    force : `bool`, optional
+        Override any existing files with the basic template, by default False
+    """
     assert config.options['data_folder'] != 'none', 'Data directory invalid'
     # Get all files avaiable
     templates = (Path(__file__).parent.parent / 'group_templates/').glob('*.json')
@@ -102,6 +142,15 @@ def copy_group_templates(force=False):
 
 
 def set_data_dir(new_dir):
+    """
+    Set a new data directory and initializes the directory with the default
+    folder structure and templates. Wont override anything (should, at least)
+
+    Parameters
+    ----------
+    new_dir : `Path`
+        New location for data folder.
+    """
     cparser = configparser.ConfigParser()
     _ = cparser.read(_c_file)
     new_dir = Path(new_dir)
@@ -119,7 +168,9 @@ def set_data_dir(new_dir):
 
 def set_option(name, value, persistent=True):
     """
-    Sets the value of a configuration option.
+    Sets the value of a configuration option. Iterates over config dict and
+    replaces the first value. If `persistent`, it will also replace the value
+    in the user condiguration file.
     """
     if name not in config.options:
         error = f'Configuration option "{name}" does not exist.'
