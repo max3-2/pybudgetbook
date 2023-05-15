@@ -23,6 +23,7 @@ logger = logging.getLogger(__package__)
 
 
 def _type_check(retrieved_data):
+    """Ensures that the data type in each view column is correct"""
     try:
         retrieved_data = retrieved_data.astype(
             {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
@@ -34,7 +35,10 @@ def _type_check(retrieved_data):
 
 
 class _BaseReceipt():
-
+    """
+    Base Receipt holds methods and attributes that are valid for either a pdf
+    or an image based receipt. Should not be called directly!
+    """
     def __init__(self):
         self._type = None
         self._gs_image = None
@@ -49,9 +53,9 @@ class _BaseReceipt():
         self._fig = None
         self.disp_ax = None
 
-    # Get but no manual set
     @property
     def raw_text(self):
+        """Raw extracted text from the receipt"""
         if self._data_extracted:
             return self._raw_text
         else:
@@ -60,10 +64,12 @@ class _BaseReceipt():
 
     @property
     def type(self):
+        """Receipt type, image or pdf"""
         return self._type
 
     @property
     def valid_data(self):
+        """Returns if data has been extracted from the receipt"""
         if self._data_extracted:
             return self._data
         else:
@@ -72,20 +78,28 @@ class _BaseReceipt():
 
     @property
     def parsing_patterns(self):
+        """Returns the current set of regexp parsing patterns"""
         return self._patset
 
     @property
     def vendor(self):
+        """Returns vendor"""
         return self._vendor
 
     # Template to allow chaining if receipt type not known beforehand
     def filter_image(self, **kwargs):
+        """Template, dont use directly"""
         return self
 
     def _create_figure(self):
+        """Figure convenience function for high level use"""
         self._fig, self._ax = plt.subplots(1, 2, sharex=True, sharey=True)
 
     def parse_vendor(self, lang=config.options['lang']):
+        """
+        Tries to extract the vendor from the receipt. Call this after
+        extract_data to get a meaningful result
+        """
         self._vendor, self._patident = parsers.get_vendor(self.raw_text)
         if self._vendor == 'General':
             logger.warning(
@@ -95,6 +109,7 @@ class _BaseReceipt():
         return self.set_vendor(self._vendor, lang)
 
     def set_vendor(self, vendor, lang=config.options['lang']):
+        """Manually set vendor if auto detect failed"""
         self._vendor = vendor
         self._patident = config.receipt_types.get(self._vendor, 'gen')
         self._patset = parsers.get_patterns(self._patident, lang)
@@ -102,6 +117,15 @@ class _BaseReceipt():
         return self._vendor
 
     def parse_data(self, fill=True):
+        """
+        Parses extracted data into articles and prices - this is where the most
+        complicated functions are being called!
+
+        Parameters
+        ----------
+        fill : `bool`
+            Fill missing and nans with some basic math. Defaults to `True`.
+        """
         if not self._data_extracted:
             logger.info('Please extract data first')
             return None
@@ -132,6 +156,7 @@ class _BaseReceipt():
         return retrieved_data, total_price
 
     def parse_date(self):
+        """Retrieves date from raw text. Call after extract_data"""
         if 'date_pattern' in self._patset:
             date = parsers.get_date(self._raw_text, self._patset['date_pattern'])
         else:
@@ -163,6 +188,7 @@ class ImgReceipt(_BaseReceipt):
 
     @property
     def file(self):
+        """Holds the file path of the underlying image file"""
         return self._file
 
     @file.setter
@@ -185,6 +211,7 @@ class ImgReceipt(_BaseReceipt):
 
     @property
     def rotation(self):
+        """Returns current image rotation"""
         if not self._has_rotation:
             return None
         return self._rotation
@@ -199,10 +226,12 @@ class ImgReceipt(_BaseReceipt):
 
     @property
     def valid_filter(self):
+        """Returns the state of the image filter"""
         return self._is_filtered
 
     @property
     def image(self):
+        """Returns the original (rescaled) image"""
         if not self._is_filtered:
             logger.warning('Image is not filtered - using base grayscale')
             ref_img = self._gs_image
@@ -216,6 +245,7 @@ class ImgReceipt(_BaseReceipt):
 
     @property
     def bin_img(self):
+        """Returns the binary filtered image if available"""
         if not self._is_filtered:
             error = 'Binary image is not filtered yet'
             logger.error(error)
@@ -227,6 +257,10 @@ class ImgReceipt(_BaseReceipt):
             return self._bin_img
 
     def filter_image(self, **kwargs):
+        """
+        Filters the receipt using the filter function defined in library. Any
+        kwargs are passed to `image_filters.preprocess_image()` so look there
+        for more information."""
         self._proc_img, self._bin_img = image_filters.preprocess_image(
             self._gs_image, **kwargs)
         self._is_filtered = True
@@ -237,6 +271,7 @@ class ImgReceipt(_BaseReceipt):
         return self
 
     def show_receipt(self):
+        """Creates a plot with the receipt and its filtered view"""
         if not self.valid_filter:
             logger.warning('Please filter first')
             return
@@ -250,7 +285,21 @@ class ImgReceipt(_BaseReceipt):
         return self
 
     def extract_data(self, lang=config.options['lang']):
-        """Extracts text **and** converts to data"""
+        """
+        Extracts text **and** converts to dataframe. Uses tesseract as backend
+        with the given language.
+
+        Parameters
+        ----------
+        lang : `str`, optional
+            tesseract base language for text extraction, by default the
+            current default value from the config file.
+
+        Returns
+        -------
+        self ; `Receipt`
+            Self for chaining support
+        """
         tess_in = Image.fromarray(self.bin_img.astype(bool))
         tess_in.format = 'TIFF'
         logger.debug(f'Tesseract with lang: {lang}')
@@ -291,16 +340,16 @@ class ImgReceipt(_BaseReceipt):
         return self
 
     def reset_rotation(self):
+        """Resets current rotation"""
         self._rotation = 0
         self._has_rotation = False
 
 
 class PdfReceipt(_BaseReceipt):
     """
-    A receipt based on a pdf with text, this could be used solo but is wrapped
-    in a user class for handling all types of receipts
+    A Receipt based on a pdf. This **must** contain valid text and not just
+    images. Currenly, only single page is supported with page 1 being parsed!
     """
-
     def __init__(self, filepath):
         _BaseReceipt.__init__(self)
         self._type = 'pdf'
@@ -309,6 +358,7 @@ class PdfReceipt(_BaseReceipt):
 
     @property
     def file(self):
+        """Holds the file apth of the underlying pdf file"""
         return self._file
 
     @file.setter
@@ -325,6 +375,9 @@ class PdfReceipt(_BaseReceipt):
 
     @property
     def image(self):
+        """
+        Provides a simple image for plotting extracted from the pdf. Only use
+        this for plotting purposes!"""
         if not self._data_extracted:
             error = 'Image is not extracted yet'
             logger.error(error)
@@ -333,6 +386,7 @@ class PdfReceipt(_BaseReceipt):
             return self._gs_image
 
     def show_receipt(self):
+        """Helper function to diplay the extracted image"""
         if not self._data_extracted:
             logger.warning('Please extract data first')
             return
@@ -345,8 +399,21 @@ class PdfReceipt(_BaseReceipt):
 
     def extract_data(self, page=0, lang=None):
         """
-        Extracts text **and** converts to data. lang is unused here and just
-        is used for standardization of patterns.
+        Extracts text **and** converts to dataframe. lang is unused here in
+        case of pdf and is solely used for standardization of function
+        signatures.
+
+        Parameters
+        ----------
+        page : `int`, optional
+            Page to parse, by default 0
+        lang : `str`, optional
+            Placeholder, by default None
+
+        Returns
+        -------
+        self ; `Receipt`
+            Self for chaining support
         """
         # Split line-wise
         pdf = pdfium.PdfDocument(self._file)
@@ -393,6 +460,21 @@ def Receipt(file):
     """
     The main wrapper function that calls an init from a specific base class
     and then provides all needed methods.
+
+    Parameters
+    ----------
+    file : `Path`
+        Receipt image or pdf path.
+
+    Returns
+    -------
+    Receipt : `Receipt`
+        The receipt class instance
+
+    Raises
+    ------
+    FileNotFoundError
+    IOError
     """
     file = Path(file)
     if not file.is_file() or not file.exists():

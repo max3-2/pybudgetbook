@@ -14,16 +14,45 @@ from .configs import constants
 
 
 def load_image(imgpath):
+    """Loads image and converts to grayscale"""
     return rgb2gray(skio.imread(imgpath))
 
 
 def preprocess_image(grayscale, otsu='global',
                      rescale_image=True, unsharp_ma=(5, 1.15), final_er_dil=1,
-                     remove_border_art=True, receipt_width=80, show=False):
+                     remove_border_art=True, receipt_width=80):
     """
-    Assumes portrait mode. Filter factors are designed after scaling!
+    Takes a grayscale image and processes the image for best tesseract result.
+    The image is scaled to a good resolution and the filter parameters are
+    designed for that resolution, so changing can have different effects.
 
-    width in mm
+    Filtering includes rescaling, unsharp masking, binarization, erosion and
+    border removal and final padding.
+
+    Parameters
+    ----------
+    grayscale : `ndarray`
+        Input image as numpy array, grayscale
+    otsu : `str`, optional
+        Use global or local otsu threshold detection, by default 'global'
+    rescale_image : `bool`, optional
+        Apply rescale to approx. 600dpi before filtering, by default True
+    unsharp_ma : `tuple`, optional
+        Unsharp mask parameters, by default (5, 1.15)
+    final_er_dil : `int`, optional
+        The number of erosion passes to apply to the binary image, by default 1
+    remove_border_art : `bool`, optional
+        Removes a possible border from the binary image, if e.g. image was
+        taken on a dark background, by default True
+    receipt_width : `int`, optional
+        Approximate receipt width in millimeters. Used for calculating the
+        correct scale and final dimensions, by default 80
+
+    Returns
+    -------
+    `(ndarray, ndarray)`
+        The processed image, as scaled and sharpened grayscale and fully
+        processed binary image.
     """
     if rescale_image:
         scale = constants._TARGET_DPI / grayscale.shape[1] * (80 / 25.4)
@@ -64,4 +93,12 @@ def preprocess_image(grayscale, otsu='global',
 
 
 def detect_rotation(image):
+    """
+    Placeholder for an auto rotate function which is a ToDo.
+
+    Parameters
+    ----------
+    image : `ndarray`
+        Input image
+    """
     ...

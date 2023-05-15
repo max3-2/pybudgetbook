@@ -13,6 +13,10 @@ logger = logging.getLogger(_top_package)
 _icon_loc = Path(__file__).parent.parent / 'img' / 'tray_icon.svg'
 
 def start_main_ui(sys_argv=[]):
+    """
+    Starts the main UI. Creates the QApplication and handles some settings,
+    then runs the UI.
+    """
     app = QtWidgets.QApplication(sys_argv)
     app.setStyle('Light')
 

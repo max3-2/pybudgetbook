@@ -12,10 +12,28 @@ logger = logging.getLogger(__package__)
 
 
 def _match_group(data, reference_groups, use_fuzzy=False):
-    # TODO Add brute force remark in doc
-    # data is a row from DF this is used in apply
+    """
+    Matches groups from the article name using a brute force approach and the
+    references supplied
 
-    # Loop groups and (fuzzy) match and count matches.
+    Parameters
+    ----------
+    data :
+        A pandas Series or anything containing a `Name` attribute with the
+        article name
+    reference_groups : `dict`
+        A matcher dict with keys being the group names and values being
+        input for the matcher, in this case list of strings of close
+        alternatives
+    use_fuzzy : bool, optional
+        Use a fuzzy instead of a brute force. Usually, the latter performs
+        better in this case. By default False
+
+    Returns
+    -------
+    `str`
+        Group name or none (`str`)
+    """
     result = list()
     for key, grp in reference_groups.items():
         if use_fuzzy:
@@ -34,10 +52,23 @@ def _match_group(data, reference_groups, use_fuzzy=False):
 
 def matcher_feedback(retrieved_data, lang=config.options['lang']):
     """
-    Feedback the data new to the matcher dict. This is pretty much brute force
+    Feedback the data to the matcher dict. This is pretty much brute force
     and there will be a certain overlap in basic and user data since matching
     works more generous than feedback. Anything else would be too complicated
     and since the data is fairly small its better to have more!
+
+    Parameters
+    ----------
+    retrieved_data :
+        Data retrieved from a receipt in the default dataframe format.
+    lang : `str`, optional
+        Language identifier that is currently active, by default
+        config.options['lang']
+
+    Raises
+    ------
+    RuntimeError
+        If group is not valid
     """
     logger.debug(f'Running matcher feedback with lang: {lang}')
 
@@ -58,7 +89,7 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
             if feedgroup == 'none': continue
             error = (f'Group {feedgroup:s} does not exist in user group data '
                      'and creating is not enabled, check for '
-                     'typos and / enable flag!')
+                     'typos and / enable flag (upcmoing)!')  # TODO
             logger.error(error)
             raise RuntimeError(error)
 
@@ -85,6 +116,10 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
 
 
 def find_groups(retrieved_data, lang=config.options['lang']):
+    """
+    Wrapper aroung the core matcher, pretty much just loads the matching data
+    for a given language from package and user space and calls `pd.apply()`
+    """
     logger.debug(f'Matching groups with language {lang}')
     match_data = bb_io.load_group_match_data(lang)
 
