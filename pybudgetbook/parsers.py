@@ -69,7 +69,7 @@ def get_date(raw_text, pattern):
     """TODO"""
     date = pattern.search(raw_text)
     if date is not None:
-        date = date.group(0).replace('_', '').replace('/', '.')
+        date = date.group(0).replace('_', '').replace('/', '.').replace(',', '.')
         try:
             date = pd.to_datetime(date, format='%d.%m.%Y')
         except ValueError:
@@ -231,10 +231,14 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
         # Has mult, e.g. weight (before item): pre-create row and set flag
         # Mult and weight cant occur together if the code above works!
-        # Real places mult after item: look behind
+        # Real and Rewe places mult after item: look behind
         if has_mult and not has_price:
             if pattern == 'real':
                 logger.debug('Real look behind')
+                retrieved_data.loc[
+                    retrieved_data.index[-1], ['PricePerUnit']] = price_per_unit
+            elif pattern == 'rewe':
+                logger.debug('Rewe look behind')
                 retrieved_data.loc[
                     retrieved_data.index[-1], ['PricePerUnit']] = price_per_unit
             else:

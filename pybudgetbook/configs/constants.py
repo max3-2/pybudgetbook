@@ -54,6 +54,7 @@ _patterns = {
         'total_sum_pattern': re.compile(r'((?<=summe.)\d{1,3}_*?[,.]_*?\d{2})', re.IGNORECASE),
     },
     'real_deu': {},  # inherits all, but the flag is needed for sorting
+    'rewe_deu': {'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3}[,.]\d{2})')},  # small catch due to sometimes bad mults
     'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3}[,.]\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
                  },
     'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12I\]\[]|AW)'),

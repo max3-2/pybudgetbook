@@ -59,6 +59,7 @@ receipt_aliases = {
     'Aldi': ['aldi', 'aldl', 'aidi'],
     'Real': ['real', 'rael'],
     'Raiffeisen': ['zg', 'raiff'],
+    'Rewe': ['rewe', 'rwe', 'r_e_w_e']
 }
 
 # Maps receipt types to pattern types
@@ -71,6 +72,7 @@ receipt_types = {
     'Real': 'real',
     'Tankstelle': 'tank',
     'Raiffeisen': 'raiff',
+    'Rewe': 'rewe',
     'General': 'gen',
 }
 
