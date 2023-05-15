@@ -29,6 +29,9 @@ ideas and improvements!)
 
 Uses some icons from [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/)
 
+Attribute openmoji
+Add openmoji icons for buttons?
+
 ## Current State of Functionality and Roadmap
 
 - Prepare receipt images for `tesseract`
@@ -45,6 +48,10 @@ Future
 - Better analysis tools
 - Continous UX improvements
 
+
+## A Note on Tax classes
+ambigious, implemented is 1,2 (A,B) with 19%, %. ALDI vice versa is switched
+on parse. Else your job!
 
 ## A Note on Language Settings
 Grouping may error, just set lang and rerun
@@ -77,6 +84,8 @@ TODO Manual corrections, e.g. chaning amount if bulk packages are bought
   and also for some types of identification where a logo is matched.
 - Try to apply a lateral Crop fairly close at the receipt borders. Rotate to
   have the text horizontal.
+
+If this all does not work, use some other extractors and use pdf
 
 ### Grouping
 Categrorizing searches language specific (currently only german) dicts which
