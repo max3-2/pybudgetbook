@@ -18,6 +18,10 @@ logger = logging.getLogger(__package__)
 
 
 def _check_numeric(data):
+    """
+    Checks if data (a single data element) is of numeric type and thus can be
+    handled differenly than a non numeric type in the table view.
+    """
     if isinstance(data, str):
         return False
     if np.isnan(data):
@@ -37,6 +41,24 @@ def _check_numeric(data):
 
 
 def convert_date(input_date):
+    """
+    Converts a date back and forth from `QDate` to `pd.datetime`
+
+    Parameters
+    ----------
+    input_date : `QDate`, `pd.datetime`
+        Input date
+
+    Returns
+    -------
+    `QDate`, `pd.datetime`
+        Output date in different format
+
+    Raises
+    ------
+    ValueError
+        If conversion is not possible
+    """
     if isinstance(input_date, QtCore.QDate):
         return pd.to_datetime(input_date.toPython())
     elif isinstance(input_date, pd.Timestamp):
@@ -47,6 +69,7 @@ def convert_date(input_date):
 
 # Build icons to reduce IO, only possible after App is started
 def _create_icons():
+    """Creates `QIcons` from icon image paths"""
     return {key: QtGui.QIcon(value) for key, value in icons.items()}
 
 
@@ -54,6 +77,20 @@ def set_new_conf_val(parent, name, valtype):
     """
     Opens a dialog to get a new config value and converts it for the use in a
     config.ini file type. Writes to config file and options.
+
+    Parameters
+    ----------
+    parent : `QWidget`
+        Parent widget, can be `None`
+    name : `str`
+        Config value name to change
+    valtype : `str`
+        Config calue type, decides what is asked by the UI
+
+    Raises
+    ------
+    LookupError
+    ValueError
     """
     try:
         curr_val = options[name]
@@ -92,10 +129,10 @@ def set_new_conf_val(parent, name, valtype):
 
 class _LogSignalProxies(QtCore.QObject):
     """
-    Signal namespace protection with logging emit calls - else there will be
-    crazy untracable namespace bugs!
+    This is needed for signal namespace protection with logging emit calls -
+    else there will be crazy untracable namespace bugs! Just creates the
+    signals needed for logging.
     """
-
     log_record_signal = Signal(int, str)
     show_log_window = Signal()
 
@@ -104,16 +141,15 @@ class _LogSignalProxies(QtCore.QObject):
 
 
 class MplCanvas(FigureCanvas):
+    """Creates a matplotlib plot in an empty `QFrame` widget."""
     def __init__(self, parent=None, *args, **kwargs):
         """
-        TODO
-        """
-        """_summary_
+        Set up plotting frame.
 
         Parameters
         ----------
-        parent : _type_, optional
-            _description_, by default None
+        parent : `QWidget`, optional
+            Parent widget, by default None
         """
         self.qt_parent = parent  # Can't overload parent from FigureCanvas
 
@@ -135,17 +171,17 @@ class MplCanvas(FigureCanvas):
         self.canvas = self.fig.canvas
 
     def draw_blit(self):
+        """Redraw canvas using blit"""
         self.fig.canvas.blit()
         self.fig.canvas.draw()
 
 
 class QLoggingThread(QtCore.QThread, logging.StreamHandler):
     """
-    QLoggingThread does nothing else but run a background thread that catches all log
-    messages and reroutes them with a signal to prevent any unregistered
-    quantitites when using sub package, sub thread logging.
+    QLoggingThread does nothing else but run a background thread that catches
+    all log messages and reroutes them with a signal to prevent any
+    unregistered quantitites when using sub package, sub thread logging.
     """
-
     def __init__(self, **kwargs):
         QtCore.QThread.__init__(self)
         logging.StreamHandler.__init__(self, **kwargs)
@@ -155,6 +191,10 @@ class QLoggingThread(QtCore.QThread, logging.StreamHandler):
 
     @property
     def popup_lvl(self):
+        """
+        Level at which the window is `raise()` to show an important message to
+        the user.
+        """
         return self._popup_threshold
 
     @popup_lvl.setter
@@ -187,10 +227,17 @@ class QLoggingWindow(QtWidgets.QDialog):
     Pattern class to generate a buffered logging stream handler to display
     and format logging messages during execution of the UI.
     """
-
     new_level_signal = Signal(int)
 
     def __init__(self, parent=None):
+        """
+        Creates the window `QDialog` that holds the logging messages.
+
+        Parameters
+        ----------
+        parent : `QWidget`, optional
+            Parent widget, by default None
+        """
         super().__init__(parent)
         self._show_debug = False
         self.create_logging_dialog()
@@ -299,6 +346,10 @@ class QLoggingWindow(QtWidgets.QDialog):
 
 
 class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
+    """
+    A delegate to display a combo box in a table view. Supports presetting
+    possible groups to display and a color highlight if the group is *none*.
+    """
     def __init__(self, parent=None, possible_groups=[]):
         super(ComboBoxDelegate, self).__init__(parent)
         self.possible_groups = possible_groups
@@ -317,7 +368,7 @@ class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
         else:
             editor.setCurrentText('none')
 
-    # That changes the displayed value but not the undelying data
+    # That changes the displayed value but not the underlying data
     def displayText(self, value, locale):
         if str(value) in self.possible_groups:
             return self.possible_groups[self.possible_groups.index(str(value))]
@@ -339,6 +390,11 @@ class ComboBoxDelegate(QtWidgets.QStyledItemDelegate):
 
 
 class PandasTableModel(QtCore.QAbstractTableModel):
+    """
+    The main table model backend to handle the display and edit of a fairly
+    complex `pd.DataFrame`. Supports header display, sorting, group icons,
+    type specific format, insert and removal of rows.
+    """
     def __init__(self, data=None, parent=None):
         QtCore.QAbstractTableModel.__init__(self, parent)
         self._ref_idx = 'Orig. Index'
@@ -466,6 +522,10 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
 
 class PandasViewer(QtWidgets.QTableView):
+    """
+    The main viewer class that displays the data the custom model holds and
+    allows high level access to the data.
+    """
     def __init__(self, parent=None, model=None):
         QtWidgets.QTableView.__init__(self, parent)
         self._combo_delegate = None
@@ -518,8 +578,23 @@ class PandasViewer(QtWidgets.QTableView):
 
 
 class SliderWithVal(QtWidgets.QWidget):
+    """
+    A slider that displays its val to the user. Also allows scaling to float
+    since the basic slider does not support that.
+    Has a callback that is timed at `self.delay`
+    """
     def __init__(
-            self, parent=None):
+            self, parent=None, layout='h'):
+        """See above for info
+
+        Parameters
+        ----------
+        parent : `QWidget`, optional
+            parent widget, by default None
+        layout : `str`, optional
+            Can be `h` or `v` for slider layout horizontal or vertical, by
+            default 'h'
+        """
         super().__init__(parent)
 
         # Dummy init
@@ -528,14 +603,22 @@ class SliderWithVal(QtWidgets.QWidget):
         self.delay = 1000
         self._timer_cb = None
 
-        # Create a horizontal layout for slider and label
-        slider_layout = QtWidgets.QHBoxLayout(self)
+        # Create a layout for slider and label
+        if layout == 'h':
+            slider_layout = QtWidgets.QHBoxLayout(self)
+        elif layout == 'v':
+            slider_layout = QtWidgets.QVBoxLayout(self)
+        else:
+            raise RuntimeError('Invalid slider layout')
 
         # Create a slider widget
         self.slider = QtWidgets.QSlider(self)
         self.slider.setSingleStep(1)   # Set step size of slider
         self.slider.valueChanged.connect(self.slider_moved)  # Connect signal to slot
-        self.slider.setOrientation(Qt.Horizontal)
+        if layout == 'h':
+            self.slider.setOrientation(Qt.Horizontal)
+        else:
+            self.slider.setOrientation(Qt.Vertical)
 
         self.slider_value_label = QtWidgets.QLabel(parent=self)
         # Add the slider and label to the horizontal layout
@@ -574,8 +657,24 @@ class SliderWithVal(QtWidgets.QWidget):
     def setTickPosition(self, val):
         self.slider.setTickPosition(val)
 
-    def custom_setup(self, minval=0.5, maxval=2, step=0.05,
+    def custom_setup(self, minval=0.5, maxval=2., step=0.05,
                      label='Amount: ', value_change_delay=1500):
+        """
+        Sets up the sliders main values for scaling and callback
+
+        Parameters
+        ----------
+        minval : `float`, optional
+            Minimum scale value, by default 0.5
+        maxval : `float`, optional
+            Maximum scale value, by default 2
+        step : `float`, optional
+            Scaled step, by default 0.05
+        label : `str`, optional
+            Slider label, by default 'Amount: '
+        value_change_delay : `int`, optional
+            Timer delay before callback in millis, by default 1500
+        """
         self.labeltext = label
         self.delay = value_change_delay
         self.minval = minval
@@ -602,6 +701,14 @@ class SliderWithVal(QtWidgets.QWidget):
         self.timer.start()  # Start the timer again
 
     def set_timer_callback(self, new_cb):
+        """
+        Sets a new timer callback
+
+        Parameters
+        ----------
+        new_cb : `callable`
+            New slider callback
+        """
         if callable(new_cb):
             self._timer_cb = new_cb
         else:
@@ -620,6 +727,10 @@ class SliderWithVal(QtWidgets.QWidget):
 
 
 class ColoredStatusBar(QtWidgets.QStatusBar):
+    """
+    A nice colored statusbar that supports the same functionality as the
+    default implementation.
+    """
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -645,11 +756,16 @@ class ColoredStatusBar(QtWidgets.QStatusBar):
 
 
 class TextDisplayWindow(QtWidgets.QWidget):
+    """
+    A simple `QDialog` that displays long text with correct special char
+    parsing. Has a closed signal to prevent lingering windows if called from
+    a main UI loop.
+    """
     closed = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Raw Text display')
+        self.setWindowTitle('Raw Text Display')
         self.setGeometry(100, 50, 500, 700)
         # self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
@@ -678,6 +794,10 @@ class TextDisplayWindow(QtWidgets.QWidget):
 
 
 class CustomFadeDialog(QtWidgets.QDialog):
+    """
+    A small fading out dialog to show a quick confirmations message without
+    too much obstruction for the user.
+    """
     def __init__(self, parent=None, text='Confirmation message'):
         super().__init__(parent)
 
