@@ -5,19 +5,26 @@ data entry. This will be adapted as soon as a stable API is finalized!
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QCoreApplication
 import pandas as pd
+import logging
 
 from pybudgetbook.configs.plotting_conf import set_style
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.receipt import Receipt
 
+
 set_style()
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)-8s [%(name)s:%(filename)s:%(lineno)d] %(message)s',
+)
+
 
 if QCoreApplication.instance() is None:
     app = QCoreApplication()
 receipt_file = QFileDialog().getOpenFileName(caption='Select receipt')[0]
 
 rec = Receipt(receipt_file)
-rec.filter_image(unsharp_ma=(5, 1.)).extract_data()
+rec.filter_image(unsharp_ma=(5, 1.2)).extract_data()
 rec.show_receipt()
 raw_text = rec.raw_text
 
