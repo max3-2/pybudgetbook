@@ -2,8 +2,13 @@
 A small helper that shows how to use a script based approach script to build a
 data entry. This will be adapted as soon as a stable API is finalized!
 """
-from PyQt5.QtWidgets import QFileDialog
-from PyQt5.QtCore import QCoreApplication
+try:
+    from PySide6.QtWidgets import QFileDialog
+    from PySide6.QtCore import QCoreApplication
+except ImportError:
+    # Spyder support
+    from PyQt5.QtWidgets import QFileDialog
+    from PyQt5.QtCore import QCoreApplication
 import pandas as pd
 import logging
 
