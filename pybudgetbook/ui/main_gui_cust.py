@@ -5,6 +5,8 @@ from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 import pandas as pd
 from os.path import expanduser
+import datetime
+from shutil import make_archive
 
 from .. import __version__ as bbvers
 from . import ui_support
@@ -175,6 +177,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.pushButton_saveData.clicked.connect(self.save_data)
         self.comboBox_baseLang.currentTextChanged.connect(self.refilter_and_display)
         self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
+        self.actionCreate_data_backup.triggered.connect(
+            lambda _: self.show_backup_dialog())
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -643,3 +647,57 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         dialog.show()
 
         self.set_new_data(_default_data())
+
+    def show_backup_dialog(self, target_folder=options['data_folder']):
+        """
+        Creates and shows the dialog to backup data. Usually this is placed in
+        data folder / backup but this can be changed.
+        """
+        full_dataset, n_files = bb_io.load_concatenad_data()
+
+        backup_dialog = ui_support.AskComboDialog(self)
+        backup_dialog.label1.setText(
+            'Backup Data: Please select the best format. Using csv and hdf '
+            'will combine all data into one file.<br>This is good for exporting '
+            'and archival purposes but <b>removes any metadata as receipt '
+            'specific tags</b>'
+        )
+        backup_dialog.label2.setText(
+            f'Currently there are <font color="red">{full_dataset.shape[0]:d}'
+            f'</font> datasets in <font color="red">{n_files:d}</font> files. '
+            'The overall total amounts to '
+            f'<font color="red">{full_dataset["Price"].sum():.2f}€</font>!'
+        )
+        ok, format = backup_dialog.exec()
+
+        if not ok:
+            logger.info('Export stopped')
+            return
+
+        today = datetime.date.today().strftime('%Y_%m_%d_')
+
+        if Path(target_folder).resolve() == Path(options['data_folder']).resolve():
+            target_folder = Path(target_folder) / 'backup'
+
+        if not target_folder.is_dir():
+            logger.error("Target Folder does not exists")
+            return
+
+        target = target_folder / f'{today:s}full_export.{format:s}'
+
+        if format == 'csv':
+            full_dataset.to_csv(target)
+        elif format == 'hdf':
+            full_dataset.attrs['version'] = bbvers
+            full_dataset.attrs['creator'] = 'pybudgetbook'
+            bb_io.save_with_metadata(full_dataset, target)
+        elif format == 'zip':
+            # Get all files and images
+            to_zip = Path(options['data_folder']) / 'data'
+            _ = make_archive(target.parent / target.stem, 'zip', to_zip)
+
+        else:
+            logger.warning("Invalid backup format")
+            return
+
+        logger.info(f'Export finished to: {target}')

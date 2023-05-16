@@ -836,3 +836,57 @@ class CustomFadeDialog(QtWidgets.QDialog):
 
         # Start the animation
         self.animation.start()
+
+
+class AskComboDialog(QtWidgets.QDialog):
+    """
+    Displays a dialog with two labels and a combo box and handles the users
+    custom choice on return. Currently this is used once and thus ahs fixed
+    strings, but this could be generalized easily."""
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.result = (False, None)
+
+        # Create the UI elements
+        self.label1 = QtWidgets.QLabel()
+        self.label2 = QtWidgets.QLabel()
+        self.label1.setTextFormat(Qt.RichText)
+        self.label2.setTextFormat(Qt.RichText)
+        self.label_combo = QtWidgets.QLabel('Select export type: ')
+        self.combo = QtWidgets.QComboBox()
+        self.combo.addItems(["csv", "hdf", "zip"])
+        self.button_box = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel)
+
+        # Set the layouts
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(self.label1)
+        layout.addWidget(self.label2)
+
+        combo_layout = QtWidgets.QHBoxLayout()
+        combo_layout.addWidget(self.label_combo)
+        combo_layout.addWidget(self.combo)
+        layout.addLayout(combo_layout)
+
+        layout.addWidget(self.button_box)
+        self.setLayout(layout)
+
+        # Connect the signals
+        self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+    def accept(self):
+        # Return True and combo value on 'Ok'
+        self.result = (True, self.combo.currentText())
+        super().accept()
+
+    def reject(self):
+        # Return False on 'Cancel'
+        self.result = (False, None)
+        super().reject()
+
+    def exec(self):
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+        super().exec()
+        return self.result

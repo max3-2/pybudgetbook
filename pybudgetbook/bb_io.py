@@ -214,11 +214,12 @@ def load_concatenad_data(work_dir=None):
         Concatenated data from all datasets present in the folder.
     """
     if work_dir is None:
-        data_files = Path(config.options['data_folder'])
+        data_files = Path(config.options['data_folder']) / 'data'
     else:
         data_files = Path(work_dir)
 
-    data_files = _findFilesExt(data_files, '.hdf5')
+    data_files = list(_findFilesExt(data_files, '.hdf5'))
+    n_files = len(data_files)
 
     conc_data = pd.DataFrame(columns=constants._MANDATORY_COLS)
 
@@ -226,7 +227,7 @@ def load_concatenad_data(work_dir=None):
         this_dataset = load_with_metadata(file)
         conc_data = pd.concat((conc_data, this_dataset))
 
-    return conc_data.sort_values('Date').reset_index(drop=True)
+    return conc_data.sort_values('Date').reset_index(drop=True), n_files
 
 
 def resort_data(data):
