@@ -5,22 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Main UI File",
+            "name": "Python: Main UI",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/pybudgetbook/ui/start_gui.py",
-            "cwd": "${workspaceFolder}/pybudgetbook/",
-            "console": "externalTerminal",
+            "module": "pybudgetbook.ui.start_gui",
+            // "program": "${workspaceFolder}/pybudgetbook/ui/start_gui.py",
+            "env": {"PYTHONPATH": "${workspaceFolder}/pybudgetbook/"},
+            "cwd": "${userHome}",
+            "console": "integratedTerminal",
             "justMyCode": true
         },
-        {
-            "name": "Python: Main UI Script",
-            "type": "python",
-            "request": "launch",
-            "program": "pybudgetbook",
-            "cwd": "${userHome}",
-            "console": "externalTerminal",
-            "justMyCode": true
-        }
     ]
 }
