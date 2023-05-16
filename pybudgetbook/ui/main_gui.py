@@ -21,7 +21,7 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QMenu, QMenuBar, QPushButton,
     QSizePolicy, QSlider, QSpacerItem, QSplitter,
-    QTabWidget, QVBoxLayout, QWidget)
+    QTabWidget, QToolButton, QVBoxLayout, QWidget)
 
 from .ui_support import (ColoredStatusBar, PandasViewer, SliderWithVal)
 
@@ -232,9 +232,9 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(9, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(15, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(17, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(3, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(12, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(14, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -383,38 +383,64 @@ class Ui_pybb_MainWindow(object):
         self.tabWidgetPage2 = QWidget()
         self.tabWidgetPage2.setObjectName(u"tabWidgetPage2")
         self.horizontalLayout_2 = QHBoxLayout(self.tabWidgetPage2)
-        self.horizontalLayout_2.setSpacing(0)
+        self.horizontalLayout_2.setSpacing(10)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.horizontalLayout_2.setContentsMargins(0, 0, 0, 4)
-        self.gridLayout_tabWidgetPage2 = QGridLayout()
-        self.gridLayout_tabWidgetPage2.setObjectName(u"gridLayout_tabWidgetPage2")
-        self.gridLayout_tabWidgetPage2.setContentsMargins(4, 4, 6, 4)
-        self.comboBox_mainPlotType = QComboBox(self.tabWidgetPage2)
-        self.comboBox_mainPlotType.setObjectName(u"comboBox_mainPlotType")
-        sizePolicy3.setHeightForWidth(self.comboBox_mainPlotType.sizePolicy().hasHeightForWidth())
-        self.comboBox_mainPlotType.setSizePolicy(sizePolicy3)
-        self.comboBox_mainPlotType.setMinimumSize(QSize(100, 0))
+        self.horizontalLayout_2.setContentsMargins(4, 4, 6, 4)
+        self.frame_plotButtonbar = QFrame(self.tabWidgetPage2)
+        self.frame_plotButtonbar.setObjectName(u"frame_plotButtonbar")
+        self.frame_plotButtonbar.setFrameShape(QFrame.NoFrame)
+        self.frame_plotButtonbar.setFrameShadow(QFrame.Plain)
+        self.verticalLayout = QVBoxLayout(self.frame_plotButtonbar)
+        self.verticalLayout.setSpacing(10)
+        self.verticalLayout.setObjectName(u"verticalLayout")
+        self.verticalLayout.setContentsMargins(0, 0, 0, 0)
+        self.toolButton_loadPlotData = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_loadPlotData.setObjectName(u"toolButton_loadPlotData")
+        self.toolButton_loadPlotData.setMinimumSize(QSize(70, 72))
 
-        self.gridLayout_tabWidgetPage2.addWidget(self.comboBox_mainPlotType, 0, 1, 1, 1)
+        self.verticalLayout.addWidget(self.toolButton_loadPlotData)
 
-        self.label_mainPlotType = QLabel(self.tabWidgetPage2)
-        self.label_mainPlotType.setObjectName(u"label_mainPlotType")
+        self.toolButton_plotStem = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_plotStem.setObjectName(u"toolButton_plotStem")
+        self.toolButton_plotStem.setEnabled(False)
+        self.toolButton_plotStem.setMinimumSize(QSize(70, 70))
 
-        self.gridLayout_tabWidgetPage2.addWidget(self.label_mainPlotType, 0, 0, 1, 1)
+        self.verticalLayout.addWidget(self.toolButton_plotStem)
 
-        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.toolButton_plotPie = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_plotPie.setObjectName(u"toolButton_plotPie")
+        self.toolButton_plotPie.setEnabled(False)
+        self.toolButton_plotPie.setMinimumSize(QSize(70, 70))
 
-        self.gridLayout_tabWidgetPage2.addItem(self.horizontalSpacer_4, 0, 2, 1, 1)
+        self.verticalLayout.addWidget(self.toolButton_plotPie)
+
+        self.label_pieType = QLabel(self.frame_plotButtonbar)
+        self.label_pieType.setObjectName(u"label_pieType")
+        font1 = QFont()
+        font1.setUnderline(True)
+        self.label_pieType.setFont(font1)
+
+        self.verticalLayout.addWidget(self.label_pieType)
+
+        self.comboBox_PiePlotType = QComboBox(self.frame_plotButtonbar)
+        self.comboBox_PiePlotType.setObjectName(u"comboBox_PiePlotType")
+        sizePolicy3.setHeightForWidth(self.comboBox_PiePlotType.sizePolicy().hasHeightForWidth())
+        self.comboBox_PiePlotType.setSizePolicy(sizePolicy3)
+        self.comboBox_PiePlotType.setMinimumSize(QSize(100, 0))
+
+        self.verticalLayout.addWidget(self.comboBox_PiePlotType)
+
+
+        self.horizontalLayout_2.addWidget(self.frame_plotButtonbar)
 
         self.frame_dataAnalysis = QFrame(self.tabWidgetPage2)
         self.frame_dataAnalysis.setObjectName(u"frame_dataAnalysis")
-        self.frame_dataAnalysis.setFrameShape(QFrame.StyledPanel)
-        self.frame_dataAnalysis.setFrameShadow(QFrame.Raised)
+        sizePolicy5.setHeightForWidth(self.frame_dataAnalysis.sizePolicy().hasHeightForWidth())
+        self.frame_dataAnalysis.setSizePolicy(sizePolicy5)
+        self.frame_dataAnalysis.setFrameShape(QFrame.NoFrame)
+        self.frame_dataAnalysis.setFrameShadow(QFrame.Plain)
 
-        self.gridLayout_tabWidgetPage2.addWidget(self.frame_dataAnalysis, 1, 0, 1, 3)
-
-
-        self.horizontalLayout_2.addLayout(self.gridLayout_tabWidgetPage2)
+        self.horizontalLayout_2.addWidget(self.frame_dataAnalysis)
 
         self.centralTabWidget.addTab(self.tabWidgetPage2, "")
 
@@ -508,7 +534,10 @@ class Ui_pybb_MainWindow(object):
         self.checkBox_feedbackMatch.setText(QCoreApplication.translate("pybb_MainWindow", u"Feedback matching data", None))
         self.lineEdit_tags.setText(QCoreApplication.translate("pybb_MainWindow", u"tag1;tag2", None))
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("pybb_MainWindow", u"Add New Receipt", None))
-        self.label_mainPlotType.setText(QCoreApplication.translate("pybb_MainWindow", u"Plot Type:", None))
+        self.toolButton_loadPlotData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.toolButton_plotStem.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.toolButton_plotPie.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.label_pieType.setText(QCoreApplication.translate("pybb_MainWindow", u"Pie", None))
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage2), QCoreApplication.translate("pybb_MainWindow", u"Data Analysis", None))
         self.menuFile.setTitle(QCoreApplication.translate("pybb_MainWindow", u"File", None))
         self.menuEdit.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Edit", None))

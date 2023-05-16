@@ -1,7 +1,7 @@
 """Contains helpers to run customized UI functions, e.g. better logging"""
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
-from matplotlib.pyplot import subplots
+from matplotlib.pyplot import subplots, figure
 from collections.abc import Iterable
 import logging
 from PySide6 import QtCore, QtWidgets, QtGui
@@ -153,13 +153,18 @@ class MplCanvas(FigureCanvas):
         """
         self.qt_parent = parent  # Can't overload parent from FigureCanvas
 
-        self.fig, self.ax = subplots(*args, **kwargs)
-
-        if isinstance(self.ax, Iterable):
-            for ax in self.ax:
-                ax.set_aspect('auto')
+        no_ax = kwargs.pop('no_ax', False)
+        if no_ax:
+            self.fig = figure()
+            self.ax = None
         else:
-            self.ax.set_aspect('auto')
+            self.fig, self.ax = subplots(*args, **kwargs)
+
+            if isinstance(self.ax, Iterable):
+                for ax in self.ax:
+                    ax.set_aspect('auto')
+            else:
+                self.ax.set_aspect('auto')
 
         super(FigureCanvas, self).__init__(self.fig)
         self.toolbar = NavigationToolbar(self, self.qt_parent)

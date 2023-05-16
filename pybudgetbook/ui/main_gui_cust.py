@@ -67,6 +67,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.rotate_timer.timeout.connect(
             lambda: self.refilter_and_display(keep_lim=False))
 
+        self.conc_data = None
+
         # Logger setup
         self.qt_logstream = ui_support.QLoggingThread()
         self.qt_log_window = ui_support.QLoggingWindow(self)
@@ -94,7 +96,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         # Setup plot area, 2
         self.plot_area_data = ui_support.MplCanvas(
-            self.frame_dataAnalysis, 2, 1, constrained_layout=False)
+            self.frame_dataAnalysis, no_ax=True, constrained_layout=False)
 
         self.plot_area_data.draw_blit()
         logger.debug("Created plotting area 2")
@@ -146,6 +148,18 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 self, 'lang', 'str')
         )
 
+        # Configure second tab: Plotting
+        self.frame_plotButtonbar.layout().setAlignment(Qt.AlignTop)
+        # Center all
+        for widget in [
+            self.frame_plotButtonbar.layout().itemAt(i)
+            for i in range(self.frame_plotButtonbar.layout().count())]:
+            self.frame_plotButtonbar.layout().setAlignment(
+                widget.widget(), Qt.AlignHCenter)
+
+        self.comboBox_PiePlotType.addItems(
+            ['Vendors', 'Categories', 'Groups'])
+
         # Attach menu handlers
         self.actionMove_on_Save.toggled.connect(
             lambda new_val: set_option('move_on_save', new_val)
@@ -179,6 +193,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
         self.actionCreate_data_backup.triggered.connect(
             lambda _: self.show_backup_dialog())
+        self.toolButton_loadPlotData.clicked.connect(self.load_conc_data)
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -712,3 +727,14 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             return
 
         logger.info(f'Export finished to: {target}')
+
+    def load_conc_data(self):
+        conc_data = bb_io.load_concatenad_data()[0]
+        if conc_data.shape[0] == 0:
+            logger.error('Loaded dataset seems to be empty')
+            return
+
+        self.conc_data = conc_data
+        self.toolButton_plotStem.setEnabled(True)
+        self.toolButton_plotPie.setEnabled(True)
+        logger.debug(f'Dataset loaded with {conc_data.shape[0]:d} elements')
