@@ -160,6 +160,15 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.comboBox_PiePlotType.addItems(
             ['Vendors', 'Categories', 'Groups'])
 
+        # Add modern buttons
+        self.toolButton_loadPlotData.set_scaled_icon_and_text(
+            'reload_data.png', 'Load'
+        )
+        self.toolButton_plotPie.set_scaled_icon_and_text(
+            QtWidgets.QStyle.SP_FileDialogDetailedView, 'Plot Pie'
+        )
+
+
         # Attach menu handlers
         self.actionMove_on_Save.toggled.connect(
             lambda new_val: set_option('move_on_save', new_val)
@@ -214,6 +223,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 raise IOError("Invalid folder")
             set_data_dir(Path(folder))
             logger.info('New data directory created')
+
+        # Fix init tab
+        self.centralTabWidget.setCurrentIndex(0)
 
     def closeEvent(self, event):
         """Handle additional open windows"""

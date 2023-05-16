@@ -1,4 +1,6 @@
 """Contains helpers to run customized UI functions, e.g. better logging"""
+from typing import Optional
+from pathlib import Path
 from matplotlib.backends.backend_qt5agg import (
     FigureCanvas, NavigationToolbar2QT as NavigationToolbar)
 from matplotlib.pyplot import subplots, figure
@@ -842,6 +844,48 @@ class CustomFadeDialog(QtWidgets.QDialog):
         # Start the animation
         self.animation.start()
 
+
+class ModernButton(QtWidgets.QToolButton):
+    """
+    TODO
+    """
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Set the highlight effect on mouseover and frame
+        self.setStyleSheet(
+            """
+            ModernButton {
+                border: 2px solid gray;
+                border-radius: 4px;
+            }
+
+            ModernButton:hover {
+                background-color: rgba(255, 255, 255, 0.3);
+                border: 2px solid black;
+                border-radius: 4px;
+            }
+            """
+        )
+
+    def set_scaled_icon_and_text(self, icon, text):
+        """
+        Icon can be a path (prio 1), if this is not valid tries to use the inp
+        as a QIcon standard. Takes pkg rel. path and assumes icon in icon in img.
+        """
+        try:
+            icon = Path(__file__).parent.parent / 'img' / icon
+            icon = QtGui.QIcon(str(icon))
+        except TypeError:
+            icon = self.style().standardIcon(icon)
+
+        self.setIcon(icon)
+        icon_size = int(self.size().width() * 0.7)
+        logger.debug(f'Sclaed icon to {icon_size:d}')
+        self.setIconSize(QtCore.QSize(icon_size, icon_size))
+
+        self.setText(text)
+        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
 class AskComboDialog(QtWidgets.QDialog):
     """

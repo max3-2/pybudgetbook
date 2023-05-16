@@ -21,9 +21,9 @@ from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
     QMainWindow, QMenu, QMenuBar, QPushButton,
     QSizePolicy, QSlider, QSpacerItem, QSplitter,
-    QTabWidget, QToolButton, QVBoxLayout, QWidget)
+    QTabWidget, QVBoxLayout, QWidget)
 
-from .ui_support import (ColoredStatusBar, PandasViewer, SliderWithVal)
+from .ui_support import (ColoredStatusBar, ModernButton, PandasViewer, SliderWithVal)
 
 class Ui_pybb_MainWindow(object):
     def setupUi(self, pybb_MainWindow):
@@ -232,9 +232,9 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(3, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(12, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(14, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(1, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(11, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(13, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -394,20 +394,20 @@ class Ui_pybb_MainWindow(object):
         self.verticalLayout.setSpacing(10)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.toolButton_loadPlotData = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_loadPlotData = ModernButton(self.frame_plotButtonbar)
         self.toolButton_loadPlotData.setObjectName(u"toolButton_loadPlotData")
         self.toolButton_loadPlotData.setMinimumSize(QSize(70, 72))
 
         self.verticalLayout.addWidget(self.toolButton_loadPlotData)
 
-        self.toolButton_plotStem = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_plotStem = ModernButton(self.frame_plotButtonbar)
         self.toolButton_plotStem.setObjectName(u"toolButton_plotStem")
         self.toolButton_plotStem.setEnabled(False)
         self.toolButton_plotStem.setMinimumSize(QSize(70, 70))
 
         self.verticalLayout.addWidget(self.toolButton_plotStem)
 
-        self.toolButton_plotPie = QToolButton(self.frame_plotButtonbar)
+        self.toolButton_plotPie = ModernButton(self.frame_plotButtonbar)
         self.toolButton_plotPie.setObjectName(u"toolButton_plotPie")
         self.toolButton_plotPie.setEnabled(False)
         self.toolButton_plotPie.setMinimumSize(QSize(70, 70))
@@ -486,7 +486,7 @@ class Ui_pybb_MainWindow(object):
 
         self.retranslateUi(pybb_MainWindow)
 
-        self.centralTabWidget.setCurrentIndex(0)
+        self.centralTabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(pybb_MainWindow)

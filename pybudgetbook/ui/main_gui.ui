@@ -52,7 +52,7 @@
     <item>
      <widget class="QTabWidget" name="centralTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>3</hour>
+                       <hour>1</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>12</hour>
+                       <hour>11</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>14</hour>
+                       <hour>13</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -672,7 +672,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QToolButton" name="toolButton_loadPlotData">
+            <widget class="ModernButton" name="toolButton_loadPlotData">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -685,7 +685,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="toolButton_plotStem">
+            <widget class="ModernButton" name="toolButton_plotStem">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -701,7 +701,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="toolButton_plotPie">
+            <widget class="ModernButton" name="toolButton_plotPie">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -921,6 +921,11 @@
   <customwidget>
    <class>ColoredStatusBar</class>
    <extends>QStatusBar</extends>
+   <header>.ui_support</header>
+  </customwidget>
+  <customwidget>
+   <class>ModernButton</class>
+   <extends>QToolButton</extends>
    <header>.ui_support</header>
   </customwidget>
  </customwidgets>
