@@ -1,6 +1,6 @@
 """pybudgetbook main init"""
 __version__ = '0.2.0'
-__name__ = 'pybudgetbook'
+name = 'pybudgetbook'
 
 _top_package = __package__
 

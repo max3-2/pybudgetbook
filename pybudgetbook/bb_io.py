@@ -10,6 +10,8 @@ import shutil
 
 from .configs import config
 from .configs import constants
+from . import __version__ as bbvers, name as bbname
+
 
 logger = logging.getLogger(__package__)
 
@@ -279,6 +281,9 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
 
     if unique_name and data_target.exists():
         data_target = _unique_file_name(data_target)
+
+    dataframe.attrs['version'] = bbvers
+    dataframe.attrs['creator'] = bbname
 
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

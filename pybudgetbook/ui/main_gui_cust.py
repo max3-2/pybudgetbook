@@ -688,8 +688,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         if format == 'csv':
             full_dataset.to_csv(target)
         elif format == 'hdf':
-            full_dataset.attrs['version'] = bbvers
-            full_dataset.attrs['creator'] = 'pybudgetbook'
             bb_io.save_with_metadata(full_dataset, target)
         elif format == 'zip':
             # Get all files and images
