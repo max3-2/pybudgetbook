@@ -15,7 +15,7 @@ from .main_gui import Ui_pybb_MainWindow
 from ..configs.plotting_conf import set_style
 from ..configs import constants
 from ..configs.config import options
-from ..configs.config_tools import set_option
+from ..configs.config_tools import set_option, _check_user_folder, set_data_dir
 
 from ..receipt import Receipt, _type_check
 from .. import bb_io, fuzzy_match
@@ -186,6 +186,19 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         if options['show_logger_on_start']:
             self.qt_log_window.show()
         self.qt_logstream.popup_lvl = options['logger_popup_level']
+
+        # Check user folder
+        try:
+            _check_user_folder()
+        except (IOError, FileNotFoundError):
+            logger.warning('No valid data folder, please select existing or new!')
+            folder = QtWidgets.QFileDialog.getExistingDirectory(
+                self, 'Select data directory', dir=expanduser('~'),
+            )
+            if not folder:
+                raise IOError("Invalid folder")
+            set_data_dir(Path(folder))
+            logger.info('New data directory created')
 
     def closeEvent(self, event):
         """Handle additional open windows"""

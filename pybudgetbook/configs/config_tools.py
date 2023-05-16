@@ -10,6 +10,7 @@ from . import config
 from . import constants
 from .. import _top_package
 
+
 logger = logging.getLogger(__package__)
 
 
@@ -55,6 +56,18 @@ def _make_folder_structure(root, template):
     one_directory(template, Path(root))
 
     logging.info('New Folder structure created')
+
+
+def _check_user_folder():
+    """Performs a basic check if a data folder exists. If not, raises error.
+    """
+    if (config.options['data_folder'] is None or
+            config.options['data_folder'] == 'none'):
+        raise IOError('Invalid data folder definition in user config')
+
+    if not (Path(config.options['data_folder']).is_dir() and
+                Path(config.options['data_folder']).exists()):
+        raise FileNotFoundError('Data folder specified in config does not exists')
 
 
 def _intelligent_converter(value):
@@ -123,7 +136,7 @@ def copy_group_templates(force=False):
     target = Path(config.options['data_folder'])
     for template in templates:
         if (target / template.name).exists() and not force:
-            logger.info(f'Skipping file {str(template.name):s} - already available')
+            logger.debug(f'Skipping file {str(template.name):s} - already available')
             continue
 
         # Negatives are copied full since there will be no active feedback
