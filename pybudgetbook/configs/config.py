@@ -60,6 +60,7 @@ options = {
     'logger_popup_level': 20,
     'logger_show_debug': False,
     'ask_for_image': True,
+    'currency': '€'
 }
 
 # Search aliases for receipts

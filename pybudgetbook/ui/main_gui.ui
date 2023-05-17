@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>23</hour>
+                       <hour>21</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>10</hour>
+                       <hour>9</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>12</hour>
+                       <hour>11</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -802,6 +802,7 @@
     <addaction name="menuFlags"/>
     <addaction name="actionData_Directory"/>
     <addaction name="actionDefault_Language"/>
+    <addaction name="actionCurrency"/>
     <addaction name="actionLogger_Popup_Level"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -904,6 +905,11 @@
   <action name="actionCreate_data_backup">
    <property name="text">
     <string>Create data backup</string>
+   </property>
+  </action>
+  <action name="actionCurrency">
+   <property name="text">
+    <string>Currency</string>
    </property>
   </action>
  </widget>

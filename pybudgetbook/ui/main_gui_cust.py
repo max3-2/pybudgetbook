@@ -148,6 +148,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lambda _: ui_support.set_new_conf_val(
                 self, 'lang', 'str')
         )
+        self.actionCurrency.triggered.connect(
+            lambda _: ui_support.set_new_conf_val(
+                self, 'currency', 'str')
+        )
 
         # Configure second tab: Plotting
         self.frame_plotButtonbar.layout().setAlignment(Qt.AlignTop)
