@@ -12,7 +12,7 @@ except ImportError:
 import pandas as pd
 import logging
 
-from pybudgetbook.configs.plotting_conf import set_style
+from pybudgetbook.plotting import set_style
 from pybudgetbook import bb_io, fuzzy_match
 from pybudgetbook.receipt import Receipt
 

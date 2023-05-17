@@ -6,7 +6,7 @@ import logging
 
 from .configs import config
 from .configs import constants
-from .configs.plotting_conf import default_rect
+from .plotting import default_rect
 
 """
 The module begings with common and utility functions. At the end, the main

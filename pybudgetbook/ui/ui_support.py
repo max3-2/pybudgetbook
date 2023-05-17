@@ -182,6 +182,9 @@ class MplCanvas(FigureCanvas):
         self.fig.canvas.blit()
         self.fig.canvas.draw()
 
+    def add_subplot(self, *args, **kwargs):
+        self.ax = self.figure.add_subplot(*args, **kwargs)
+
 
 class QLoggingThread(QtCore.QThread, logging.StreamHandler):
     """
