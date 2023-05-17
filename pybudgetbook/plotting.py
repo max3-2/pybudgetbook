@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from .configs.config import options
+
+
 _def_style = {
     'figure.constrained_layout.use': True,
 
@@ -64,9 +67,10 @@ def create_stem(data, ax):
 
     # Get the 5 main with colors, the rest is gray
     top_five = grouped.groupby(
-        'Vendor')['Price'].sum().sort_values(ascending=False)[:5].index
+        'Vendor')['Price'].sum().sort_values(ascending=False)[:5]
+
     colors = {name: color for name, color
-              in zip(top_five, plt.rcParams['axes.prop_cycle'].by_key()['color'])}
+              in zip(top_five.index, plt.rcParams['axes.prop_cycle'].by_key()['color'])}
 
     locations = grouped['Vendor'].unique()
 
@@ -96,9 +100,12 @@ def create_stem(data, ax):
 
         color = colors.get(loc, 'gray')
         if color == 'gray':
-            loc = None
+            label = None
+        else:
+            label = loc + f': {top_five[loc]:.2f} {options["currency"]}'
+
         # Plot the lines
-        stems = ax.stem(x, y, linefmt=color, basefmt='none', markerfmt='o', label=loc)
+        stems = ax.stem(x, y, linefmt=color, basefmt='none', markerfmt='o', label=label)
         # Plot the markers as empty circles with different edge colors
         stems.markerline.set_markerfacecolor('none')
         stems.markerline.set_markersize(4)
@@ -112,12 +119,12 @@ def create_stem(data, ax):
     ax2.set_ylim(0, None)
 
     # Add legend
-    ax.legend(loc='best')
+    ax.legend(loc='best', title='Top 5')
 
     # and labels
     ax.set_xlabel('Date')
-    ax.set_ylabel('Amount per Shop [€]')
-    ax2.set_ylabel('Amount Total [€]')
+    ax.set_ylabel(f'Amount per Shop [{options["currency"]}]')
+    ax2.set_ylabel(f'Amount Total [{options["currency"]}]')
 
     # and padding
     ax.figure.set_layout_engine('constrained')

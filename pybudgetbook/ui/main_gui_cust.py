@@ -761,6 +761,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         logger.debug(f'Dataset loaded with {conc_data.shape[0]:d} elements')
 
     def create_stem_plot(self):
+        for ax in self.plot_area_data.fig.get_axes():
+            ax.remove()
+        self.plot_area_data.draw_blit()
         self.plot_area_data.add_subplot(111)
         plotting.create_stem(self.conc_data, self.plot_area_data.ax)
         self.plot_area_data.draw_blit()
