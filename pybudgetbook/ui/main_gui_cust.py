@@ -12,7 +12,7 @@ from .. import __version__ as bbvers
 from . import ui_support
 from .main_gui import Ui_pybb_MainWindow
 
-from ..configs.plotting_conf import set_style
+from .. import plotting
 from ..configs import constants
 from ..configs.config import options
 from ..configs.config_tools import set_option, _check_user_folder, set_data_dir
@@ -30,7 +30,7 @@ _log_formatter = logging.Formatter(
 logger = logging.getLogger(_top_package)
 logger.setLevel(logging.DEBUG)
 
-set_style()
+plotting.set_style()
 
 
 def _default_data():
@@ -90,6 +90,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         # Setup plot area, 1
         self.plot_area_receipts = ui_support.MplCanvas(
             self.frame_plotReceipt, 1, constrained_layout=True)
+        self.plot_area_receipts.ax.grid(True)
 
         self.plot_area_receipts.draw_blit()
         logger.debug("Created plotting area 1")
@@ -161,11 +162,14 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             ['Vendors', 'Categories', 'Groups'])
 
         # Add modern buttons
-        self.toolButton_loadPlotData.set_scaled_icon_and_text(
+        self.modernButton_loadPlotData.set_scaled_icon_and_text(
             'reload_data.png', 'Load'
         )
-        self.toolButton_plotPie.set_scaled_icon_and_text(
-            QtWidgets.QStyle.SP_FileDialogDetailedView, 'Plot Pie'
+        self.modernButton_plotStem.set_scaled_icon_and_text(
+            'stem.png', 'Plot Stem'
+        )
+        self.modernButton_plotPie.set_scaled_icon_and_text(
+            'pie.png', 'Plot Pie'
         )
 
 
@@ -202,7 +206,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
         self.actionCreate_data_backup.triggered.connect(
             lambda _: self.show_backup_dialog())
-        self.toolButton_loadPlotData.clicked.connect(self.load_conc_data)
+        self.modernButton_loadPlotData.clicked.connect(self.load_conc_data)
+        self.modernButton_plotStem.clicked.connect(self.create_stem_plot)
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -747,6 +752,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             return
 
         self.conc_data = conc_data
-        self.toolButton_plotStem.setEnabled(True)
-        self.toolButton_plotPie.setEnabled(True)
+        self.modernButton_plotStem.setEnabled(True)
+        self.modernButton_plotPie.setEnabled(True)
         logger.debug(f'Dataset loaded with {conc_data.shape[0]:d} elements')
+
+    def create_stem_plot(self):
+        self.plot_area_data.add_subplot(111)
+        plotting.create_stem(self.conc_data, self.plot_area_data.ax)
+        self.plot_area_data.draw_blit()

@@ -376,7 +376,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>1</hour>
+                       <hour>23</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -386,7 +386,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>11</hour>
+                       <hour>10</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -396,7 +396,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>13</hour>
+                       <hour>12</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -672,7 +672,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="ModernButton" name="toolButton_loadPlotData">
+            <widget class="ModernButton" name="modernButton_loadPlotData">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -685,7 +685,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ModernButton" name="toolButton_plotStem">
+            <widget class="ModernButton" name="modernButton_plotStem">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -701,7 +701,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ModernButton" name="toolButton_plotPie">
+            <widget class="ModernButton" name="modernButton_plotPie">
              <property name="enabled">
               <bool>false</bool>
              </property>
