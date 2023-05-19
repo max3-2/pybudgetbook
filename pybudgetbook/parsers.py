@@ -186,13 +186,13 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
             matcher = re.compile(r'\d{1,3},\d{2,3}', re.IGNORECASE)
         else:
             last_line = data['text'].str.extract(
-                pats['total_sum_pattern']).first_valid_index() - 1
+                pats['total_sum_pattern']).first_valid_index()
             matcher = pats['total_sum_pattern']
 
         try:
             total_price = float(
                 matcher.search(data.iloc[last_line]['text']).group(0).replace(',', '.').replace('_', ''))
-            logger.debug(f'Found total price: {total_price:.f}')
+            logger.debug(f'Found total price: {total_price:.2f}')
         except ValueError:
             logger.warning('No total price detected')
 
