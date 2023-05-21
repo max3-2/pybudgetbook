@@ -19,9 +19,9 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
 from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateEdit,
     QDateTimeEdit, QFrame, QGridLayout, QGroupBox,
     QHBoxLayout, QHeaderView, QLabel, QLineEdit,
-    QMainWindow, QMenu, QMenuBar, QPushButton,
-    QSizePolicy, QSpacerItem, QSplitter, QTabWidget,
-    QVBoxLayout, QWidget)
+    QMainWindow, QMenu, QMenuBar, QSizePolicy,
+    QSpacerItem, QSplitter, QTabWidget, QVBoxLayout,
+    QWidget)
 
 from .ui_support import (ColoredStatusBar, ModernButton, PandasViewer, SliderWithVal)
 
@@ -29,7 +29,7 @@ class Ui_pybb_MainWindow(object):
     def setupUi(self, pybb_MainWindow):
         if not pybb_MainWindow.objectName():
             pybb_MainWindow.setObjectName(u"pybb_MainWindow")
-        pybb_MainWindow.resize(1300, 800)
+        pybb_MainWindow.resize(1392, 800)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -102,7 +102,7 @@ class Ui_pybb_MainWindow(object):
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.frame_buttonsMainLeft.sizePolicy().hasHeightForWidth())
         self.frame_buttonsMainLeft.setSizePolicy(sizePolicy2)
-        self.frame_buttonsMainLeft.setMinimumSize(QSize(100, 70))
+        self.frame_buttonsMainLeft.setMinimumSize(QSize(90, 0))
         self.frame_buttonsMainLeft.setFrameShape(QFrame.NoFrame)
         self.frame_buttonsMainLeft.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.frame_buttonsMainLeft)
@@ -227,17 +227,24 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setSpacing(5)
         self.gridLayout_additionalData.setObjectName(u"gridLayout_additionalData")
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
-        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
-        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(17, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(7, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(9, 0, 0)))
-        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
-        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
-        self.dateEdit_shopDate.setCalendarPopup(True)
-        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
+        self.comboBox_overalCat = QComboBox(self.groupBox_additionalData)
+        self.comboBox_overalCat.setObjectName(u"comboBox_overalCat")
 
-        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 2, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 2, 1, 1)
+
+        self.checkBox_useDiffParsingLang = QCheckBox(self.groupBox_additionalData)
+        self.checkBox_useDiffParsingLang.setObjectName(u"checkBox_useDiffParsingLang")
+
+        self.gridLayout_additionalData.addWidget(self.checkBox_useDiffParsingLang, 4, 1, 1, 1)
+
+        self.lineEdit_marketVendor = QLineEdit(self.groupBox_additionalData)
+        self.lineEdit_marketVendor.setObjectName(u"lineEdit_marketVendor")
+
+        self.gridLayout_additionalData.addWidget(self.lineEdit_marketVendor, 0, 2, 1, 1)
+
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_additionalData.addItem(self.horizontalSpacer_3, 4, 0, 1, 1)
 
         self.label_overallCat = QLabel(self.groupBox_additionalData)
         self.label_overallCat.setObjectName(u"label_overallCat")
@@ -250,54 +257,27 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_additionalData.addWidget(self.comboBox_diffParsingLang, 4, 2, 1, 1)
 
-        self.comboBox_overalCat = QComboBox(self.groupBox_additionalData)
-        self.comboBox_overalCat.setObjectName(u"comboBox_overalCat")
+        self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
+        self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(17, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(7, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(9, 0, 0)))
+        self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
+        self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
+        self.dateEdit_shopDate.setCalendarPopup(True)
+        self.dateEdit_shopDate.setDate(QDate(2023, 4, 14))
 
-        self.gridLayout_additionalData.addWidget(self.comboBox_overalCat, 1, 2, 1, 1)
-
-        self.lineEdit_marketVendor = QLineEdit(self.groupBox_additionalData)
-        self.lineEdit_marketVendor.setObjectName(u"lineEdit_marketVendor")
-
-        self.gridLayout_additionalData.addWidget(self.lineEdit_marketVendor, 0, 2, 1, 1)
+        self.gridLayout_additionalData.addWidget(self.dateEdit_shopDate, 2, 2, 1, 1)
 
         self.label_marketVendor = QLabel(self.groupBox_additionalData)
         self.label_marketVendor.setObjectName(u"label_marketVendor")
 
         self.gridLayout_additionalData.addWidget(self.label_marketVendor, 0, 1, 1, 1)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout_additionalData.addItem(self.horizontalSpacer_3, 4, 0, 1, 1)
-
         self.label_shopDate = QLabel(self.groupBox_additionalData)
         self.label_shopDate.setObjectName(u"label_shopDate")
 
         self.gridLayout_additionalData.addWidget(self.label_shopDate, 2, 1, 1, 1)
-
-        self.pushButton_detectVendor = QPushButton(self.groupBox_additionalData)
-        self.pushButton_detectVendor.setObjectName(u"pushButton_detectVendor")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_detectVendor, 0, 3, 1, 1)
-
-        self.checkBox_useDiffParsingLang = QCheckBox(self.groupBox_additionalData)
-        self.checkBox_useDiffParsingLang.setObjectName(u"checkBox_useDiffParsingLang")
-
-        self.gridLayout_additionalData.addWidget(self.checkBox_useDiffParsingLang, 4, 1, 1, 1)
-
-        self.pushButton_reClassify = QPushButton(self.groupBox_additionalData)
-        self.pushButton_reClassify.setObjectName(u"pushButton_reClassify")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_reClassify, 4, 3, 1, 1)
-
-        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
-        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 1, 3, 1, 1)
-
-        self.pushButton_fillData = QPushButton(self.groupBox_additionalData)
-        self.pushButton_fillData.setObjectName(u"pushButton_fillData")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_fillData, 2, 3, 1, 1)
 
 
         self.horizontalLayout_5.addLayout(self.gridLayout_additionalData)
@@ -347,11 +327,6 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_saveReceipt.addWidget(self.label_totalAmountData, 1, 0, 1, 1)
 
-        self.pushButton_saveData = QPushButton(self.groupBox_saveReceipt)
-        self.pushButton_saveData.setObjectName(u"pushButton_saveData")
-
-        self.gridLayout_saveReceipt.addWidget(self.pushButton_saveData, 1, 3, 1, 1)
-
         self.label_totalAmountDataValue = QLabel(self.groupBox_saveReceipt)
         self.label_totalAmountDataValue.setObjectName(u"label_totalAmountDataValue")
 
@@ -380,6 +355,74 @@ class Ui_pybb_MainWindow(object):
         self.splitter_mainPage.addWidget(self.frame_dataDisplay)
 
         self.horizontalLayout_3.addWidget(self.splitter_mainPage)
+
+        self.frame_buttonsMainRight = QFrame(self.tabWidgetPage1)
+        self.frame_buttonsMainRight.setObjectName(u"frame_buttonsMainRight")
+        sizePolicy2.setHeightForWidth(self.frame_buttonsMainRight.sizePolicy().hasHeightForWidth())
+        self.frame_buttonsMainRight.setSizePolicy(sizePolicy2)
+        self.frame_buttonsMainRight.setMinimumSize(QSize(90, 0))
+        self.frame_buttonsMainRight.setFrameShape(QFrame.NoFrame)
+        self.frame_buttonsMainRight.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_3 = QVBoxLayout(self.frame_buttonsMainRight)
+        self.verticalLayout_3.setSpacing(10)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, -1, 0, 0)
+        self.modernButton_detectVendor = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_detectVendor.setObjectName(u"modernButton_detectVendor")
+        self.modernButton_detectVendor.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_detectVendor)
+
+        self.modernButton_parseData = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_parseData.setObjectName(u"modernButton_parseData")
+        self.modernButton_parseData.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_parseData)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer_3)
+
+        self.modernButton_addRow = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_addRow.setObjectName(u"modernButton_addRow")
+        self.modernButton_addRow.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_addRow)
+
+        self.modernButton_removeRow = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_removeRow.setObjectName(u"modernButton_removeRow")
+        self.modernButton_removeRow.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_removeRow)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer)
+
+        self.modernButton_fillData = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_fillData.setObjectName(u"modernButton_fillData")
+        self.modernButton_fillData.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_fillData)
+
+        self.modernButton_classData = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_classData.setObjectName(u"modernButton_classData")
+        self.modernButton_classData.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_classData)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.verticalLayout_3.addItem(self.verticalSpacer_2)
+
+        self.modernButton_saveData = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_saveData.setObjectName(u"modernButton_saveData")
+        self.modernButton_saveData.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_saveData)
+
+
+        self.horizontalLayout_3.addWidget(self.frame_buttonsMainRight)
 
         self.centralTabWidget.addTab(self.tabWidgetPage1, "")
         self.tabWidgetPage2 = QWidget()
@@ -452,7 +495,7 @@ class Ui_pybb_MainWindow(object):
         pybb_MainWindow.setCentralWidget(self.centralwidget)
         self.pybb_menubar = QMenuBar(pybb_MainWindow)
         self.pybb_menubar.setObjectName(u"pybb_menubar")
-        self.pybb_menubar.setGeometry(QRect(0, 0, 1300, 24))
+        self.pybb_menubar.setGeometry(QRect(0, 0, 1392, 24))
         self.menuFile = QMenu(self.pybb_menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuEdit = QMenu(self.pybb_menubar)
@@ -521,24 +564,26 @@ class Ui_pybb_MainWindow(object):
 
         self.label_filterSlider.setText(QCoreApplication.translate("pybb_MainWindow", u"Filter", None))
         self.groupBox_additionalData.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Receipt Data", None))
-        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
-        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
-        self.label_shopDate.setText(QCoreApplication.translate("pybb_MainWindow", u"Date:", None))
-        self.pushButton_detectVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Detect Vendor", None))
 #if QT_CONFIG(tooltip)
         self.checkBox_useDiffParsingLang.setToolTip(QCoreApplication.translate("pybb_MainWindow", u"<html><head/><body><p>This can be used to use a different language to parse the extracted string and group match the data. Examples are parsing a receipt in french or english from a vacation but adding and matching the data to the german patterns. <span style=\" font-weight:700; color:#ca4d69;\">Warning:</span> This can make your patterns slightly obscure!</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_useDiffParsingLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Use different lang. for data parsing", None))
-        self.pushButton_reClassify.setText(QCoreApplication.translate("pybb_MainWindow", u"Classify Data", None))
-        self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
-        self.pushButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"Fill Data", None))
+        self.label_overallCat.setText(QCoreApplication.translate("pybb_MainWindow", u"Overall Category:", None))
+        self.label_marketVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"Supermarket / Vendor:", None))
+        self.label_shopDate.setText(QCoreApplication.translate("pybb_MainWindow", u"Date:", None))
         self.groupBox_saveReceipt.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Save Receipt", None))
         self.label_totalAmountReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Total amount extracted:", None))
         self.label_totalAmountData.setText(QCoreApplication.translate("pybb_MainWindow", u"Difference to data sum:", None))
-        self.pushButton_saveData.setText(QCoreApplication.translate("pybb_MainWindow", u"Save Data", None))
         self.label_totalAmountDataValue.setText("")
         self.checkBox_feedbackMatch.setText(QCoreApplication.translate("pybb_MainWindow", u"Feedback matching data", None))
         self.lineEdit_tags.setText(QCoreApplication.translate("pybb_MainWindow", u"tag1;tag2", None))
+        self.modernButton_detectVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_addRow.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_removeRow.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_classData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_saveData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("pybb_MainWindow", u"Add New Receipt", None))
         self.modernButton_loadPlotData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_plotStem.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))

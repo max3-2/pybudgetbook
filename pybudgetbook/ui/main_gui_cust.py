@@ -164,6 +164,15 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.frame_buttonsMainLeft.layout().setAlignment(
                 widget.widget(), Qt.AlignHCenter)
 
+        # Layout button bar tab data right
+        self.frame_buttonsMainRight.layout().setAlignment(Qt.AlignTop)
+        # Center all
+        for widget in [
+            self.frame_buttonsMainRight.layout().itemAt(i)
+            for i in range(self.frame_buttonsMainRight.layout().count())]:
+            self.frame_buttonsMainRight.layout().setAlignment(
+                widget.widget(), Qt.AlignHCenter)
+
         # Configure second tab: Plotting
         self.frame_plotButtonbar.layout().setAlignment(Qt.AlignTop)
         # Center all
@@ -215,12 +224,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
         self.actionRaw_Text.triggered.connect(self.show_raw_text)
         self.tableView_pandasViewer.model().dataChanged.connect(self.recompute_diff)
-        self.pushButton_detectVendor.clicked.connect(self.detect_vendor)
-        self.pushButton_parseData.clicked.connect(self.parse_data)
+        self.modernButton_detectVendor.clicked.connect(self.detect_vendor)
+        self.modernButton_parseData.clicked.connect(self.parse_data)
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
-        self.pushButton_reClassify.clicked.connect(self.re_match_data)
-        self.pushButton_fillData.clicked.connect(self.refill_data)
-        self.pushButton_saveData.clicked.connect(self.save_data)
+        self.modernButton_classData.clicked.connect(self.re_match_data)
+        self.modernButton_fillData.clicked.connect(self.refill_data)
+        self.modernButton_saveData.clicked.connect(self.save_data)
         self.comboBox_baseLang.currentTextChanged.connect(self.refilter_and_display)
         self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
         self.actionCreate_data_backup.triggered.connect(
@@ -264,7 +273,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.centralTabWidget.setCurrentIndex(0)
 
         # Setup splitter default
-        c_wi = self.width() - 120
+        c_wi = self.width() - 180
         self.splitter_mainPage.setSizes(
             [int(c_wi * 1 / 3), int(c_wi * 2 / 3)])
 
