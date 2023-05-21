@@ -777,7 +777,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         for ax in self.plot_area_data.fig.get_axes():
             ax.remove()
         self.plot_area_data.ax = None
-        self.plot_area_data.draw_blit()
         self.plot_area_data.add_subplot(111)
         plotting.create_stem(self.conc_data, self.plot_area_data.ax[0])
         self.plot_area_data.draw_blit()

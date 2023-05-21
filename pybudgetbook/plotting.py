@@ -1,11 +1,16 @@
 """Updates package wide plot settings"""
+import logging
 import matplotlib as mpl
 from matplotlib.patches import Rectangle, Shadow
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from darkdetect import isDark
 
 from .configs.config import options
+
+
+logger = logging.getLogger(__package__)
 
 
 _def_style = {
@@ -49,6 +54,25 @@ def set_style():
     """Sets a default style for good receipt plotting."""
     mpl.rcParams.update(_def_style)
 
+    if isDark():
+        logger.debug('Dark mode plotting style')
+        dark_update = {
+            'figure.facecolor': '#404040',
+            'axes.facecolor': '#404040',
+
+            'text.color': '#f0f0f0',
+            'axes.titlecolor': '#f0f0f0',
+            'axes.edgecolor': '#f0f0f0',
+            'axes.labelcolor': '#f0f0f0',
+            'xtick.color': '#f0f0f0',
+            'xtick.labelcolor': '#f0f0f0',
+            'ytick.color': '#f0f0f0',
+            'ytick.labelcolor': '#f0f0f0',
+            'legend.edgecolor': '#f0f0f0',
+
+            'grid.color': '#BCB0B0',
+        }
+        mpl.rcParams.update(dark_update)
 
 def create_stem(data, ax):
     """

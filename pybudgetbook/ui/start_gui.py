@@ -18,7 +18,6 @@ def start_main_ui(sys_argv=[]):
     then runs the UI.
     """
     app = QtWidgets.QApplication(sys_argv)
-    app.setStyle('Light')
 
     if _icon_loc.exists():
         tray_icon = QIcon(str(_icon_loc))

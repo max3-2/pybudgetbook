@@ -42,6 +42,7 @@ dependencies = [
     'Pillow',
     'pytesseract',
     'pypdfium2',
+    'darkdetect',
     ]
 
 [project.optional-dependencies]
