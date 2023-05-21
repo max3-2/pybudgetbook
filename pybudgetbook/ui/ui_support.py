@@ -597,7 +597,7 @@ class SliderWithVal(QtWidgets.QWidget):
     Has a callback that is timed at `self.delay`
     """
     def __init__(
-            self, parent=None, layout='h'):
+            self, parent=None, layout='v'):
         """See above for info
 
         Parameters
@@ -702,6 +702,10 @@ class SliderWithVal(QtWidgets.QWidget):
         # Create a label for slider value
         self.slider_value_label.setText(
             f'{ self.labeltext:s}{self.slider.value() * step:.2f}')
+
+    def _remove_label(self):
+        self.slider_value_label.setVisible(False)
+        self.layout().removeWidget(self.slider_value_label)
 
     def get_scaled_val(self):
         return self.slider.value() * self.step

@@ -52,11 +52,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         super().__init__()
         self.setupUi(self)
 
-        # Setup splitter default
-        c_wi = self.tabWidgetPage1.width()
-        self.splitter_mainPage.setSizes(
-            [int(c_wi * 1 / 4), int(c_wi * 3 / 4)])
-
         # Additional vars
         self.receipt = None
         self.raw_text_window = None
@@ -116,10 +111,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
         self.tableView_pandasViewer.model().combo_col = 7
 
-        self.horizontalSliderFilterAmount.custom_setup(value_change_delay=500)
-        self.horizontalSliderFilterAmount.slider.setValue(23)
+        self.slider_FilterAmount.custom_setup(value_change_delay=500)
+        self.slider_FilterAmount.slider.setValue(23)
         # Stop initial timer
-        self.horizontalSliderFilterAmount.timer.stop()
+        self.slider_FilterAmount.timer.stop()
+        # Hide label
+        self.slider_FilterAmount._remove_label()
 
         # Other configs for fields
         self.label_totalAmountDataValue.setTextFormat(Qt.RichText)
@@ -158,6 +155,15 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 self, 'currency', 'str')
         )
 
+        # Layout button bar tab data left
+        self.frame_buttonsMainLeft.layout().setAlignment(Qt.AlignTop)
+        # Center all
+        for widget in [
+            self.frame_buttonsMainLeft.layout().itemAt(i)
+            for i in range(self.frame_buttonsMainLeft.layout().count())]:
+            self.frame_buttonsMainLeft.layout().setAlignment(
+                widget.widget(), Qt.AlignHCenter)
+
         # Configure second tab: Plotting
         self.frame_plotButtonbar.layout().setAlignment(Qt.AlignTop)
         # Center all
@@ -171,6 +177,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             ['Vendors', 'Categories', 'Groups'])
 
         # Add modern buttons
+        self.modernButton_loadReceipt.set_scaled_icon_and_text(
+            'load_rec.png', 'Load'
+        )
         self.modernButton_loadPlotData.set_scaled_icon_and_text(
             'reload_data.png', 'Load'
         )
@@ -200,8 +209,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         )
 
         # Attach all the handlers for custom functions
-        self.pushButton_loadNewReceipt.clicked.connect(self.load_receipt)
-        self.horizontalSliderFilterAmount.set_timer_callback(self.refilter_and_display)
+        self.modernButton_loadReceipt.clicked.connect(self.load_receipt)
+        self.slider_FilterAmount.set_timer_callback(self.refilter_and_display)
         self.comboBox_receiptDisplayMode.currentIndexChanged.connect(self.update_rec_plot)
         self.checkBox_useDiffParsingLang.stateChanged.connect(self.comboBox_diffParsingLang.setEnabled)
         self.actionRaw_Text.triggered.connect(self.show_raw_text)
@@ -243,8 +252,21 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             set_data_dir(Path(folder))
             logger.info('New data directory created')
 
+
+
+        # Center labels in menu
+        self.label_baseLang.setAlignment(Qt.AlignCenter)
+        self.label_receiptDisplayMode.setAlignment(Qt.AlignCenter)
+        self.label_filterSlider.setAlignment(Qt.AlignCenter)
+        self.label_pieType.setAlignment(Qt.AlignCenter)
+
         # Fix init tab
         self.centralTabWidget.setCurrentIndex(0)
+
+        # Setup splitter default
+        c_wi = self.width() - 120
+        self.splitter_mainPage.setSizes(
+            [int(c_wi * 1 / 3), int(c_wi * 2 / 3)])
 
     def closeEvent(self, event):
         """Handle additional open windows"""
@@ -326,7 +348,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             try:
                 self.receipt = Receipt(file)
                 self.receipt.filter_image(
-                    unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
+                    unsharp_ma=(5, self.slider_FilterAmount.get_scaled_val())).extract_data(
                     lang=self.comboBox_baseLang.currentText())
 
                 # Reset events on new load
@@ -346,7 +368,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                     self.plot_area_receipts.setFocus()
 
                 elif self.receipt.type == 'pdf':
-                    self.horizontalSliderFilterAmount.setEnabled(False)
+                    self.slider_FilterAmount.setEnabled(False)
                     self.comboBox_receiptDisplayMode.setEnabled(False)
 
             except (IOError, FileNotFoundError):
@@ -376,7 +398,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         if self.receipt is None:
             return
         self.receipt.filter_image(
-            unsharp_ma=(5, self.horizontalSliderFilterAmount.get_scaled_val())).extract_data(
+            unsharp_ma=(5, self.slider_FilterAmount.get_scaled_val())).extract_data(
             lang=self.comboBox_baseLang.currentText())
         self.statusbar.showMessage('Refiltering image', timeout=2000, color='green')
         self.update_rec_plot(keep_lim)
