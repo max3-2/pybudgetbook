@@ -21,7 +21,7 @@ from ..configs.config import options
 from ..configs.config_tools import set_option, _check_user_folder, set_data_dir
 
 from ..receipt import Receipt, _type_check
-from .. import bb_io, fuzzy_match
+from .. import bb_io, fuzzy_match, parsers
 from .. import _top_package
 
 # This might need to be moved into init...currently it works here!
@@ -210,6 +210,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.pushButton_parseData.clicked.connect(self.parse_data)
         self.lineEdit_totalAmountReceipt.textChanged.connect(self.update_diff)
         self.pushButton_reClassify.clicked.connect(self.re_match_data)
+        self.pushButton_fillData.clicked.connect(self.refill_data)
         self.pushButton_saveData.clicked.connect(self.save_data)
         self.comboBox_baseLang.currentTextChanged.connect(self.refilter_and_display)
         self.actionExport_to_CSV.triggered.connect(lambda: self.save_data(target='csv'))
@@ -613,6 +614,22 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         except FileNotFoundError as missing_data:
             logger.error(f'{missing_data}')
             data['Group'] = 'none'
+
+        self.set_new_data(data)
+
+    def refill_data(self):
+        """
+        Re-Runs data fill computation for units and unit prices if data has
+        been changed or on manual request, e. g. with manual data entered by
+        the user.
+        """
+        if self.tableView_pandasViewer.model().rowCount() > 0:
+            data = self.tableView_pandasViewer.get_final_data()
+
+        else:
+            return
+
+        data = parsers.fill_missing_data(data)
 
         self.set_new_data(data)
 

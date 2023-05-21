@@ -234,9 +234,9 @@ class Ui_pybb_MainWindow(object):
         self.gridLayout_additionalData.setContentsMargins(-1, 0, -1, 5)
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(21, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(9, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(11, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(19, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(8, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(10, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -289,15 +289,20 @@ class Ui_pybb_MainWindow(object):
 
         self.gridLayout_additionalData.addWidget(self.checkBox_useDiffParsingLang, 4, 1, 1, 1)
 
-        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
-        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
-
-        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 2, 3, 1, 1)
-
         self.pushButton_reClassify = QPushButton(self.groupBox_additionalData)
         self.pushButton_reClassify.setObjectName(u"pushButton_reClassify")
 
         self.gridLayout_additionalData.addWidget(self.pushButton_reClassify, 4, 3, 1, 1)
+
+        self.pushButton_parseData = QPushButton(self.groupBox_additionalData)
+        self.pushButton_parseData.setObjectName(u"pushButton_parseData")
+
+        self.gridLayout_additionalData.addWidget(self.pushButton_parseData, 1, 3, 1, 1)
+
+        self.pushButton_fillData = QPushButton(self.groupBox_additionalData)
+        self.pushButton_fillData.setObjectName(u"pushButton_fillData")
+
+        self.gridLayout_additionalData.addWidget(self.pushButton_fillData, 2, 3, 1, 1)
 
 
         self.horizontalLayout_5.addLayout(self.gridLayout_additionalData)
@@ -489,7 +494,7 @@ class Ui_pybb_MainWindow(object):
 
         self.retranslateUi(pybb_MainWindow)
 
-        self.centralTabWidget.setCurrentIndex(1)
+        self.centralTabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(pybb_MainWindow)
@@ -528,8 +533,9 @@ class Ui_pybb_MainWindow(object):
         self.checkBox_useDiffParsingLang.setToolTip(QCoreApplication.translate("pybb_MainWindow", u"<html><head/><body><p>This can be used to use a different language to parse the extracted string and group match the data. Examples are parsing a receipt in french or english from a vacation but adding and matching the data to the german patterns. <span style=\" font-weight:700; color:#ca4d69;\">Warning:</span> This can make your patterns slightly obscure!</p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
         self.checkBox_useDiffParsingLang.setText(QCoreApplication.translate("pybb_MainWindow", u"Use different lang. for data parsing", None))
-        self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
         self.pushButton_reClassify.setText(QCoreApplication.translate("pybb_MainWindow", u"Classify Data", None))
+        self.pushButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"Parse Data", None))
+        self.pushButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"Fill Data", None))
         self.groupBox_saveReceipt.setTitle(QCoreApplication.translate("pybb_MainWindow", u"Save Receipt", None))
         self.label_totalAmountReceipt.setText(QCoreApplication.translate("pybb_MainWindow", u"Total amount extracted:", None))
         self.label_totalAmountData.setText(QCoreApplication.translate("pybb_MainWindow", u"Difference to data sum:", None))
