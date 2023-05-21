@@ -569,14 +569,20 @@ class PandasViewer(QtWidgets.QTableView):
 
         # Evaluate menu
         if action == add_action:
-            self.model().insertRows(self.model().rowCount(), 1)
+            self._menu_insert_row()
 
         elif action == remove_row_action:
-            selected_indexes = self.selectedIndexes()
-            if selected_indexes:
-                selected_rows = sorted(list(set(index.row() for index in selected_indexes)), reverse=True)
-                for row in selected_rows:
-                    self.model().removeRow(row)
+            self._menu_remove_row()
+
+    def _menu_insert_row(self):
+        self.model().insertRows(self.model().rowCount(), 1)
+
+    def _menu_remove_row(self):
+        selected_indexes = self.selectedIndexes()
+        if selected_indexes:
+            selected_rows = sorted(list(set(index.row() for index in selected_indexes)), reverse=True)
+            for row in selected_rows:
+                self.model().removeRow(row)
 
     def set_combo_column(self, column, poss_col):
         self._combo_delegate = ComboBoxDelegate(self, possible_groups=poss_col)

@@ -389,12 +389,6 @@ class Ui_pybb_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.modernButton_addRow)
 
-        self.modernButton_removeRow = ModernButton(self.frame_buttonsMainRight)
-        self.modernButton_removeRow.setObjectName(u"modernButton_removeRow")
-        self.modernButton_removeRow.setMinimumSize(QSize(70, 70))
-
-        self.verticalLayout_3.addWidget(self.modernButton_removeRow)
-
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
@@ -580,7 +574,6 @@ class Ui_pybb_MainWindow(object):
         self.modernButton_detectVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_addRow.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
-        self.modernButton_removeRow.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_classData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_saveData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))

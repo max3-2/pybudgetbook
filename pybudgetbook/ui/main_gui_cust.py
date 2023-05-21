@@ -240,6 +240,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lambda _: self.create_pie_plot())
         self.comboBox_PiePlotType.currentTextChanged.connect(
             lambda _: self.create_pie_plot())
+        self.modernButton_addRow.clicked.connect(self.tableView_pandasViewer._menu_insert_row)
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
