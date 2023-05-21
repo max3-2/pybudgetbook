@@ -4,6 +4,7 @@ from pathlib import Path
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
 import pandas as pd
+import numpy as np
 from os.path import expanduser
 import datetime
 from shutil import make_archive
@@ -68,6 +69,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lambda: self.refilter_and_display(keep_lim=False))
 
         self.conc_data = None
+        self.pieplot = None
+        self.piehandler = None
 
         # Logger setup
         self.qt_logstream = ui_support.QLoggingThread()
@@ -212,6 +215,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             lambda _: self.show_backup_dialog())
         self.modernButton_loadPlotData.clicked.connect(self.load_conc_data)
         self.modernButton_plotStem.clicked.connect(self.create_stem_plot)
+        self.modernButton_plotPie.clicked.connect(
+            lambda _: self.create_pie_plot())
+        self.comboBox_PiePlotType.currentTextChanged.connect(
+            lambda _: self.create_pie_plot())
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -750,6 +757,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         logger.info(f'Export finished to: {target}')
 
     def load_conc_data(self):
+        """
+        Loads all available data from the data folder into a single dataframe.
+        """
         conc_data = bb_io.load_concatenad_data()[0]
         if conc_data.shape[0] == 0:
             logger.error('Loaded dataset seems to be empty')
@@ -761,9 +771,68 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         logger.debug(f'Dataset loaded with {conc_data.shape[0]:d} elements')
 
     def create_stem_plot(self):
+        """Parses data, clears axes and calls backend to create a stem plot."""
         for ax in self.plot_area_data.fig.get_axes():
             ax.remove()
+        self.plot_area_data.ax = None
         self.plot_area_data.draw_blit()
         self.plot_area_data.add_subplot(111)
-        plotting.create_stem(self.conc_data, self.plot_area_data.ax)
+        plotting.create_stem(self.conc_data, self.plot_area_data.ax[0])
+        self.plot_area_data.draw_blit()
+
+    def create_pie_plot(self):
+        """Parses data, clears axes and calls backend for pie plot."""
+        def _fmt_pie_label(number, cutoff):
+            if number < cutoff:
+                return ''
+            return f'{number:.1f} %'
+
+        # Check setup
+        if self.comboBox_PiePlotType.currentText() == 'Vendors':
+            pie_by = 'Vendor'
+            bar_by = 'Group'
+            label_cutoff = 4.
+
+        elif self.comboBox_PiePlotType.currentText() == 'Categories':
+            pie_by = 'Category'
+            bar_by = 'Group'
+            label_cutoff = 1.
+
+        elif self.comboBox_PiePlotType.currentText() == 'Groups':
+            pie_by = 'Group'
+            bar_by = 'Vendor'
+            label_cutoff = 1.
+
+        else:
+            logger.error('Pie / Bar setup invalid')
+            return
+
+        # Reset area
+        for ax in self.plot_area_data.fig.get_axes():
+            ax.remove()
+
+        self.pieplot = None
+        self.piehandler = None
+
+        self.plot_area_data.ax = None
+        self.plot_area_data.draw_blit()
+        self.plot_area_data.add_subplot(1, 2, 1)
+        self.plot_area_data.add_subplot(1, 2, 2)
+        self.plot_area_data.draw_blit()
+
+        # Create plot
+        data_pie = self.conc_data.groupby(pie_by)['Price'].sum().abs()
+        total = data_pie.sum()
+        labels = np.array(data_pie.index)
+        labels[data_pie * 100 / total < label_cutoff] = ''
+        self.pieplot = self.plot_area_data.ax[0].pie(
+            data_pie, labels=labels,
+            autopct=lambda num: _fmt_pie_label(num, label_cutoff),
+            pctdistance=0.75)
+
+        self.piehandler = plotting.PieEventHandler(
+            self.pieplot, self.conc_data,
+            self.plot_area_data.ax[1], bar_labels='both',
+            reduce_df=(pie_by, bar_by))
+
         self.plot_area_data.draw_blit()
