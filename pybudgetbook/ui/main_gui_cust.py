@@ -1,13 +1,15 @@
 """Inherits from the UI design and adapts the class with some core features"""
 import logging
 from pathlib import Path
+from os.path import expanduser
+from shutil import make_archive
+import datetime
+
 from PySide6 import QtWidgets, QtCore
 from PySide6.QtCore import Qt
+
 import pandas as pd
 import numpy as np
-from os.path import expanduser
-import datetime
-from shutil import make_archive
 
 from .. import __version__ as bbvers
 from . import ui_support
