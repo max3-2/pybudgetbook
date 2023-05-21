@@ -213,9 +213,17 @@ class PieEventHandler:
             The amount of explosion applied to an active pie, by default 0.2
         click_ew : `float`, optional
             The edgewidth to highlight am active pie, by default 1.3
-        `bar_labels` : str, optional
+        `bar_labels` : `str`, optional
             Bar labels to generate on the bar plot. This uses the `bar_fmt`
             function, so see there for possible options, by default 'abs'
+        `reduce_df` : `tuple`
+            Optional tuple working with dataframe bar details input. First is
+            a selection of a column to compare with the pie slice label,
+            second is the following groupby to reduce data for plotting.
+            Defaults to `None`
+        `label_cutoff` : `float`, optional
+            Cutoff label display if value is below a certain percent. Defaults
+            to `0` which shows all labels
         """
         self.pieplot = pieplot
         self.bar_details = bar_details
