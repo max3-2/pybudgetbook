@@ -835,6 +835,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.piehandler = plotting.PieEventHandler(
             self.pieplot, self.conc_data,
             self.plot_area_data.ax[1], bar_labels='both',
-            reduce_df=(pie_by, bar_by))
+            reduce_df=(pie_by, bar_by), label_cutoff=label_cutoff)
 
         self.plot_area_data.draw_blit()

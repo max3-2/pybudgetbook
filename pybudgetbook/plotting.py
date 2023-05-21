@@ -21,10 +21,10 @@ _def_style = {
 }
 
 
-def _dbl_fmt(val, sum_vals):
+def _dbl_fmt(val, sum_vals, label_cutoff):
     """Shows a number in float format and percent"""
     rel_val = val * 100 / sum_vals
-    return f'{val:.2f} {options["currency"]:s} ({rel_val:.2f}%)'
+    return f'{val:.2f} {options["currency"]:s} ({rel_val:.2f}%)' if rel_val >= label_cutoff else ''
 
 
 def default_rect(group, ax):
@@ -136,7 +136,7 @@ def create_stem(data, ax):
     ax.figure.set_layout_engine('constrained')
 
 
-def bar_fmt(values, fmt_type):
+def bar_fmt(values, fmt_type, label_cutoff):
     """
     Formats values to bar labels as used in the `matplotlib` `bar_label`
     function. This is just a simple warpper around some more useful cases for
@@ -145,19 +145,23 @@ def bar_fmt(values, fmt_type):
     Currently, possible options are specified using a `str` which can be one of
     `off`, `abs`, `rel`, `both`.
     """
+    values = np.array(values).astype(float)
+    total = np.nansum(values)
     if fmt_type == 'off':
         return values, ''
 
     elif fmt_type == 'abs':
-        return values, lambda val: f'{val:.2f} {options["currency"]:s}'
+        return (
+            values,
+            lambda val: f'{val:.2f} {options["currency"]:s}' if val * 100 / total >= label_cutoff else ''
+        )
 
     elif fmt_type == 'rel':
-        values = np.array(values).astype(float)
-        values = values * 100 / np.nansum(values)
-        return values, lambda val: f'{val:.2f} %'
+        values = values * 100 / total
+        return values, lambda val: f'{val:.2f} %' if val * 100 / total >= label_cutoff else ''
 
     elif fmt_type == 'both':
-        return values, lambda val: _dbl_fmt(val, np.nansum(values))
+        return values, lambda val: _dbl_fmt(val, np.nansum(values), label_cutoff)
 
     else:
         raise IOError('Invalid bar label format')
@@ -186,7 +190,7 @@ class PieEventHandler:
     """
     def __init__(self, pieplot, bar_details={}, bar_axes=None,
                  click_explode=0.2, click_ew=1.3, bar_labels='abs',
-                 reduce_df=None):
+                 reduce_df=None, label_cutoff=0.):
         """
         Creates the handler on the pieplot and attaches a bar plot for details
         if the needed inputs are provided. See below for an explanation of
@@ -237,6 +241,7 @@ class PieEventHandler:
         self._nom_val_pos = None
         self._curr_shadow = None
         self.reduce_df = reduce_df
+        self.label_cutoff = label_cutoff
 
     def cust_explode(self, index, expl):
         """Explodes a pie element from the rest of the plot."""
@@ -321,9 +326,14 @@ class PieEventHandler:
 
             shades = np.linspace(0.3, 1, len(values))
 
-            values, fmt = bar_fmt(values, self.bar_labels)
+            values, fmt = bar_fmt(values, self.bar_labels, self.label_cutoff)
+            sort_vals = np.argsort(values)
 
-            for height, label, shade in reversed([*zip(values, barlabels, shades)]):
+            # Sort and blank
+            values = values[sort_vals]
+            barlabels = np.array(barlabels)[sort_vals]
+
+            for height, label, shade in zip(values[::-1], barlabels[::-1], shades[::-1]):
                 bottom -= height
                 self._barplot = self.bar_ax.bar(
                     0, height, width, bottom=bottom, color=color, label=label,
