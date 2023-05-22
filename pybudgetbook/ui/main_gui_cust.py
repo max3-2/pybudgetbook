@@ -107,7 +107,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         table_model = ui_support.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
-        poss_groups = list(bb_io._load_basic_match_data(options['lang'])[0].keys())
+        poss_groups = sorted(list(bb_io._load_basic_match_data(options['lang'])[0].keys()))
         self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
         self.tableView_pandasViewer.model().combo_col = 7
 

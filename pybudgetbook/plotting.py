@@ -70,7 +70,7 @@ def set_style():
             'ytick.labelcolor': '#f0f0f0',
             'legend.edgecolor': '#f0f0f0',
 
-            'grid.color': '#BCB0B0',
+            'grid.color': '#565055',
         }
         mpl.rcParams.update(dark_update)
 
