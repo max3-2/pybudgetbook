@@ -189,6 +189,26 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.modernButton_loadReceipt.set_scaled_icon_and_text(
             'load_rec.png', 'Load'
         )
+
+        self.modernButton_detectVendor.set_scaled_icon_and_text(
+            'parse_vendor.png', 'Vendor'
+        )
+        self.modernButton_parseData.set_scaled_icon_and_text(
+            'parse_data.png', 'Parse'
+        )
+        self.modernButton_addRow.set_scaled_icon_and_text(
+            'add_row.png', 'Add'
+        )
+        self.modernButton_classData.set_scaled_icon_and_text(
+            'classify.png', 'Group'
+        )
+        self.modernButton_fillData.set_scaled_icon_and_text(
+            'fill_data.png', 'Fill'
+        )
+        self.modernButton_saveData.set_scaled_icon_and_text(
+            'save.png', 'Save'
+        )
+
         self.modernButton_loadPlotData.set_scaled_icon_and_text(
             'reload_data.png', 'Load'
         )

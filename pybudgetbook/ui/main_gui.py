@@ -93,8 +93,9 @@ class Ui_pybb_MainWindow(object):
         self.tabWidgetPage1 = QWidget()
         self.tabWidgetPage1.setObjectName(u"tabWidgetPage1")
         self.horizontalLayout_3 = QHBoxLayout(self.tabWidgetPage1)
+        self.horizontalLayout_3.setSpacing(5)
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.horizontalLayout_3.setContentsMargins(0, 0, 0, 4)
+        self.horizontalLayout_3.setContentsMargins(4, 4, 6, 4)
         self.frame_buttonsMainLeft = QFrame(self.tabWidgetPage1)
         self.frame_buttonsMainLeft.setObjectName(u"frame_buttonsMainLeft")
         sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
@@ -259,9 +260,9 @@ class Ui_pybb_MainWindow(object):
 
         self.dateEdit_shopDate = QDateEdit(self.groupBox_additionalData)
         self.dateEdit_shopDate.setObjectName(u"dateEdit_shopDate")
-        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(17, 0, 0)))
-        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(7, 59, 59)))
-        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(9, 0, 0)))
+        self.dateEdit_shopDate.setDateTime(QDateTime(QDate(2023, 4, 14), QTime(13, 0, 0)))
+        self.dateEdit_shopDate.setMaximumDateTime(QDateTime(QDate(2222, 12, 30), QTime(5, 59, 59)))
+        self.dateEdit_shopDate.setMinimumDateTime(QDateTime(QDate(2000, 1, 1), QTime(7, 0, 0)))
         self.dateEdit_shopDate.setMinimumDate(QDate(2000, 1, 1))
         self.dateEdit_shopDate.setCurrentSection(QDateTimeEdit.DaySection)
         self.dateEdit_shopDate.setCalendarPopup(True)
@@ -393,17 +394,17 @@ class Ui_pybb_MainWindow(object):
 
         self.verticalLayout_3.addItem(self.verticalSpacer)
 
-        self.modernButton_fillData = ModernButton(self.frame_buttonsMainRight)
-        self.modernButton_fillData.setObjectName(u"modernButton_fillData")
-        self.modernButton_fillData.setMinimumSize(QSize(70, 70))
-
-        self.verticalLayout_3.addWidget(self.modernButton_fillData)
-
         self.modernButton_classData = ModernButton(self.frame_buttonsMainRight)
         self.modernButton_classData.setObjectName(u"modernButton_classData")
         self.modernButton_classData.setMinimumSize(QSize(70, 70))
 
         self.verticalLayout_3.addWidget(self.modernButton_classData)
+
+        self.modernButton_fillData = ModernButton(self.frame_buttonsMainRight)
+        self.modernButton_fillData.setObjectName(u"modernButton_fillData")
+        self.modernButton_fillData.setMinimumSize(QSize(70, 70))
+
+        self.verticalLayout_3.addWidget(self.modernButton_fillData)
 
         self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -422,11 +423,14 @@ class Ui_pybb_MainWindow(object):
         self.tabWidgetPage2 = QWidget()
         self.tabWidgetPage2.setObjectName(u"tabWidgetPage2")
         self.horizontalLayout_2 = QHBoxLayout(self.tabWidgetPage2)
-        self.horizontalLayout_2.setSpacing(10)
+        self.horizontalLayout_2.setSpacing(5)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout_2.setContentsMargins(4, 4, 6, 4)
         self.frame_plotButtonbar = QFrame(self.tabWidgetPage2)
         self.frame_plotButtonbar.setObjectName(u"frame_plotButtonbar")
+        sizePolicy2.setHeightForWidth(self.frame_plotButtonbar.sizePolicy().hasHeightForWidth())
+        self.frame_plotButtonbar.setSizePolicy(sizePolicy2)
+        self.frame_plotButtonbar.setMinimumSize(QSize(90, 0))
         self.frame_plotButtonbar.setFrameShape(QFrame.NoFrame)
         self.frame_plotButtonbar.setFrameShadow(QFrame.Plain)
         self.verticalLayout = QVBoxLayout(self.frame_plotButtonbar)
@@ -527,7 +531,7 @@ class Ui_pybb_MainWindow(object):
 
         self.retranslateUi(pybb_MainWindow)
 
-        self.centralTabWidget.setCurrentIndex(0)
+        self.centralTabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(pybb_MainWindow)
@@ -574,8 +578,8 @@ class Ui_pybb_MainWindow(object):
         self.modernButton_detectVendor.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_parseData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_addRow.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
-        self.modernButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_classData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
+        self.modernButton_fillData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.modernButton_saveData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))
         self.centralTabWidget.setTabText(self.centralTabWidget.indexOf(self.tabWidgetPage1), QCoreApplication.translate("pybb_MainWindow", u"Add New Receipt", None))
         self.modernButton_loadPlotData.setText(QCoreApplication.translate("pybb_MainWindow", u"...", None))

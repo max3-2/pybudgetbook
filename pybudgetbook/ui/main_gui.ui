@@ -52,21 +52,24 @@
     <item>
      <widget class="QTabWidget" name="centralTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabWidgetPage1">
        <attribute name="title">
         <string>Add New Receipt</string>
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <property name="spacing">
+         <number>5</number>
+        </property>
         <property name="leftMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="topMargin">
-         <number>0</number>
+         <number>4</number>
         </property>
         <property name="rightMargin">
-         <number>0</number>
+         <number>6</number>
         </property>
         <property name="bottomMargin">
          <number>4</number>
@@ -406,7 +409,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>17</hour>
+                       <hour>13</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -416,7 +419,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>7</hour>
+                       <hour>5</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -426,7 +429,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>9</hour>
+                       <hour>7</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -683,7 +686,7 @@
             </spacer>
            </item>
            <item>
-            <widget class="ModernButton" name="modernButton_fillData">
+            <widget class="ModernButton" name="modernButton_classData">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -696,7 +699,7 @@
             </widget>
            </item>
            <item>
-            <widget class="ModernButton" name="modernButton_classData">
+            <widget class="ModernButton" name="modernButton_fillData">
              <property name="minimumSize">
               <size>
                <width>70</width>
@@ -745,7 +748,7 @@
        </attribute>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>10</number>
+         <number>5</number>
         </property>
         <property name="leftMargin">
          <number>4</number>
@@ -761,6 +764,18 @@
         </property>
         <item>
          <widget class="QFrame" name="frame_plotButtonbar">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>90</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="frameShape">
            <enum>QFrame::NoFrame</enum>
           </property>
