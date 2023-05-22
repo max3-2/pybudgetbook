@@ -409,7 +409,7 @@
                     <widget class="QDateEdit" name="dateEdit_shopDate">
                      <property name="dateTime">
                       <datetime>
-                       <hour>13</hour>
+                       <hour>11</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2023</year>
@@ -419,7 +419,7 @@
                      </property>
                      <property name="maximumDateTime">
                       <datetime>
-                       <hour>5</hour>
+                       <hour>4</hour>
                        <minute>59</minute>
                        <second>59</second>
                        <year>2222</year>
@@ -429,7 +429,7 @@
                      </property>
                      <property name="minimumDateTime">
                       <datetime>
-                       <hour>7</hour>
+                       <hour>6</hour>
                        <minute>0</minute>
                        <second>0</second>
                        <year>2000</year>
@@ -1062,6 +1062,32 @@
    <header>.ui_support</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>centralTabWidget</tabstop>
+  <tabstop>modernButton_loadReceipt</tabstop>
+  <tabstop>comboBox_baseLang</tabstop>
+  <tabstop>comboBox_receiptDisplayMode</tabstop>
+  <tabstop>slider_FilterAmount</tabstop>
+  <tabstop>lineEdit_marketVendor</tabstop>
+  <tabstop>comboBox_overalCat</tabstop>
+  <tabstop>dateEdit_shopDate</tabstop>
+  <tabstop>checkBox_useDiffParsingLang</tabstop>
+  <tabstop>comboBox_diffParsingLang</tabstop>
+  <tabstop>tableView_pandasViewer</tabstop>
+  <tabstop>modernButton_detectVendor</tabstop>
+  <tabstop>modernButton_parseData</tabstop>
+  <tabstop>modernButton_addRow</tabstop>
+  <tabstop>modernButton_classData</tabstop>
+  <tabstop>modernButton_fillData</tabstop>
+  <tabstop>lineEdit_totalAmountReceipt</tabstop>
+  <tabstop>lineEdit_tags</tabstop>
+  <tabstop>checkBox_feedbackMatch</tabstop>
+  <tabstop>modernButton_saveData</tabstop>
+  <tabstop>modernButton_loadPlotData</tabstop>
+  <tabstop>modernButton_plotStem</tabstop>
+  <tabstop>modernButton_plotPie</tabstop>
+  <tabstop>comboBox_PiePlotType</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
