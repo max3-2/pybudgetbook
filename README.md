@@ -77,6 +77,8 @@ ToDo Start he UI and load the receipt
 
 TODO Manual corrections, e.g. chaning amount if bulk packages are bought
 
+TODO vendor importance, set manual logic
+
 ## More Informations
 ### Good Scans / Images
 - Have your receipt as flat as possible against a darker background.

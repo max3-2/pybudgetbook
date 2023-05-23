@@ -592,6 +592,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 self.receipt.set_vendor(self.lineEdit_marketVendor.text(), lang)
 
         self.detect_date()
+
+        # Remove old rects
+        for patch in self.plot_area_receipts.ax.patches:
+            patch.remove()
+
         new_data, total_price = self.receipt.parse_data()
 
         if self.checkBox_useDiffParsingLang.isChecked():
@@ -622,11 +627,11 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         if rec_date is None:
             msg = 'No Date could be extracted'
             logger.info(msg)
-            self.statusbar.showMessage(msg, timetout=3000)
+            self.statusbar.showMessage(msg, timeout=3000, color='red')
             return
 
         self.dateEdit_shopDate.setDate(ui_support.convert_date(rec_date))
-        self.statusbar.showMessage('Date extracted', timeout=2000, color='green')
+        self.statusbar.showMessage('Date extracted', timeout=3000, color='green')
 
     def detect_vendor(self):
         """Parses vendor and sets the vendor text."""
@@ -641,9 +646,16 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         else:
             lang = self.comboBox_baseLang.currentText()
 
-        vendor = self.receipt.parse_vendor(lang)
-        self.lineEdit_marketVendor.setText(vendor)
-        self.statusbar.showMessage('Vendor extracted', timeout=2000, color='green')
+        curr_vendor = self.lineEdit_marketVendor.text()
+        if curr_vendor == '' or curr_vendor == 'General':
+            vendor = self.receipt.parse_vendor(lang)
+            self.lineEdit_marketVendor.setText(vendor)
+            self.statusbar.showMessage(
+                'Vendor extracted', timeout=2000, color='green')
+
+        else:
+            logger.info(f'Manually setting vendor to {curr_vendor}')
+            self.receipt.set_vendor(curr_vendor)
 
     def re_match_data(self):
         """
