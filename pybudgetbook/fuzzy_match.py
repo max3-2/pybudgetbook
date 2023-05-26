@@ -95,7 +95,7 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
 
         feedback = [substring.casefold() for substring in
                     remove_weight.sub('', remove_trash.sub('', feedname)).split(' ')
-                    if substring and len(substring) > 3]
+                    if substring and len(substring) > 2]
 
         # Fuzzy backcheck to reduce redundancy...
         if feedgroup in basic_match_data:
