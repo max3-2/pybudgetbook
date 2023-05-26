@@ -26,7 +26,7 @@ _UI_LANG_SUPPORT = ['deu', 'eng', 'fra']
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{2})'),
                 'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_[AB12]|AW)'),
-                'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3}[,.]\d{2})'),
+                'mult_pattern': re.compile(r'((?<=[\W][xX*]_)\d{1,3}[,.]\d{2})'),
                 'weight_pattern': re.compile(r'(\d{1,3}[,.]\d{1,3}(?=_EUR\/kg))', re.IGNORECASE),
                 'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
                 'amount_in_weight': re.compile(r'(\b\d{1,2}[,.]\d{1,3})'),
