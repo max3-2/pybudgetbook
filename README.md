@@ -1,65 +1,56 @@
 # pybudgetbook
-
 Organize and sort your receipts locally, use pandas power to analyze your
 spendings!
 But why? There are tons of Apps out there scanning and even some for receipts.
+Sure, but here are the core reasons why I built this app. If they are important
+to you, give it a try!
 
-
-TODO note that each part works by his own and describe parts
-
-Also, the core ideas are:
 <u>Reason 1: Data Privacy</u>
 
 Your receipts combined with some personal data are a pretty good estimator on
 where you are and what you are doing. I prefer to keep that data locally. This
-software will access any of that data since it runs locally.
+software will never *access and send* any of that data since it runs locally.
 
 <u>Reason 2: Adaptability</u>
 
-Receipts differ for region and even for supermarket. Here, some of the more
+Receipts differ for region and even for supermarkets. Here, some of the more
 common german stores are included. If something does not work, add your own
 reader / parser!
 
 <u>Reason 3: Data Analysis</u>
 
 The data is saved in `hdf`-files for `pandas` and can be easily exported to
-`csv` or any other format manually (ADD NOTE THAT READING IN HDF IS SUPPROTED!).
-So analysis is not limited to simple plots over time (even though the initial
-version does just that. Feel free to add ideas and improvements!)
+`csv` or any other format manually. So analysis is not limited to the few plots
+available (even though the initial version has some important ones). You can
+easily load all your data using a simple one-liner and run all the analysis you
+want. If you find anything particular useful, let me know and I can implement
+that.
+
 
 Uses some icons from [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/)
 
-Attribute openmoji
-Add openmoji icons for buttons?
+Some emojis / incos designed by OpenMoji – the open-source emoji and icon
+project. License: CC BY-SA 4.0
 
 ## Current State of Functionality and Roadmap
-
-- Prepare receipt images for `tesseract`
-- Rotation
-- Parse receipts from german supermarkets and read items
+- Prepare receipt images for `tesseract` including manual rotation
+- Parse receipts from (german) supermarkets and read items
+- Sort data into receipt specific categories and item specific groups
 - Correct items, add important metadata
-- Save items it a dedicated folder
-- Generate most basic analysis
-- Export data
+- Save receipts and organize them in a dedicated folder.
+- Basic data analysis with plots
+- Export data to various formats
 
 Future
 
-- More types of receipts
-- More languages
-- Better analysis tools
-- Continous UX improvements
+- More types of receipts and more languages
+- Better analysis tools and more pretty plots
+- Continuous UX improvements
 
-
-## A Note on Tax classes
-ambigious, implemented is 1,2 (A,B) with 19%, %. ALDI vice versa is switched
-on parse. Else your job!
-
-## A Note on Language Settings
-Grouping may error, just set lang and rerun
-Dont feedback to prevent chaos
-
-New language: see contributing. Patterns (at least gen), default groups (may be empty)
-
+## Installation
+This is fairly easy, just run `pip install pybudgetbook`. Please note that a
+`tesseract` installation is required, the executable `tesseract` must be in the
+path.
 
 ## Tutorial
 To get started, you will need a receipt from a supermarket. A main criterion in
@@ -79,80 +70,125 @@ TODO Manual corrections, e.g. chaning amount if bulk packages are bought
 
 TODO vendor importance, set manual logic
 
-## More Informations
+## Pitfalls and current Limitations
+The following points should be noted before usage:
+
+### Current Supermarkets
+Besides smaller stores and supermarkets which work with the general format,
+currently the following supermarket receipts are tested:
+
+- **Germany:** Aldi, DM, Rewe, Real
+- **France:** Carrefour
+
+The above list will get updates. Others might work out of the box or with very
+little adaptions. Im happy to help.
+
+### A Note on Language Settings
+Currently language settings is split into two settings. The left selector sets
+the `tesseract` language and the default language for grouping and matching.
+The latter can be changed using the second selector (after activation). This
+gives all options but can mess up your grouping data - use with care! (One
+possible use would be shopping in a different country just a few times a year.)
+
+If you want a new language, you will need to prove the following:
+
+- A matcher pattern, initially a general one. See the `parser` module for
+  the API.
+- If not english or french: A set of default groups. They may be empty but at
+  least the keys should be defined. Store them in a `group_templates/item_groups_lang.json`.
+- Icons for the groups. You can reuse the existing or add new. Optional.
+
+**Pitfall:** Currently, a `general_eng` parser is missing, so english will not
+work. I will happily include this as soon as is get a receipt from an english
+store.
+
+### A Note on Tax classes
+Tax classes are very country-specific and, at least in Germany, not even
+standardized. Currently implemented is a number system which covers them the
+best:
+- Germany has `1`, `2` (and `A`, `B` will be converted to that numbers). Here,
+  `1` is the high tax class and `2` is the low tax class used for food.
+- France has `6` and `7`, maybe more that I do not know about.
+
+**Pitfall:** The very common supermarket *Aldi* in Germany has the tax class
+switched, e.g. `A` is the low tax class. This seems to be the exception so they
+will get switched on reading. The switcher can be extended to other exceptions.
+
+## More Information
 ### Good Scans / Images
 - Have your receipt as flat as possible against a darker background.
 - Images are scaled to 600dpi **assuming a basic receipt width of 75mm**. This
   is an option which might needs adaption. Scale is important for `tesseract`
   and also for some types of identification where a logo is matched.
-- Try to apply a lateral Crop fairly close at the receipt borders. Rotate to
+- Try to apply a lateral crop fairly close at the receipt borders. Rotate to
   have the text horizontal.
+- Take the image under good lighting (e.g. daylight). Low light effects and
+  especially noise will lead to bad text extraction.
 
-If this all does not work, use some other extractors and use pdf
+If this all does not work, you can try to use some other extractors and then
+feed the pdf. E.g. macOS *Preview* can extract text from images and then create
+a pdf containing the image and the text in a separate layer.
 
 ### Grouping
-Categrorizing searches language specific (currently only german) dicts which
-are consecutively improved from data (if you want to help, see below). Tagging
-your articles will improve matching. You can always create your own language
-specific dicts following a fairly simple `json` syntax for a dict with keys
-being groups and the values being list of case-insensitive patterns. Feel free
-to create issues / gists with your local dicts so I can merge them in.
-Best practice:
+Grouping searches language specific (currently only german,french, english)
+dicts which are consecutively improved from data (if you want to help, see
+below). Tagging your articles will improve matching since on save the data will
+be used for feedback (only in your data folder, not publicly). Feel free
+to create issues / gists with your local dicts so I can merge them in if you
+want to share your data.
+
+Under the hood:
+
 - Base dataset dicts are delivered for some languages with the package and
   updated from time to time with package updates.
 - A User data dict with the same syntax is kept in the data folder and is
   updated with your data.
-- On load, those will be combined (exclusive set())
-- Explain negative groups
+- On load, those will be combined (exclusive set()).
+- Before feedback, article names will be split in groups. Too small elements
+  will be removed. A possible `negative_match_lang.json` can be provided that
+  is used to further filter the article names.
+- Reduced article names will be fed back into grouping file in the user dict.
 
-## Improving
-If you want, you can help to improve! Code improvement and bug fixes are
-welcome. Additionally, classification is based on brute force and needs more
-data. There are different options with some drawbacks (mainly reason 1: Privacy)
-to partake:
-- ToDo
-- ToDo
+Currently, there are no AI or other complex models for matching due to a lack of
+data. This might come in the future if enough matching data exists.
 
 ## Issues
 ### The receipt is not detected or the information is not parsed correctly
 Check the following step by step. If you need more information on where to look,
 run the functions and analyze the output without the UI (see also under the
-hood)
-- Check orientation
+hood). You can always look at the raw text output under `Show->Raw Text`
+- Check orientation and rotation of image
 - Check image crop
 - Check filter result (text legible?)
-- Check detected supermarket
-- Check unfiltered base string data (see UI menu ToDo)
-- Check retrieved data
+- **Check raw text**
+- Check detected supermarket. If not correct, set manually by entering and
+  hitting the button.
 
 ### Still not detected?
-- If your receipt type **is supported** and your **base text** is recognized
+- If your receipt type **is supported** and your **raw text** is recognized
   but not parsed, create an issue.
-- If your **receipt type is not supported** and your **base text is**
+- If your **receipt type is not supported** and your **raw text** is
   recognized but not parsed, create a PR asking for the new receipt type. If
   you do not have the capabilities for a PR, create an issue and support the
   receipt image and additional information (the more receipts of a type,
   the better!)
-- If your **base text** is not recognized, you need to adapt filtering
+- If your **raw text** is not recognized, you need to adapt filtering
   parameters. Check filtered output and use the API to improve (UI
   not supported). If there are better parameters, let me know via issues or PR!
 
 ## API Usage
-ToDO
+You can always use the API in its base version, check `examples/api_read_receipt`
+for a good start.
 
 ## Under the hood
-1. Images are scaled, (rotated, ) filtered
-2. Text extraction using OCR by `tesseract`
-3. Vendor detection by either
-   1. Text search for a known vendor
-   2. Logo detection: Logo is filtered and pattern matched in the receipt
-4. Regexp based text analysis with receipt specific patterns (optional) and /
-   or best fit for all patterns
-5. Sort and post-process data in DataFrame, display data
-
-## Drawbacks
-- Relies on a "valid" price, at least for the current state and the supported
-  types of german receipts. A valid price is a price that is followed by
-  `[A,B,1,2]` for Tax Class (which is the default in Germany). Not the case for
-  you? **Create a new receipt type!** Caveat: Find a new way to identify a
-  single valid article.
+1. Images are scaled, filtered and possibly manually rotated.
+2. Text extraction using OCR by `tesseract`.
+3. Vendor detection by either:
+   1. Text search for a known vendor.
+   2. Logo detection: Logo is filtered and pattern matched in the receipt (ToDo).
+   3. Manual vendor setup.
+4. `Regexp` based text analysis with receipt specific patterns (optional) and /
+   or best fit for all patterns.
+5. Sort and post-process data in DataFrame, article grouping, display data.
+6. Feedback matching data to continuously improve grouping.
+7. Convert and save data.
