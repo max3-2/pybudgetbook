@@ -107,8 +107,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         table_model = ui_support.PandasTableModel(data=init_data_viewer)
         self.tableView_pandasViewer.setModel(table_model)
-        poss_groups = sorted(list(bb_io._load_basic_match_data(options['lang'])[0].keys()))
-        self.tableView_pandasViewer.set_combo_column(7, poss_groups + ['none'])
+        self.set_group_options(sender=-1)
         self.tableView_pandasViewer.model().combo_col = 7
 
         self.slider_FilterAmount.custom_setup(value_change_delay=500)
@@ -261,6 +260,10 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.comboBox_PiePlotType.currentTextChanged.connect(
             lambda _: self.create_pie_plot())
         self.modernButton_addRow.clicked.connect(self.tableView_pandasViewer._menu_insert_row)
+        self.comboBox_baseLang.currentTextChanged.connect(
+            lambda text: self.set_group_options(0))
+        self.comboBox_diffParsingLang.currentTextChanged.connect(
+            lambda text: self.set_group_options(1))
 
         # Do some post init stuff
         self.qt_log_window.debug_state_toggle.setChecked(
@@ -553,6 +556,35 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 float(self.lineEdit_totalAmountReceipt.text()),
                 self.tableView_pandasViewer.model()._data['Price'].sum()
             )
+
+    def set_group_options(self, sender):
+        if self.checkBox_useDiffParsingLang.isChecked() and sender == 0:
+            # This catched a possible language change if the second is active
+            # but the first has been changed
+            return
+
+        if sender == 0:
+            lang = self.comboBox_baseLang.currentText()
+        elif sender == 1:
+            lang = self.comboBox_diffParsingLang.currentText()
+        elif sender == -1:
+            lang = options['lang']
+        else:
+            raise RuntimeError('Invalid siganture')
+
+        # Read in a dict with possible language based groups
+        try:
+            _possible_groups = bb_io._load_basic_match_data(lang)[0]
+        except FileNotFoundError:
+            try:
+                _possible_groups = bb_io._load_user_match_data(lang)[0]
+            except FileNotFoundError:
+                logger.exception('No group data for current language ')
+                return
+
+        # If found, reset group boxes
+        _possible_groups = sorted(list(_possible_groups.keys()))
+        self.tableView_pandasViewer.set_combo_column(7, _possible_groups + ['none'])
 
     def parse_data(self):
         """
