@@ -40,6 +40,8 @@ def _check_config():
     else:
         raise FileNotFoundError('Config file can neither be found nor created')
 
+    logger.debug("Config OK")
+
 
 def _make_folder_structure(root, template):
     """
@@ -55,7 +57,7 @@ def _make_folder_structure(root, template):
 
     one_directory(template, Path(root))
 
-    logging.info('New Folder structure created')
+    logger.debug('(New) Folder structure created')
 
 
 def _check_user_folder():
