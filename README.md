@@ -53,22 +53,45 @@ This is fairly easy, just run `pip install pybudgetbook`. Please note that a
 path.
 
 ## Tutorial
-To get started, you will need a receipt from a supermarket. A main criterion in
-the current state is that the items have a price with a tax class connected,
-usually an **A**, **B**, **1** or a **2** trailing the price. This should be the
-case for most german receipts. Other languages might differ but are not in
-scope yet.
+First of all, it should be noted that any of the three main parts **Parsing**,
+**Data Editing and Saving** and **Plotting** can be used independently. They
+access the same data folder to have a convenient working experience but that is
+all.
 
-Take an image from the receipt as flat as possible, including all from the
-header (for supermarket identification) to at least the total. JPEG is fine,
-iPhones are fine. Lateral crop to the receipt borders. Straighten / Rotate to
-make the text horizontal. This all takes a minute on any modern phone.
+To get started, there are several options. First, if you do not have any
+receipts and just want to look around the UI, you can create sample data to get
+started.
 
-ToDo Start he UI and load the receipt
+### Sample Data Example
+ToDo
 
-TODO Manual corrections, e.g. chaning amount if bulk packages are bought
+### Data Analysis
+ToDo
 
-TODO vendor importance, set manual logic
+### Working with Receipts
+To get started, you will need a receipt from a (supported) supermarket. Take an
+image from the receipt as flat as possible, including all from the
+header (for supermarket identification) to at least the total. Try to include
+the date. JPEG is fine, iPhones are fine. Lateral crop to the receipt borders.
+Straighten to make the text horizontal. This all takes a minute on any modern
+phone.
+
+Even better: Get your receipt as pdf from the store - but check that the pdf
+has a separate text layer!
+
+Then, hit the load button on the left and either load an image or the pdf file.
+Start by using the arrow keys (while the cursor is in the plotting area) to
+rotate the image so the text is horizontal. You can use shift to rotate in
+larger steps. Adapt filtering until the text pops.
+
+Mind that after rotation and filtering changes, there is a slight delay before
+`tesseract` is started, so wait a few seconds and then take a look at the
+extracted text using `Show->Raw Text`. This should show the text from the
+receipt which, in the main body, a single article per line.
+
+ToDo
+### Adding manual Data
+ToDo
 
 ## Pitfalls and current Limitations
 The following points should be noted before usage:
