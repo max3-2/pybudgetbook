@@ -10,6 +10,7 @@ from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtCore import Signal, Slot, Qt
 import numpy as np
 import pandas as pd
+from darkdetect import isDark
 
 from ..configs.config import options
 from ..configs.constants import icons
@@ -17,6 +18,25 @@ from ..configs.config_tools import set_option, set_data_dir
 
 
 logger = logging.getLogger(__package__)
+
+
+def _get_log_text_colors():
+    """
+    Returs text colors depending on dark mode setting in the order of
+    DEBUG, INFO, WARNING, ERROR, EXCEPTION.
+    """
+    if isDark():
+        return (QtGui.QColor(220, 220, 220, 170),
+                QtGui.QColor(220, 220, 220, 255),
+                QtGui.QColor(250, 170, 0, 255),
+                QtGui.QColor(255, 80, 0, 255),
+                QtGui.QColor(255, 0, 0, 255))
+    else:
+        return (QtGui.QColor(22, 22, 22, 170),
+                QtGui.QColor(22, 22, 22, 255),
+                QtGui.QColor(250, 170, 0, 255),
+                QtGui.QColor(255, 80, 0, 255),
+                QtGui.QColor(255, 0, 0, 255))
 
 
 def _check_numeric(data):
@@ -272,6 +292,7 @@ class QLoggingWindow(QtWidgets.QDialog):
 
     @Slot()
     def catch_message(self, levelno, msg):
+        colors = _get_log_text_colors()
         cursor = self.console.textCursor()
         old_fmt = cursor.charFormat()
 
@@ -279,7 +300,7 @@ class QLoggingWindow(QtWidgets.QDialog):
         if levelno <= logging.DEBUG:  # Debug
             fmt = QtGui.QTextCharFormat()
             fmt.setFontWeight(12)
-            fmt.setForeground(QtGui.QColor(220, 220, 220, 170))
+            fmt.setForeground(colors[0])
             cursor.setCharFormat(fmt)
             self.console.setTextCursor(cursor)
 
@@ -287,28 +308,28 @@ class QLoggingWindow(QtWidgets.QDialog):
             fmt = QtGui.QTextCharFormat()
             fmt.setFontWeight(50)
             fmt.setFontItalic(True)
-            fmt.setForeground(QtGui.QColor(220, 220, 220, 254))
+            fmt.setForeground(colors[1])
             cursor.setCharFormat(fmt)
             self.console.setTextCursor(cursor)
 
         elif levelno <= logging.WARNING:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontWeight(50)
-            fmt.setForeground(QtGui.QColor(250, 170, 0, 254))
+            fmt.setForeground(colors[2])
             cursor.setCharFormat(fmt)
             self.console.setTextCursor(cursor)
 
         elif levelno <= logging.ERROR:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontWeight(75)
-            fmt.setForeground(QtGui.QColor(255, 50, 0, 254))
+            fmt.setForeground(colors[3])
             cursor.setCharFormat(fmt)
             self.console.setTextCursor(cursor)
 
         elif levelno <= logging.CRITICAL:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontWeight(100)
-            fmt.setForeground(QtGui.QColor(255, 0, 0, 254))
+            fmt.setForeground(colors[4])
             cursor.setCharFormat(fmt)
             self.console.setTextCursor(cursor)
 
