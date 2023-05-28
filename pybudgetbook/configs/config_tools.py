@@ -107,7 +107,7 @@ def load_config(cfile=_c_file):
     file = Path(_c_file)
     logger.debug(f'Loading configuration from "{file}".')
     cparser = configparser.ConfigParser()
-    _ = cparser.read(file)
+    _ = cparser.read(file, encoding='utf-8')
 
     for section in cparser.sections():
         for item, val in cparser[section].items():
@@ -145,12 +145,12 @@ def copy_group_templates(force=False):
         if 'negative' in template.name:
             shutil.copy2(template, target / template.name)
         else:  # Create an empty template
-            with open(template) as tmpl:
+            with open(template, encoding='utf-8') as tmpl:
                 tmpl_dict = json.load(tmpl)
             tmpl_dict = {key: [] for key in tmpl_dict.keys()}
 
             # And write
-            with open(target / template.name, 'w') as trgt:
+            with open(target / template.name, 'w', encoding='utf-8') as trgt:
                 json.dump(tmpl_dict, trgt, indent=4, ensure_ascii=False)
 
         logger.debug(f'Created new grouping template: {str(template.name):s}')
@@ -167,13 +167,13 @@ def set_data_dir(new_dir):
         New location for data folder.
     """
     cparser = configparser.ConfigParser()
-    _ = cparser.read(_c_file)
+    _ = cparser.read(_c_file, encoding='utf-8')
     new_dir = Path(new_dir)
     assert (new_dir.exists() and new_dir.is_dir()), 'New working directory root must exist'
 
     cparser.set('folders', 'data_folder', str(new_dir))
 
-    with open(_c_file, 'w') as configfile:
+    with open(_c_file, 'w', encoding='utf-8') as configfile:
         cparser.write(configfile)
 
     config.options['data_folder'] = str(new_dir)
@@ -196,12 +196,12 @@ def set_option(name, value, persistent=True):
     if persistent:
         file = Path(_c_file)
         cparser = configparser.ConfigParser()
-        _ = cparser.read(file)
+        _ = cparser.read(file, encoding='utf-8')
 
         for section_name in cparser.sections():
             if name in cparser[section_name]:
                 cparser.set(section_name, name, str(value))
                 break
 
-        with open(file, 'w') as configfile:
+        with open(file, 'w', encoding='utf-8') as configfile:
             cparser.write(configfile)

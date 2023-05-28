@@ -88,7 +88,7 @@ def _load_user_match_data(lang):
         raise FileNotFoundError(error)
 
     else:
-        with open(user_data) as udd:
+        with open(user_data, encoding='utf-8') as udd:
             result = json.load(udd)
 
     return result, user_data
@@ -105,7 +105,7 @@ def _load_basic_match_data(lang):
         raise FileNotFoundError(error)
 
     else:
-        with open(basic_data) as bdd:
+        with open(basic_data, encoding='utf-8') as bdd:
             result = json.load(bdd)
 
     return result, basic_data
@@ -120,7 +120,7 @@ def _save_user_match_data(data, target):
         logger.info('No matching data for in user folder, new file '
                     'will be created.')
 
-    with open(target, 'w') as udd:
+    with open(target, 'w', encoding='utf-8') as udd:
         json.dump(data, udd, indent=4, ensure_ascii=False)
 
 
@@ -138,7 +138,7 @@ def load_negative_match_data(lang):
         raise FileNotFoundError(error)
 
     else:
-        with open(neg_data) as ndd:
+        with open(neg_data, encoding='utf-8') as ndd:
             result = json.load(ndd)['neg_match_data']
 
     return result
@@ -171,19 +171,19 @@ def load_group_match_data(lang):
 
     if not basic_data.is_file():
         logger.warning(f'No matching data for {lang:s} included with package')
-        with open(user_data) as udd:
+        with open(user_data, encoding='utf-8') as udd:
             result = json.load(udd)
 
     elif not user_data.is_file():
         logger.warning(f'No matching data for {lang:s} in user folder')
-        with open(basic_data) as bdd:
+        with open(basic_data, encoding='utf-8') as bdd:
             result = json.load(bdd)
 
     else:
-        with open(basic_data) as bdd:
+        with open(basic_data, encoding='utf-8') as bdd:
             bd = json.load(bdd)
 
-        with open(user_data) as udd:
+        with open(user_data, encoding='utf-8') as udd:
             ud = json.load(udd)
 
         result = dict()
@@ -288,7 +288,7 @@ def save_with_metadata(dataframe, target=None, img_path=None, unique_name=False,
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        dataframe.to_hdf(data_target, 'receipt', 'w', complevel=6)
+        dataframe.to_hdf(data_target, 'receipt', 'w', complevel=6, encoding='utf-8')
 
         with h5py.File(data_target, 'a') as hdfstore:
             # rec_grp = hdfstore['receipt']
@@ -322,7 +322,7 @@ def load_with_metadata(source):
     `pd.DataFrame`
         Loaded data
     """
-    receipt = pd.read_hdf(source)
+    receipt = pd.read_hdf(source, encoding='utf-8')
     with h5py.File(source) as hdfstore:
         att_dict = dict()
         for key, val in hdfstore.attrs.items():

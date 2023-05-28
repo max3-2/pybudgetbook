@@ -1,5 +1,6 @@
 """pybudgetbook main init"""
 import warnings
+
 __version__ = '0.2.0'
 name = 'pybudgetbook'
 
