@@ -49,8 +49,14 @@ Future
 
 ## Installation
 This is fairly easy, just run `pip install pybudgetbook`. Please note that a
-`tesseract` installation is required, the executable `tesseract` must be in the
-path.
+`tesseract>=4` installation is required with Version `5.` being recommended,
+the executable `tesseract` must be in the current path.
+
+For macOS, I recommend homebrew for base installation and language packs,
+running `brew install tesseract` and `brew install tesseract-lang`.
+
+For Windows, precompiled binaries can be found and installed. Those not always
+update `PATH` so I recommend checking that `tesseract` works in a console.
 
 ## Tutorial
 First of all, it should be noted that any of the three main parts **Parsing**,
