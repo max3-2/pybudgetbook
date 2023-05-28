@@ -77,6 +77,10 @@ of the following options:
 You can always change most of the config values using the `Edit->` menu in the
 UI.
 
+Just a note: The **config** is user wide, while the data dir can be freely
+changed. This can be used to have different matching groups (they are stored
+with the data) or different languages separated.
+
 To then get started, there are several options. First, if you do not have any
 receipts and just want to look around the UI, you can create sample data to get
 started. Just call `examples/create_sample_data.py`, then start the UI. Or just
