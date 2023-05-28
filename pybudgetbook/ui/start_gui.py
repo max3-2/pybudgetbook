@@ -27,6 +27,9 @@ def start_main_ui(sys_argv=[]):
 
     qt_main_window = main_window()
 
+    if _icon_loc.exists():
+        qt_main_window.setWindowIcon(tray_icon)
+
     qt_main_window.show()
     sys.exit(app.exec())
 
