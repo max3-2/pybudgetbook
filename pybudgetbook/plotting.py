@@ -89,9 +89,14 @@ def create_stem(data, ax):
     ax : `mpl.axes`
         Axes to create the plot on
     """
+    # Get oldest, time span and compute max ticks
+    date_span = (data['Date'].max() - data['Date'].min()).days
+    reduce_by = int(round((date_span / 7) // 18))
+    grouper_freq = f'{reduce_by + 1:d}W'
+
     # Group and bin
     grouped = data.groupby([pd.Grouper(
-        key='Date', freq='W', closed='left', label='left'),
+        key='Date', freq=grouper_freq, closed='left', label='left'),
         'Vendor'])['Price'].sum().reset_index()
     grouped['Date'] += pd.to_timedelta('4d')
 
