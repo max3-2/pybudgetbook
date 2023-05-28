@@ -33,11 +33,12 @@ dynamic = ['version']
 
 dependencies = [
     'PySide6',
-    'numpy',
+    'numpy >= 1.20',
     'appdirs',
-    'matplotlib > 3.7',
-    'h5py > 3.0',
-    'pandas > 1.5',
+    'matplotlib >= 3.6',
+    'h5py >= 3.0',
+    'pandas >= 1.5',
+    'tables',
     'scikit-image',
     'Pillow',
     'pytesseract',
