@@ -6,7 +6,7 @@ import logging
 import pandas as pd
 import numpy as np
 import sys
-import requests
+from urllib.request import urlopen
 from datetime import datetime, timedelta
 from pybudgetbook.configs.constants import _CATEGORIES
 from pybudgetbook.bb_io import _load_basic_match_data, save_with_metadata
@@ -24,8 +24,8 @@ except ImportError:
 def get_wordlist():
     """Currently only english for testing sorry"""
     word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
-    response = requests.get(word_site)
-    return [line.decode(errors='ignore') for line in response.content.splitlines()]
+    response = urlopen(word_site)
+    return [line.decode(errors='ignore') for line in response.read().splitlines()]
 
 
 def create_sample_data(
