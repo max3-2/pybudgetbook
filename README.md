@@ -64,9 +64,26 @@ First of all, it should be noted that any of the three main parts **Parsing**,
 access the same data folder to have a convenient working experience but that is
 all.
 
-To get started, there are several options. First, if you do not have any
+First, a default config and a data dir needs to be set up. To do so, choose one
+of the following options:
+
+- Run `pybudgetbook`, if prompted select a data directory. The config will be
+  created and updated with the directory and well working default values.
+- Start an interpreter, and `import pybudgetbook`. This will issue a warning if
+  the data directory is none. Go ahead and set it using
+  `pybudgetbook.configs.config_tools.set_data_dir()` or check the config at
+  `pybudgetbook.configs.config_tools.location()` and edit the data folder entry.
+
+You can always change most of the config values using the `Edit->` menu in the
+UI.
+
+To then get started, there are several options. First, if you do not have any
 receipts and just want to look around the UI, you can create sample data to get
-started.
+started. Just call `examples/create_sample_data.py`, then start the UI. Or just
+start the UI and start entering own data without any receipts.
+
+Finally, if you have a good receipt present, start by loading and extracting
+the text!
 
 ### Sample Data Example
 ToDo
