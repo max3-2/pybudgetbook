@@ -285,8 +285,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             set_data_dir(Path(folder))
             logger.info('New data directory created')
 
-
-
         # Center labels in menu
         self.label_baseLang.setAlignment(Qt.AlignCenter)
         self.label_receiptDisplayMode.setAlignment(Qt.AlignCenter)
@@ -300,6 +298,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         c_wi = self.width() - 180
         self.splitter_mainPage.setSizes(
             [int(c_wi * 1 / 3), int(c_wi * 2 / 3)])
+
+        # Finally, double check that the logger level is correct
+        if options['logger_show_debug']:
+            self.qt_logstream.setLevel(logging.DEBUG)
+        else:
+            self.qt_logstream.setLevel(logging.INFO)
 
     def closeEvent(self, event):
         """Handle additional open windows"""
