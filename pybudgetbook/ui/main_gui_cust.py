@@ -364,12 +364,12 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                     'FreeForAll (*.*)')
         )
         if file and Path(file).exists():
-            self.statusbar.showMessage('New receipt loaded', 2000, color='green')
+            self.statusbar.showMessage('Loading receipt...', 2000, color='green')
         else:
             self.statusbar.showMessage('Invalid File', 3000, color='red')
             return
 
-        if 'hdf' in ptn or 'h5' in ptn or 'hdf5' in ptn:
+        if Path(file).suffix in ('.hdf', '.h5', '.hdf5'):
             logger.info('Loading a parsed receipt')
             try:
                 self.set_new_data(bb_io.load_with_metadata(file), has_meta=True)
