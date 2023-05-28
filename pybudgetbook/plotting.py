@@ -100,12 +100,15 @@ def create_stem(data, ax):
         'Vendor'])['Price'].sum().reset_index()
     grouped['Date'] += pd.to_timedelta('4d')
 
-    # Get the 5 main with colors, the rest is gray
-    top_five = grouped.groupby(
-        'Vendor')['Price'].sum().sort_values(ascending=False)[:5]
+    # Get the 4 main with colors, the rest is gray and gets summed up
+    by_price = grouped.groupby(
+        'Vendor')['Price'].sum().sort_values(ascending=False)
+    top_four = by_price[:4]
+    rest_of_the_crew = by_price[4:].index.unique()
+    grouped.loc[grouped['Vendor'].isin(rest_of_the_crew), 'Vendor'] = "Smaller"
 
     colors = {name: color for name, color
-              in zip(top_five.index, plt.rcParams['axes.prop_cycle'].by_key()['color'])}
+              in zip(top_four.index, plt.rcParams['axes.prop_cycle'].by_key()['color'])}
 
     locations = grouped['Vendor'].unique()
 
@@ -120,7 +123,7 @@ def create_stem(data, ax):
     ax2 = ax.twinx()
     ax2.plot(grouped['Date'], grouped['Price'].cumsum(), ls='--')
 
-    for i, loc in enumerate(locations):
+    for loc in locations:
         loc_data = grouped[grouped['Vendor'] == loc]
         count_per_loc = location_count[loc_data['Date']].values
         offset_here = used_offsets[loc_data['Date']].values
@@ -137,7 +140,7 @@ def create_stem(data, ax):
         if color == 'gray':
             label = None
         else:
-            label = loc + f': {top_five[loc]:.2f} {options["currency"]}'
+            label = loc + f': {top_four[loc]:.2f} {options["currency"]}'
 
         # Plot the lines
         stems = ax.stem(x, y, linefmt=color, basefmt='none', markerfmt='o', label=label)
