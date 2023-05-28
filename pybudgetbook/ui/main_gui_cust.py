@@ -74,7 +74,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.qt_log_window = ui_support.QLoggingWindow(self)
 
         self.qt_logstream.setFormatter(_log_formatter)
-        self.qt_logstream.popup_lvl = logging.WARNING
+        self.qt_logstream.popup_lvl = options['logger_popup_level']
         self.qt_logstream.signals.log_record_signal.connect(self.qt_log_window.catch_message)
         self.qt_log_window.new_level_signal.connect(self.qt_logstream.set_new_loglvl)
         self.qt_logstream.signals.show_log_window.connect(self.qt_log_window.show_logging_window)
@@ -93,14 +93,14 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.plot_area_receipts.ax.grid(True)
 
         self.plot_area_receipts.draw_blit()
-        logger.debug("Created plotting area 1")
+        # logger.debug("Created plotting area 1")
 
         # Setup plot area, 2
         self.plot_area_data = ui_support.MplCanvas(
             self.frame_dataAnalysis, no_ax=True, constrained_layout=False)
 
         self.plot_area_data.draw_blit()
-        logger.debug("Created plotting area 2")
+        # logger.debug("Created plotting area 2")
 
         # Create data viewer and attach to frame
         init_data_viewer = _default_data()
