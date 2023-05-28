@@ -123,7 +123,8 @@ def create_stem(data, ax):
     ax2 = ax.twinx()
     ax2.plot(grouped['Date'], grouped['Price'].cumsum(), ls='--')
 
-    for loc in locations:
+    sorting = grouped.groupby('Vendor')['Price'].sum().sort_values(ascending=False)
+    for loc in sorting.index:
         loc_data = grouped[grouped['Vendor'] == loc]
         count_per_loc = location_count[loc_data['Date']].values
         offset_here = used_offsets[loc_data['Date']].values
