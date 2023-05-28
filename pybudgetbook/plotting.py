@@ -154,6 +154,15 @@ def create_stem(data, ax):
         labels=grouped['Date'].unique().strftime('2023-%U'),
         rotation=35)
 
+    # Compute hline per tick
+    hline_range = (used_offsets * offset / 2)
+    hline_start = used_offsets.index
+
+    basecolor = 'white' if isDark() else 'black'
+    for hline, hline_r in zip(hline_start, hline_range):
+        line = ax.plot((hline-hline_r, hline+hline_r), (0, 0), ls='--',
+                       color=basecolor, marker='|', markersize=6)
+
     ax2.set_ylim(0, None)
 
     # Add legend
