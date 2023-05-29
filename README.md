@@ -190,7 +190,7 @@ If you have a `hdf` receipt loaded and you want to save that, you maybe need to
 uncheck the *Always Ask For Image* flag in the menu. Also, if you want to
 change some data and override the old file, uncheck *Generate Unique Name*.
 
-## Pitfalls and current Limitations
+## Pitfalls and Current Limitations
 The following points should be noted before usage:
 
 ### Current Supermarkets

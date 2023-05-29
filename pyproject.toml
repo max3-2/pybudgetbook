@@ -5,7 +5,7 @@ build-backend = 'flit_core.buildapi'
 [project]
 name = 'pybudgetbook'
 authors = [
-    {name = 'Max Elfner', email = 'max_elfner@icloud.com'},
+    {name = 'Max Elfner', email = 'max_elfner@gmx.net'},
 ]
 
 readme = 'README.md'
