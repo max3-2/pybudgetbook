@@ -9,10 +9,7 @@ authors = [
 ]
 
 readme = 'README.md'
-description= '''
-Organize and sort your receipts locally,
-use pandas power to analyze your spendings!
-'''
+description= 'Organize and sort your receipts locally, use pandas power to analyze your spendings!'
 
 classifiers = [
     'Development Status :: 3 - Alpha',
