@@ -478,7 +478,11 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         col = index.column()
 
         if role == Qt.DisplayRole:
-            return str(row[col])
+            val = row[col]
+            if _check_numeric(val):
+                return f'{val:.2f}'
+            else:
+                return str(val)
 
         elif role == Qt.EditRole:
             return str(row[col])
