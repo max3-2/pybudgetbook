@@ -1,9 +1,10 @@
 # pybudgetbook
 Organize and sort your receipts locally, use pandas power to analyze your
-spendings!
+expenses!
 But why? There are tons of Apps out there scanning and even some for receipts.
-Sure, but here are the core reasons why I built this app. If they are important
-to you, give it a try!
+Some of them might even be more general or better at parsing. Sure, but here are
+the core reasons why I built this app. If they are important to you, give it a
+try (and help to support more receipts)!
 
 <u>Reason 1: Data Privacy</u>
 
@@ -50,7 +51,8 @@ Future
 ## Installation
 This is fairly easy, just run `pip install pybudgetbook`. Please note that a
 `tesseract>=4` installation is required with Version `5.` being recommended,
-the executable `tesseract` must be in the current path.
+the executable `tesseract` must be in the current path. This obviously only is
+necessary if you want to use the data extraction tools.
 
 For macOS, I recommend homebrew for base installation and language packs,
 running `brew install tesseract` and `brew install tesseract-lang`.
@@ -79,7 +81,7 @@ UI.
 
 Just a note: The **config** is user wide, while the data dir can be freely
 changed. This can be used to have different matching groups (they are stored
-with the data) or different languages separated.
+with the data and also kept private!) or different languages separated.
 
 To then get started, there are several options. First, if you do not have any
 receipts and just want to look around the UI, you can create sample data to get
@@ -90,10 +92,24 @@ Finally, if you have a good receipt present, start by loading and extracting
 the text!
 
 ### Sample Data Example
-ToDo
+After creating sample data, you can try viewing and editing the data. Just start
+up the UI and load a sample receipt. You should get something like the following
+and can try the edit functions! If you are working in a separate data folder
+with example data as recommended, go ahead and change whatever you want!
+
 
 ### Data Analysis
-ToDo
+Currently, only a small amount of the possibilities existing with `pandas` are
+implemented.
+Again, using sample data or added data, head over to the *Data Analysis* tab and
+load all data from the current data folder. Afterwards, two main options exist:
+
+- A stem based plot grouped by vendor, showing expenses over time and a
+  cumulative sum of expenses. The four largest (by expense) vendors are shown
+  with a distinct color, the rest is grouped in gray.
+- An interactive clickable pie allowing to show different groupings. The combo
+  on the left sets the pie grouping. Afterwards. click on the pie to show a
+  second level. The second level is currently fixed.
 
 ### Working with Receipts
 To get started, you will need a receipt from a (supported) supermarket. Take an
@@ -116,9 +132,49 @@ Mind that after rotation and filtering changes, there is a slight delay before
 extracted text using `Show->Raw Text`. This should show the text from the
 receipt which, in the main body, a single article per line.
 
-ToDo
-### Adding manual Data
-ToDo
+Continue to the right side of the UI and extract the vendor using the **Vendor**
+button. If this fails, set the Vendor in the field manually (you can always use
+`General` if at least the language is supported) and hit the **Vendor** button
+to get the parsers.
+
+The continue with **Parse Data** to fill up the table and show rectangles in the
+plot with the extracted items. This is where only few receipts are supported
+right now but the number will be growing!
+
+If all works well, the items are shown in the table. Continue to manual
+editing!
+
+### Adding and Editing Data
+Manual editing can be used starting from a blank table if parsing did not work
+or by altering some fields that have not been detected right. Just change
+whatever information needs changing and add new rows using the **Add Row**
+button.
+
+Just a tip: Check the total amount extracted and see if it matches with your
+receipt, then the difference shown is a good indicator of the data quality as it
+should be `0`!
+
+For manual data without groups, and if you want to *Reset* current grouping, you
+can use the *Group* button. For missing unit price or amounts, fill in one,
+leave the other as `nan` at hit *Fill*.
+
+Tags can be added by preference and, during save, are written to metadata. They
+have no use in the UI yet but can be used in custom filtering later on.
+
+### Saving Data
+Just hit save, the data will be saved in `hdf` in your data folder. Tags, the
+total amount, language settings and some version info will be added as metadata.
+The receipt image is copied or moved depending on your config. If you do not
+want to add an image, uncheck the option in the menu. Done!
+
+The group matcher feedback will be performed on save with the box checked. That
+is a reduction on article names will be performed and the reduced article names
+will be added to their respective groups in the template files in your data
+folder.
+
+If you have a `hdf` receipt loaded and you want to save that, you maybe need to
+uncheck the *Always Ask For Image* flag in the menu. Also, if you want to
+change some data and override the old file, uncheck *Generate Unique Name*.
 
 ## Pitfalls and current Limitations
 The following points should be noted before usage:
@@ -165,6 +221,9 @@ switched, e.g. `A` is the low tax class. This seems to be the exception so they
 will get switched on reading. The switcher can be extended to other exceptions.
 
 ## More Information
+The following can be considered for advanced use or if something fails:
+### Data export
+Two options ToDo
 ### Good Scans / Images
 - Have your receipt as flat as possible against a darker background.
 - Images are scaled to 600dpi **assuming a basic receipt width of 75mm**. This
