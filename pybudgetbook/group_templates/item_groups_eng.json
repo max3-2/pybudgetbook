@@ -1,0 +1,19 @@
+{
+    "Groceries": ["sugar", "flour", "rye", "wheat", "spelt", "yeast",
+                            "oat", "jam", "marmalade", "honey",
+                            "oil", "rapeseed", "toast", "sandwich",
+                            "ground"],
+    "Dairy": ["milk", "yogurt", "curd"],
+    "Vegetables": ["hokkaido", "tomatoes", "cucumber"],
+    "Fruits": ["persimmon", "bananas", "lemon"],
+    "Berries": ["strawberries", "berry", "berries", "raspberries"],
+    "Ham & Cheese": ["ham", "salami", "bacon"],
+    "Candy": ["chocolate", "cookie", "chips", "pringles", "prinzen"],
+    "Beverages": ["apple juice concentrate", "apple juice", "juice", "orange juice", "oranges"],
+    "Alcoholics": ["beer", "wine", "San Miguel", "Riesling"],
+    "Household": ["vinegar", "soap"],
+    "Toiletries": ["toothpaste"],
+    "Kids": ["diaper", "wet"],
+    "Bakery": ["bread", "rolls", "pretzel", "bun"],
+    "Automotive": ["diesel", "gasoline", "super", "gas station"]
+}

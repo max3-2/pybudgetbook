@@ -1,0 +1,19 @@
+{
+    "Alimentaires Base": ["sucre", "farine", "seigle", "blé", "épeautre", "levure",
+                        "avoine", "405", "confiture", "gelée", "miel",
+                        "huile", "colza", "toast", "sandwich",
+                        "moulu"],
+    "Produits laitiers": ["lait", "yaourt", "fromage blanc"],
+    "Légumes": ["hokkaido", "tomates", "concombre"],
+    "Fruits": ["kaki", "bananes", "citron"],
+    "Baies": ["fraises", "baie", "baies", "framboises"],
+    "Charcuterie / Fromage": ["jambon", "salami", "bacon"],
+    "Douceurs": ["chocolat", "biscuit", "chips", "pringles"],
+    "Boissons": ["jus de pomme concentré", "jus de pomme", "jus", "jus d'orange", "oranges"],
+    "Alcool": ["bière", "vin", "San Miguel", "Riesling"],
+    "Entretien de la maison": ["vinaigre", "savon"],
+    "Droguerie": ["dentifrice"],
+    "Enfants": ["couche", "humide"],
+    "Boulangerie": ["pain", "petits pains", "bretzel", "brioche"],
+    "Automobile": ["diesel", "essence", "super", "station service"]
+}

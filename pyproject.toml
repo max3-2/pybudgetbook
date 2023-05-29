@@ -10,7 +10,7 @@ authors = [
 
 readme = 'README.md'
 description= '''
-Organize and sort your receipts locally, 
+Organize and sort your receipts locally,
 use pandas power to analyze your spendings!
 '''
 
@@ -31,17 +31,28 @@ license = {file = 'LICENSE.txt'}
 
 dynamic = ['version']
 
-[project.urls]
-Documentation = 'todo'
-Source = 'todo'
-Homepage = 'todo'
-
 dependencies = [
-    'numpy',
+    'PySide6',
+    'numpy >= 1.20',
     'appdirs',
+    'matplotlib >= 3.6',
+    'h5py >= 3.0',
+    'pandas >= 1.5',
+    'tables',
+    'scikit-image',
+    'Pillow',
+    'pytesseract',
+    'pypdfium2',
+    'darkdetect',
     ]
 
 [project.optional-dependencies]
 doc = ['Sphinx', 'Furo', 'MyST-parser']
 
+[project.scripts]
+pybudgetbook = "pybudgetbook.ui.start_gui:start_main_ui"
 
+[project.urls]
+# Documentation = 'OnlyReadMe'
+Source = 'https://github.com/max3-2/pybudgetbook'
+Homepage = 'https://github.com/max3-2/pybudgetbook'
