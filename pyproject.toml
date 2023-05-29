@@ -12,7 +12,7 @@ readme = 'README.md'
 description= 'Organize and sort your receipts locally, use pandas power to analyze your spendings!'
 
 classifiers = [
-    'Development Status :: 3 - Alpha',
+    'Development Status :: 4 - Beta',
     'Programming Language :: Python :: 3',
     'Operating System :: Microsoft :: Windows',
     'Operating System :: POSIX :: Linux',
