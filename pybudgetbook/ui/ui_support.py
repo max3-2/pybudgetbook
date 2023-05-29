@@ -922,7 +922,7 @@ class ModernButton(QtWidgets.QToolButton):
 
         self.setIcon(icon)
         icon_size = int(self.size().width() * 0.65)
-        # logger.debug(f'Sclaed icon to {icon_size:d}')
+        # logger.debug(f'Scaled icon to {icon_size:d}')
         self.setIconSize(QtCore.QSize(icon_size, icon_size))
 
         self.setText(text)

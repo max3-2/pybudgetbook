@@ -1,5 +1,5 @@
 ﻿Steps to take when releasing a new version:
-* Bump version number and enter current date in `pybudgetbook/__init__.py`.
+* Bump version number in `pybudgetbook/__init__.py`.
 * Add the release notes to `releases.md`.
 * Add a dedicated commit for the version bump.
 * Tag the commit with the version number, use git tag -a tagname to specify message
