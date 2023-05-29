@@ -360,7 +360,7 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         tries to reset everything. Filters and displays the new receipt if
         loading was successful.
         """
-        file, ptn = QtWidgets.QFileDialog(self).getOpenFileName(
+        file, _ = QtWidgets.QFileDialog(self).getOpenFileName(
             caption='Select a receipt file',
             dir=expanduser('~'),
             filter=('Valid files (*.pdf *.png *.PNG *.jpeg *.JPEG *.jpg *.JPG);;'
@@ -376,11 +376,18 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         if Path(file).suffix in ('.hdf', '.h5', '.hdf5'):
             logger.info('Loading a parsed receipt')
             try:
-                self.set_new_data(bb_io.load_with_metadata(file), has_meta=True)
-
-            except Exception as ioe:
-                logger.exception(f"Can't load file: {ioe:s}")
+                new_data = bb_io.load_with_metadata(file)
+            except Exception:
+                logger.exception("Can't load file")
                 return
+
+            try:
+                self.set_new_data(new_data, has_meta=True)
+
+            except Exception :
+                logger.exception("Can't set new data")
+                return
+
         else:
             try:
                 self.receipt = Receipt(file)
