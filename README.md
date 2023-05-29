@@ -95,8 +95,14 @@ the text!
 After creating sample data, you can try viewing and editing the data. Just start
 up the UI and load a sample receipt. You should get something like the following
 and can try the edit functions! If you are working in a separate data folder
-with example data as recommended, go ahead and change whatever you want!
+with example data as recommended, go ahead and change whatever you want! The two
+images show a sample receipt, first just loaded and second with some manual
+edits, mind the red difference to the computed default value which was stored as
+attribute with the receipt ans is now not matching the current computed sum.
 
+![Default Receipt Display](./tutorial_img/loaded_rec_def.png)
+
+![Some Edits performed](./tutorial_img/loaded_rec_edited.png)
 
 ### Data Analysis
 Currently, only a small amount of the possibilities existing with `pandas` are
@@ -111,6 +117,12 @@ load all data from the current data folder. Afterwards, two main options exist:
   on the left sets the pie grouping. Afterwards. click on the pie to show a
   second level. The second level is currently fixed.
 
+![Stem Plot](./tutorial_img/stem_ex.png)
+
+![Pie Alternative 1](./tutorial_img/pie_ex_1.png)
+
+![Pie Alternative 2](./tutorial_img/pie_ex_2.png)
+
 ### Working with Receipts
 To get started, you will need a receipt from a (supported) supermarket. Take an
 image from the receipt as flat as possible, including all from the
@@ -124,8 +136,9 @@ has a separate text layer!
 
 Then, hit the load button on the left and either load an image or the pdf file.
 Start by using the arrow keys (while the cursor is in the plotting area) to
-rotate the image so the text is horizontal. You can use shift to rotate in
-larger steps. Adapt filtering until the text pops.
+rotate the image so the text is horizontal (not working with pdf files!). You
+can use shift to rotate in larger steps. Adapt filtering until the text pops
+using the slider, where a slider higher up is more filtering (unsharp masking).
 
 Mind that after rotation and filtering changes, there is a slight delay before
 `tesseract` is started, so wait a few seconds and then take a look at the
@@ -149,6 +162,7 @@ Manual editing can be used starting from a blank table if parsing did not work
 or by altering some fields that have not been detected right. Just change
 whatever information needs changing and add new rows using the **Add Row**
 button.
+If you need to remove a row, right click it and select **Remove Row**.
 
 Just a tip: Check the total amount extracted and see if it matches with your
 receipt, then the difference shown is a good indicator of the data quality as it
