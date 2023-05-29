@@ -36,7 +36,7 @@ def create_sample_data(
     common_vedors = [f'Vendor {val:d}' for val in range(1, 11)]
     common_cats = _CATEGORIES
     words = get_wordlist()
-    groups = sorted(list(_load_basic_match_data('deu')[0].keys()))
+    groups = sorted(list(_load_basic_match_data('eng')[0].keys()))
 
     # Generate random dates within the last year
     end_date = datetime.now()
@@ -71,6 +71,15 @@ def create_sample_data(
         receipt['TaxClass'] = 1
         receipt['Group'] = np.random.choice(groups, num_rows_repetition)
         receipt['Category'] = repetition_cat
+
+
+        metadata = {'tags': 'sample1;sample2;sample3',
+                    'total_extracted': receipt['Price'].sum(),
+                    'langs': (f'eng;'
+                              f'eng')
+                }
+
+        receipt.attrs = metadata
 
         save_with_metadata(receipt, unique_name=True)
 
