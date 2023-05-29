@@ -21,7 +21,7 @@ classifiers = [
     'License :: OSI Approved :: MIT License'
     ]
 
-keywords = ['financial', 'anlysis', 'pandas', 'statistics']
+keywords = ['expenses', 'receipts', 'scan', 'shopping', 'financial', 'anlysis', 'pandas']
 
 requires-python = '>=3.8'
 license = {file = 'LICENSE.txt'}
@@ -43,8 +43,8 @@ dependencies = [
     'darkdetect',
     ]
 
-[project.optional-dependencies]
-doc = ['Sphinx', 'Furo', 'MyST-parser']
+# [project.optional-dependencies]
+# doc = ['Sphinx', 'Furo', 'MyST-parser']
 
 [project.scripts]
 pybudgetbook = "pybudgetbook.ui.start_gui:start_main_ui"
