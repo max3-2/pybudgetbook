@@ -507,6 +507,18 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.lineEdit_totalAmountReceipt.setText(
                 f'{total:.2f}')
             self.update_diff(total)
+            self.lineEdit_tags.setText(self._current_data.attrs['tags'])
+
+            # IF for deprecated support with older receipt data
+            if 'langs' in self._current_data.attrs:
+                langs = self._current_data.attrs['langs'].split(';')
+                self.comboBox_baseLang.setCurrentText(langs[0])
+                self.comboBox_diffParsingLang.setCurrentText(langs[1])
+                logger.debug('Setting language from receipt')
+
+            else:
+                logger.info('No language info found in receipt - this might be '
+                            'from an older version.')
 
             self.dateEdit_shopDate.setDate(
                 ui_support.convert_date(self._current_data.loc[0, 'Date']))
@@ -785,8 +797,13 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             total_ext = float(self.lineEdit_totalAmountReceipt.text())
         except ValueError:
             total_ext = 0
+
         metadata = {'tags': self.lineEdit_tags.text(),
-                    'total_extracted': total_ext}
+                    'total_extracted': total_ext,
+                    'langs': (f'{self.comboBox_baseLang.currentText():s};'
+                              f'{self.comboBox_diffParsingLang.currentText():s}')
+                }
+
         retrieved_data.attrs = metadata
         retrieved_data = bb_io.resort_data(retrieved_data)
 
