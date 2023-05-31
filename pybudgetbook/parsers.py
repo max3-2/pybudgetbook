@@ -127,11 +127,15 @@ def get_patterns(pattern, lang):
     `dict`
         Patterns in a dict which are all `re.compile()` objects
     """
+    if pattern == 'simple':
+        logger.debug('Using simple patterns')
+        return constants._patterns['simple']
+
     pats = constants._patterns['gen' + '_' + lang]
     try:
         pats.update(constants._patterns[pattern + '_' + lang])
     except KeyError:
-        logger.info('No additional patterns found for {pattern:s}')
+        logger.info(f'No additional patterns found for {pattern:s}')
     return pats
 
 
@@ -654,11 +658,82 @@ def parse_receipt_general_fra(data, pats, pattern, ax=None):
     return retrieved_data, total_price
 
 
+def parse_receipt_simple(data, pats, pattern, ax=None):
+    """Most basic parser - this is a language unspecific fallback"""
+    currency = config.options['currency'].strip()
+    logger.debug(f'Most basic parser with currency: {currency}')
+    retrieved_data = _retrieved_data_template.copy()
+
+    # Precompile, format fails with complex quantifiers
+    simple_price_pt = pats['simple_price_pattern'].replace('CURRENCY', currency)
+    article_name_pt = pats['article_name_pattern'].replace('CURRENCY', currency)
+    simple_price_pt = re.compile(simple_price_pt)
+    article_name_pt = re.compile(article_name_pt)
+
+    # First item is usually first price, if not let it 0 so get everything
+    first_item = 0
+    first_item = data['text'].str.extract(simple_price_pt).first_valid_index()
+
+    # Find the last row, before so this can be better applied with different
+    # vendors. Extract final price. DM is very annoying with different discount
+    # types and totals.
+    total_price = 0
+
+    last_line = data['text'].str.extract(
+        pats['total_sum_line']).first_valid_index()
+
+    if last_line is None:
+        last_line = data.index[-1]
+
+    try:
+        total_price = float(
+            simple_price_pt.search(
+            data.loc[last_line, 'text']).group(0).replace(',', '.').replace('_', ''))
+        logger.debug(f'Found total price @ line: {total_price:.2f} @ {last_line:d}')
+    except (ValueError, AttributeError):  # Either no match or no valid conversion
+        logger.warning('No total price detected')
+
+    # Parse line by line and see what can be classified
+    logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
+    for _, group in data[first_item:last_line].iterrows():
+        this_line = group['text']
+
+        if (re_res := simple_price_pt.search(this_line)) is not None:
+            try:
+                price = float(re_res.group(0).replace(',', '.'))
+            except ValueError:
+                price = 0.
+
+            try:
+                re_res = article_name_pt.search(this_line)
+                art_name = re_res.group(1).replace('_', ' ').strip()
+            except Exception:
+                logger.debug('Cant match article name')
+                art_name = 'none'
+
+            retrieved_data = pd.concat(
+            [retrieved_data, pd.DataFrame({
+                'ArtNr': -1,
+                'Name': art_name,
+                'Price': price,
+                'TaxClass': 0,
+                'Units': 1,
+                'PricePerUnit': np.nan
+            }, index=[0])],
+            ignore_index=True)
+
+            if 'left' in group and ax is not None:
+                default_rect(group, ax)
+
+    return retrieved_data, total_price
+
+
 _av_parser = {
     'unverpackt': parse_receipt_unverpackt,
     'raiff': parse_receipt_raiff,
     'gen_deu': parse_receipt_general_deu,
     'gen_fra': parse_receipt_general_fra,
+    'simple': parse_receipt_simple
 }
 
 
@@ -670,4 +745,11 @@ def select_parser(patident, lang):
     if patident in _av_parser:
         return _av_parser[patident]
     else:
-        return _av_parser[f'gen_{lang}']
+        if f'gen_{lang}' in _av_parser:
+            return _av_parser[f'gen_{lang}']
+        else:
+            logger.warning(
+                'Not even a language specific parser available - falling '
+                'back to super simple. Make sure at least your currency symbol '
+                'is set!')
+            return _av_parser['simple']

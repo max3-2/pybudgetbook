@@ -74,6 +74,14 @@ _patterns = {
                 'date_pattern': re.compile(
                     r'[0-3]\d[,.\/]_*?[0,1]\d[,.\/]_*?(2[0,1]\d{2}|\d{2})'),
                 },
+    'simple': {'simple_price_pattern': r'(\d{1,3}[,.]\d{2}_*?(?=CURRENCY))',
+                'total_sum_line': re.compile(
+                    '(total|betrag|summe|sum|payer|amount|totale)',
+                    re.IGNORECASE),
+                'article_name_pattern': r'(.*?)(\d{1,3}[.,|]\d{1,2}[_ ]*CURRENCY).*',
+                'date_pattern': re.compile(
+                    r'[0-3]{0,1}\d[,.\/]_*?[0,1]{0,1}\d[,.\/]_*?(2[0,1]\d{2}|\d{2})'),
+                },
 }
 
 # Icons to use fro group display, currently only based on german group names -

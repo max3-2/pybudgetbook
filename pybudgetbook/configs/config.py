@@ -86,6 +86,7 @@ receipt_types = {
     'Raiffeisen': 'raiff',
     'Rewe': 'rewe',
     'General': 'gen',
+    'Simple': 'simple'
 }
 
 # Maps from -> to if tax switching is needed for a vendor.
