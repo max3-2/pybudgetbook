@@ -8,7 +8,7 @@ authors = [
     {name = 'Max Elfner', email = 'max_elfner@gmx.net'},
 ]
 
-readme = 'README.md'
+readme = 'pypi_rm.md'
 description= 'Organize and sort your receipts locally, use pandas power to analyze your spendings!'
 
 classifiers = [
@@ -50,6 +50,5 @@ dependencies = [
 pybudgetbook = "pybudgetbook.ui.start_gui:start_main_ui"
 
 [project.urls]
-# Documentation = 'OnlyReadMe'
+Documentation = 'https://github.com/max3-2/pybudgetbook'
 Source = 'https://github.com/max3-2/pybudgetbook'
-Homepage = 'https://github.com/max3-2/pybudgetbook'
