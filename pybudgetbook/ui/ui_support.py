@@ -39,6 +39,40 @@ def _get_log_text_colors():
                 QtGui.QColor(255, 0, 0, 255))
 
 
+def _check_int(data):
+    """
+    Checks if data (a single data element) is of integer type and thus can be
+    handled differenly than a non int type in the table view.
+    """
+    if isinstance(data, (str, bool)):
+        return False
+    if np.isnan(data):
+        return False
+
+    return (
+        np.issubdtype(data, int) or
+        np.issubdtype(data, np.int32) or
+        np.issubdtype(data, np.int64)
+    )
+
+
+def _check_float(data):
+    """
+    Checks if data (a single data element) is of float type and thus can be
+    handled differenly than a non float / numeric type in the table view.
+    """
+    if isinstance(data, (str, bool)):
+        return False
+    if np.isnan(data):
+        return False
+
+    return (
+        np.issubdtype(data, float) or
+        np.issubdtype(data, np.float32) or
+        np.issubdtype(data, np.float64)
+    )
+
+
 def _check_numeric(data):
     """
     Checks if data (a single data element) is of numeric type and thus can be
@@ -50,12 +84,8 @@ def _check_numeric(data):
         return False
 
     return (
-        np.issubdtype(data, int) or
-        np.issubdtype(data, np.int32) or
-        np.issubdtype(data, np.int64) or
-        np.issubdtype(data, float) or
-        np.issubdtype(data, np.float32) or
-        np.issubdtype(data, np.float64) or
+        _check_int(data) or
+        _check_float(data) or
         np.issubdtype(data, complex) or
         np.issubdtype(data, np.complex64) or
         np.issubdtype(data, np.complex128)
@@ -479,8 +509,8 @@ class PandasTableModel(QtCore.QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             val = row[col]
-            if _check_numeric(val):
-                return f'{val:.2f}'
+            if _check_float(val):
+                return f'{val:.2f}' if int(col) in (4, 5) else f'{val:.3g}'
             else:
                 return str(val)
 
