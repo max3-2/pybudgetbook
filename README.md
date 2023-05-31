@@ -6,19 +6,19 @@ Some of them might even be more general or better at parsing. Sure, but here are
 the core reasons why I built this app. If they are important to you, give it a
 try (and help to support more receipts)!
 
-Reason 1: Data Privacy
+**Reason 1: Data Privacy**
 
 Your receipts combined with some personal data are a pretty good estimator on
 where you are and what you are doing. I prefer to keep that data locally. This
 software will never *access and send* any of that data since it runs locally.
 
-Reason 2: Adaptability
+**Reason 2: Adaptability**
 
 Receipts differ for region and even for supermarkets. Here, some of the more
 common german stores are included. If something does not work, add your own
 reader / parser!
 
-Reason 3: Data Analysis
+**Reason 3: Data Analysis**
 
 The data is saved in `hdf`-files for `pandas` and can be easily exported to
 `csv` or any other format manually. So analysis is not limited to the few plots
@@ -237,7 +237,17 @@ will get switched on reading. The switcher can be extended to other exceptions.
 ## More Information
 The following can be considered for advanced use or if something fails:
 ### Data export
-Two options ToDo
+Data can be exported in two manners: The first is used for single receipts and
+latter can be used to create a copy of the full dataset in the current data
+folder.
+1. With a receipt loaded (either during parsing or by loading a `hdf` receipt)
+   and selecting `File->Export to CSV`. The receipt will be written to csv and
+   the metadata will be written in the header.
+   Matcher feedback will not run in this case!
+2. Selecting `File->Create data backup` will create a merged dataframe with all
+   receipts in the current data folder and write that to a `csv`. Any metadata
+   from the receipts will get lost.
+
 ### Good Scans / Images
 - Have your receipt as flat as possible against a darker background.
 - Images are scaled to 600dpi **assuming a basic receipt width of 75mm**. This

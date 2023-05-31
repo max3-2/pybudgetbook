@@ -11,7 +11,7 @@ from PySide6.QtCore import Qt
 import pandas as pd
 import numpy as np
 
-from .. import __version__ as bbvers
+from .. import __version__ as bbvers, name as bbname
 from . import ui_support
 from .main_gui import Ui_pybb_MainWindow
 
@@ -787,19 +787,6 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         retrieved_data['Vendor'] = self.lineEdit_marketVendor.text()
         retrieved_data['Date'] = ui_support.convert_date(self.dateEdit_shopDate.date())
 
-        if target == 'csv':
-            year = retrieved_data.loc[0, 'Date'].strftime('%Y')
-            mon_day = retrieved_data.loc[0, 'Date'].strftime('%m_%d')
-            target = Path(options['data_folder']) / 'export'
-
-            data_target = bb_io._unique_file_name(
-                Path(target) / f'{year}_{mon_day:s}_{retrieved_data.loc[0, "Vendor"]:s}.csv')
-
-            retrieved_data = bb_io.resort_data(retrieved_data)
-            retrieved_data.to_csv(data_target)
-            logger.info(f'Exported data to csv: {str(data_target.name)}')
-            return
-
         try:
             total_ext = float(self.lineEdit_totalAmountReceipt.text())
         except ValueError:
@@ -813,6 +800,32 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         retrieved_data.attrs = metadata
         retrieved_data = bb_io.resort_data(retrieved_data)
+
+        if target == 'csv':
+            year = retrieved_data.loc[0, 'Date'].strftime('%Y')
+            mon_day = retrieved_data.loc[0, 'Date'].strftime('%m_%d')
+            target = Path(options['data_folder']) / 'export'
+
+            data_target = bb_io._unique_file_name(
+                Path(target) / f'{year}_{mon_day:s}_{retrieved_data.loc[0, "Vendor"]:s}.csv')
+
+            fileheader = [
+                '# pybudgetbook export\r\n',
+                f'# creator={bbname}\r\n',
+                f'# version={bbvers}\r\n',
+
+                f'# tags={retrieved_data.attrs["tags"]}\r\n',
+                f'# total_extracted={retrieved_data.attrs["total_extracted"]:.2f}\r\n',
+                f'# langs={retrieved_data.attrs["langs"]}\r\n\r\n',
+            ]
+
+            with open(data_target, 'w+') as rec_file:
+                rec_file.writelines(fileheader)
+            retrieved_data.to_csv(
+                data_target, na_rep='nan', index=False, mode='a')
+
+            logger.info(f'Exported data to csv: {str(data_target.name)}')
+            return
 
         if self.checkBox_feedbackMatch.isChecked():
             if self.checkBox_useDiffParsingLang.isChecked():
