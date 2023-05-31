@@ -1,7 +1,7 @@
 """pybudgetbook main init"""
 import warnings
 
-__version__ = '0.2.4'
+__version__ = '0.2.5'
 name = 'pybudgetbook'
 
 _top_package = __package__
