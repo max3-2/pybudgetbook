@@ -165,6 +165,11 @@ def fill_missing_data(retrieved_data):
         retrieved_data.loc[ppu_nan, 'Price'] /
         retrieved_data.loc[ppu_nan, 'Units'])
 
+    p_nan = retrieved_data['Price'].isna()
+    retrieved_data.loc[p_nan, 'Price'] = (
+        retrieved_data.loc[p_nan, 'PricePerUnit'] *
+        retrieved_data.loc[p_nan, 'Units'])
+
     return retrieved_data
 
 
