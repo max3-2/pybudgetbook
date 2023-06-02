@@ -32,6 +32,48 @@ def _dbl_fmt(val, sum_vals, label_cutoff):
     return f'{val:.2f} {options["currency"]:s} ({rel_val:.2f}%)' if rel_val >= label_cutoff else ''
 
 
+def make_twinx_cursor(current, other, invert=False, no_x=True):
+    """
+    Formats the displayed coordinates of a canvas to show both axis and always
+    the data value in formatted, nice precision. Add this to the plots using
+    `ax2.format_coord = make_format(ax2, ax1)`
+
+    Parameters
+    ----------
+    current: `axis`
+        Axis one, caller axis, usually twinx
+    other: `axis`
+        Axis two, second axis
+    invert: `bool`, opt
+        Invert left and right. Defaults to False.
+    no_x: `bool`, opt
+        Hide x value, so only show y value. Defaults to True
+
+    Returns
+    -------
+    format_coord: `str`
+        String with formatted coords to print under plot
+    """
+    def format_coord(x, y):
+        display_coord = current.transData.transform((x, y))
+        inv = other.transData.inverted()
+        # convert back to data coords with respect to ax
+        ax_coord = inv.transform(display_coord)
+        coords = [ax_coord, (x, y)]
+
+        loc = 'Left: {:<30}    Right: {:<}'
+
+        if invert:
+            coords = coords[::-1]
+
+        if no_x:
+            return loc.format(*['Value: {:.2f}'.format(y) for _, y in coords])
+        else:
+            return loc.format(*['({:.2f}, {:.2f})'.format(x, y) for x, y in coords])
+
+    return format_coord
+
+
 def default_rect(group, ax):
     """
     Creates a rectangle with default style from a group `Series` that holds
@@ -110,8 +152,6 @@ def create_stem(data, ax):
     colors = {name: color for name, color
               in zip(top_four.index, plt.rcParams['axes.prop_cycle'].by_key()['color'])}
 
-    locations = grouped['Vendor'].unique()
-
     # Create an offset for x-axis positions and use them
     offset = np.ptp(grouped['Date']) / 100  # Offset of 6 hours for day-level resolution
 
@@ -162,9 +202,18 @@ def create_stem(data, ax):
     basecolor = 'white' if isDark() else 'black'
     for hline, hline_r in zip(hline_start, hline_range):
         line = ax.plot((hline-hline_r, hline+hline_r), (0, 0), ls='--',
-                       color=basecolor, marker='|', markersize=6)
+                        color=basecolor, marker='|', markersize=6)
 
-    ax2.set_ylim(0, None)
+    ax.set_ylim(-3, None)
+    ax2.set_ylim(-3, None)
+
+    # scale ax2 range so the lower offset is the same as possible
+    ax1lim = ax.get_ylim()
+    ax1rel = ax1lim[0] / (ax1lim[1] - ax1lim[0])
+
+    ax2lim = ax2.get_ylim()
+    ax2_lower = ax1rel * (ax2lim[1] - ax1lim[0])
+    ax2.set_ylim(ax2_lower, ax2lim[1])
 
     # Add legend
     ax.legend(loc='best', title='Top 5')

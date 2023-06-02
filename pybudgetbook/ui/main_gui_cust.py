@@ -933,6 +933,8 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         self.plot_area_data.ax = None
         self.plot_area_data.add_subplot(111)
         plotting.create_stem(self.conc_data, self.plot_area_data.ax[0])
+        ax2 = self.plot_area_data.fig.axes[1]
+        ax2.format_coord = plotting.make_twinx_cursor(ax2, self.plot_area_data.ax[0])
         self.plot_area_data.draw_blit()
 
     def create_pie_plot(self):
