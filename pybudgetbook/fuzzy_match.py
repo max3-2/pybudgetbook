@@ -109,8 +109,10 @@ def matcher_feedback(retrieved_data, lang=config.options['lang']):
                                for fb in feedback]
             feedback = list(np.array(feedback)[fuzzy_fb_vs_neg])
 
-        user_match_data[feedgroup] = list(set(user_match_data[feedgroup]).union(
+        this_feedback = list(set(user_match_data[feedgroup]).union(
             set(feedback)))
+        logger.debug(f'Matcher feedback for group {feedgroup} b4 set: {feedback}')
+        user_match_data[feedgroup] = this_feedback
 
     bb_io._save_user_match_data(user_match_data, user_match_file)
 
