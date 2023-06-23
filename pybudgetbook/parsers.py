@@ -235,7 +235,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
         # Is there a price with tax class?
         if (re_res := pats['price_with_class'].search(this_line)) is not None:
-            price, tax_class = re_res.group(0).split('_')
+            price, tax_class = re_res.group(1).replace('_', ''), re_res.group(2)
 
             try:
                 price = float(price.replace(',', '.'))
@@ -420,7 +420,7 @@ def parse_receipt_unverpackt(data, pats, pattern, ax=None):
         # Is there a price with tax class? Then the line before is ArtNr
         # and the one before that name
         if (re_res := pats['price_with_class'].search(this_line)) is not None:
-            price, tax_class = re_res.group(0).split('_')
+            price, tax_class = re_res.group(1).replace('_', ''), re_res.group(2)
 
             try:
                 price = float(price.replace(',', '.'))
@@ -499,7 +499,7 @@ def parse_receipt_raiff(data, pats, pattern, ax=None):
         logger.debug(f'Analyzing: {this_line:s}')
         # Is there a price with tax class? Is the amount 1?
         if (re_res := pats['price_with_class'].search(this_line)) is not None:
-            price, tax_class = re_res.group(0).split('_')
+            price, tax_class = re_res.group(1).replace('_', ''), re_res.group(2)
 
             try:
                 price = float(price.replace(',', '.'))
