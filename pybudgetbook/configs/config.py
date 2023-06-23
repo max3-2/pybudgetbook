@@ -92,4 +92,5 @@ receipt_types = {
 # Maps from -> to if tax switching is needed for a vendor.
 needs_tax_switch = {
     'Aldi': (1, 2),
+    'Edeka': (1, 2),
 }
