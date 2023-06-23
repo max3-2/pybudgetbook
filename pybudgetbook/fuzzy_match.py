@@ -37,9 +37,10 @@ def _match_group(data, reference_groups, use_fuzzy=False):
     result = list()
     for key, grp in reference_groups.items():
         if use_fuzzy:
-            matches = len(get_close_matches(data['Name'].casefold(), grp, cutoff=0.3, n=7))
+            matches = len(get_close_matches(data['Name'].casefold(), grp, cutoff=0.5, n=7))
         else:
             matches = sum([tester.casefold() in data['Name'].casefold() for tester in grp])
+
         if matches > 0:
             result.append((key, matches))
 
