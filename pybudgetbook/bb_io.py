@@ -11,6 +11,7 @@ import shutil
 from .configs import config
 from .configs import constants
 from . import __version__ as bbvers, name as bbname
+from .receipt import _type_check
 
 
 logger = logging.getLogger(__package__)
@@ -214,6 +215,8 @@ def load_concatenad_data(work_dir=None):
     -------
     `pd.DataFrame`
         Concatenated data from all datasets present in the folder.
+    `int`
+        Number of data files (receipts)
     """
     if work_dir is None:
         data_files = Path(config.options['data_folder']) / 'data'
@@ -229,6 +232,7 @@ def load_concatenad_data(work_dir=None):
         this_dataset = load_with_metadata(file)
         conc_data = pd.concat((conc_data, this_dataset))
 
+    conc_data = _type_check(conc_data)
     return conc_data.sort_values('Date').reset_index(drop=True), n_files
 
 

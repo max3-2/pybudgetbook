@@ -26,11 +26,11 @@ def _type_check(retrieved_data):
     """Ensures that the data type in each view column is correct"""
     try:
         retrieved_data = retrieved_data.astype(
-            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int'})
+            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'int', 'ArtNr': 'int', 'Units': 'float'})
     except ValueError:
         logger.warning('Using float instead of int in some cols due to NaN are left')
         retrieved_data = retrieved_data.astype(
-            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'float', 'ArtNr': 'int'})
+            {'PricePerUnit': 'float', 'Price': 'float', 'TaxClass': 'float', 'ArtNr': 'int', 'Units': 'float'})
     return retrieved_data
 
 
