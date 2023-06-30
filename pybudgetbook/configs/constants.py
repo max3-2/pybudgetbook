@@ -25,7 +25,7 @@ _UI_LANG_SUPPORT = ['deu', 'eng', 'fra']
 # complex and thus are not included in user config space.
 _patterns = {
     'gen_deu': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{2})'),
-                'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_*?)([AB12]|AW)'),
+                'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_*?)([AB12]|AW)(?:[x*]*?)$'),
                 'mult_pattern': re.compile(r'((?<=[\W][xX*]_)\d{1,3}[,.]\d{2})'),
                 'weight_pattern': re.compile(r'(\d{1,3}[,.]\d{1,3}(?=_EUR\/kg))', re.IGNORECASE),
                 'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
@@ -58,7 +58,7 @@ _patterns = {
     'rewe_deu': {'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3}[,.]\d{2})')},  # small catch due to sometimes bad mults
     'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3}[,.]\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
                  },
-    'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_*?)([AB12]|AW)'),
+    'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_*?)([AB12]|AW)(?:[x*]*?)$'),
                   'mult_pattern': re.compile(r'(\d{1,3}(?=[xX*]))'),
                   'mult_price': re.compile(r'((?<=[xX*])_*?\d{1,3}[.,]\d{1,2})'),
                   'valid_article_pattern': re.compile(r'(.*?(?=(\d{1,3}[,.]\d{2})))'),
