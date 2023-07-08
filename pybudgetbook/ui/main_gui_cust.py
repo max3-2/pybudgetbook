@@ -415,6 +415,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                     self.slider_FilterAmount.setEnabled(False)
                     self.comboBox_receiptDisplayMode.setEnabled(False)
 
+                # Reset fields that needs empty vals
+                self.lineEdit_marketVendor.setText('')
+
             except (IOError, FileNotFoundError):
                 logger.warning('Invalid file type for a new receipt!')
                 return
