@@ -427,6 +427,9 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
             self.receipt.disp_ax = self.plot_area_receipts.ax
             self.display_receipt()
 
+        for patch in self.plot_area_receipts.ax.patches:
+            patch.remove()
+
     def display_receipt(self):
         """Displays the receipt in the plot window."""
         if self.receipt is None:
