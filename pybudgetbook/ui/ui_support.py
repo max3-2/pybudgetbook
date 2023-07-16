@@ -576,7 +576,7 @@ class PandasTableModel(QtCore.QAbstractTableModel):
                 new_index = 0
             self._data.loc[row + i, :] = [
                 int(new_index), int(-1),
-                'New Article Name', 1, 1, 'nan', int(0), 'none']
+                'New Article Name', 1, 1, np.nan, int(0), 'none']
         self.endInsertRows()
         return True
 

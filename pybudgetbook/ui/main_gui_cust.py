@@ -39,7 +39,7 @@ plotting.set_style()
 def _default_data():
     """Default data for first row in data viewer and new row template."""
     init_data_viewer = pd.DataFrame(columns=constants._VIEWER_COLS)
-    init_data_viewer.loc[0] = [int(-1), 'New Article Name', 1., 1., 'nan', int(0), 'none']
+    init_data_viewer.loc[0] = [int(-1), 'New Article Name', 1., 1., np.nan, int(0), 'none']
     return init_data_viewer
 
 
