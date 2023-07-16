@@ -39,7 +39,7 @@ plotting.set_style()
 def _default_data():
     """Default data for first row in data viewer and new row template."""
     init_data_viewer = pd.DataFrame(columns=constants._VIEWER_COLS)
-    init_data_viewer.loc[0] = [int(-1), 'New Article Name', 1., 1., 1., int(0), 'none']
+    init_data_viewer.loc[0] = [int(-1), 'New Article Name', 1., 1., 'nan', int(0), 'none']
     return init_data_viewer
 
 
@@ -662,9 +662,16 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
         else:
             lang = self.comboBox_baseLang.currentText()
 
+        if new_data.shape[0] == 0:
+            logger.warning('No data parsed, something is wrong with the raw text')
+            return
+
         try:
             new_data = fuzzy_match.find_groups(new_data, lang=lang)
         except FileNotFoundError as missing_data:
+            logger.error(f'{missing_data}')
+            new_data['Group'] = 'none'
+        except ValueError as missing_data:
             logger.error(f'{missing_data}')
             new_data['Group'] = 'none'
 
