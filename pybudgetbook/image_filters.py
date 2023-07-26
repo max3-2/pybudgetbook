@@ -6,7 +6,7 @@ from skimage.filters import threshold_otsu, rank
 from skimage.transform import rescale
 from skimage.filters import unsharp_mask
 from skimage.segmentation import clear_border
-from skimage.morphology import disk, diamond, binary_erosion
+from skimage.morphology import disk, diamond, binary_erosion, opening
 from skimage.util import img_as_ubyte
 
 
@@ -54,9 +54,14 @@ def preprocess_image(grayscale, otsu='global',
         The processed image, as scaled and sharpened grayscale and fully
         processed binary image.
     """
+    proc_img = grayscale
     if rescale_image:
-        scale = constants._TARGET_DPI / grayscale.shape[1] * (80 / 25.4)
-        proc_img = rescale(grayscale, scale)
+        scale = constants._TARGET_DPI / proc_img.shape[1] * (80 / 25.4)
+        proc_img = rescale(proc_img, scale)
+
+    # Test blue filter, WiP
+    # proc_img = opening(proc_img, diamond(4))
+    # proc_img = opening(proc_img, diamond(3))
 
     if not any(param is None for param in unsharp_ma):
         proc_img = unsharp_mask(proc_img, radius=unsharp_ma[0], amount=unsharp_ma[1])
