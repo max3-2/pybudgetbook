@@ -202,8 +202,9 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
             total_price = float(
                 matcher.search(data.iloc[last_line]['text']).group(0).replace(',', '.').replace('_', ''))
             logger.debug(f'Found total price: {total_price:.2f}')
-        except ValueError:
+        except (ValueError, IndexError, TypeError):
             logger.warning('No total price detected')
+            last_line = -1
 
     # This works for the general case
     else:
