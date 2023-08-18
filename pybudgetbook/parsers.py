@@ -327,8 +327,14 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
         # Found weight and price - this is a style where the name was in the row
         # before but not matched (get it from unused_lines). This is Rewe receipt
-        # TODO fill -1 if present? Waiting for an example
         elif has_weight and has_price:
+            # There is a chance that the first line is a weight line and thus
+            # the actual name was in first_item - 1 this needs to be handled:
+            if not unused_lines:
+                logger.debug(
+                    'Catching a possible first item with weight, appending: '
+                    f"{data.iloc[first_item - 1]['text']}")
+                unused_lines.append(data.iloc[first_item - 1]['text'])
             retrieved_data = pd.concat(
                 [retrieved_data, pd.DataFrame({
                     'ArtNr': -1,
