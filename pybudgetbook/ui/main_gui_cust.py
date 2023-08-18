@@ -422,14 +422,16 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
                 logger.warning('Invalid file type for a new receipt!')
                 return
 
+        # Remove old
+        for patch in self.plot_area_receipts.ax.patches:
+            patch.remove()
+        self.plot_area_receipts.ax.clear()
+        self.plot_area_receipts.ax.grid(True)
+
         self.comboBox_receiptDisplayMode.setCurrentIndex(0)
         if self.receipt is not None:
             self.receipt.disp_ax = self.plot_area_receipts.ax
             self.display_receipt()
-
-        # Remove old
-        for patch in self.plot_area_receipts.ax.patches:
-            patch.remove()
 
         # And dont forget to redraw
         self.plot_area_receipts.draw_blit()
