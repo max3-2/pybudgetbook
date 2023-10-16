@@ -134,6 +134,7 @@ class _BaseReceipt():
             logger.info('Please set a vendor first')
             return None
 
+        logger.debug(f'Parsing with patident {self._patident} and lang {self._lang}')
         parsing_func = parsers.select_parser(self._patident, lang=self._lang)
 
         retrieved_data, total_price = parsing_func(
@@ -443,10 +444,18 @@ class PdfReceipt(_BaseReceipt):
         rects = np.array([txtpage.get_rect(i) for i in range(txtpage.count_rects())])
         # Now this is left, bottom, right and top in pdf, so scale, invert y
         # and convert for MPL
-        data['left'] = rects[:, 0] * scale
-        data['top'] = ref_img.shape[0] - rects[:, 3] * scale
-        data['width'] = (rects[:, 2] - rects[:, 0]) * scale
-        data['height'] = (rects[:, 3] - rects[:, 1]) * scale
+        # TODO make this better right now just catch if rects are messed up
+        if rects.shape[0] != data.shape[0]:
+            logger.warning('Invalid text BBox data in PDF, skipping rects...')
+            data['left'] = 0
+            data['top'] = 0
+            data['width'] = 0
+            data['height'] = 0
+        else:
+            data['left'] = rects[:, 0] * scale
+            data['top'] = ref_img.shape[0] - rects[:, 3] * scale
+            data['width'] = (rects[:, 2] - rects[:, 0]) * scale
+            data['height'] = (rects[:, 3] - rects[:, 1]) * scale
 
         self._data = data
         self._raw_text = raw_text
