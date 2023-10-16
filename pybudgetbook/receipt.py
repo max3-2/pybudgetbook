@@ -9,7 +9,7 @@ from PIL import Image
 import matplotlib.pyplot as plt
 
 import pytesseract as ocr
-import pypdfium2 as pdfium
+import pdfplumber
 from skimage.color import rgb2gray
 from skimage.transform import rotate
 
@@ -413,51 +413,44 @@ class PdfReceipt(_BaseReceipt):
 
         Returns
         -------
-        self ; `Receipt`
+        self : `Receipt`
             Self for chaining support
         """
-        # Split line-wise
-        pdf = pdfium.PdfDocument(self._file)
-        pagedata = pdf.get_page(page)
-        txt = pagedata.get_textpage().get_text_range().split('\n')
+        def _clean_text(txt):
+            txt = txt.strip()  # whitespaces
+            txt = ' '.join(txt.split())  # multiple spaces
+            txt = txt.replace(' ', '_')
+            return txt
 
-        txt = [line.strip() for line in txt if line.strip()]
+        with pdfplumber.open(self._file) as pdf:
+            data_all = pd.DataFrame()
+            raw_text = ''
+            for pi, page in enumerate(pdf.pages):
 
-        # Remove  many spaces, dont need the layout
-        txt = [' '.join(line.split()) for line in txt]
-        # Spaces to underscore, better visibility
-        txt = [line.replace(' ', '_') for line in txt]
+                data = pd.DataFrame(page.extract_text_lines()).drop(['chars'], axis=1)
+                data['line_num'] = data.index + 1
+                data['text'] = data['text'].apply(_clean_text)
+                raw_text += '\n'.join(data['text'])
+                raw_text += '\n\n'
 
-        # Create raw and parse the rest into the DataFrame format which is used
-        # in the main text parser
-        raw_text = '\n'.join(txt)
+                scale = constants._TARGET_DPI / page.width * (80 / 25.4)
+                npx = 80 / 25.4 * constants._TARGET_DPI
 
-        data = pd.DataFrame(columns=['line_num', 'text'])
-        data['text'] = txt
-        data['line_num'] = [i + 1 for i in range(len(txt))]
+                # Convert to image
+                if pi == 0:
+                    ref_img = rgb2gray(np.array(page.to_image(width=npx).original))
 
-        scale = constants._TARGET_DPI / pagedata.get_width() * (80 / 25.4)
-        ref_img = rgb2gray(pagedata.render(scale=scale).to_numpy())
+                # Recompute BBox coordinates
+                data['width'] = (data['x1'] - data['x0']) * scale
+                data['height'] = (data['bottom'] - data['top']) * scale
+                data['top'] = data['top'] * scale
+                data['left'] = data['x0'] * scale
+                data = data.drop(['x0', 'x1', 'bottom'], axis=1)
+                data['page'] = pi
 
-        # Text BB
-        txtpage = pagedata.get_textpage()
-        rects = np.array([txtpage.get_rect(i) for i in range(txtpage.count_rects())])
-        # Now this is left, bottom, right and top in pdf, so scale, invert y
-        # and convert for MPL
-        # TODO make this better right now just catch if rects are messed up
-        if rects.shape[0] != data.shape[0]:
-            logger.warning('Invalid text BBox data in PDF, skipping rects...')
-            data['left'] = 0
-            data['top'] = 0
-            data['width'] = 0
-            data['height'] = 0
-        else:
-            data['left'] = rects[:, 0] * scale
-            data['top'] = ref_img.shape[0] - rects[:, 3] * scale
-            data['width'] = (rects[:, 2] - rects[:, 0]) * scale
-            data['height'] = (rects[:, 3] - rects[:, 1]) * scale
+                data_all = pd.concat([data_all, data])
 
-        self._data = data
+        self._data = data_all
         self._raw_text = raw_text
         self._gs_image = ref_img
         self._data_extracted = True

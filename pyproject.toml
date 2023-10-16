@@ -39,7 +39,7 @@ dependencies = [
     'scikit-image',
     'Pillow',
     'pytesseract',
-    'pypdfium2',
+    'pdfplumber',
     'darkdetect',
     ]
 
