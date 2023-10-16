@@ -348,6 +348,10 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
         # Price and mult in a singleline: DM
         if has_price and has_mult:
+            if 'valid_article_pattern_mult' not in pats:
+                logger.warning('This parsing is not allowed, line read error')
+                continue
+
             article_data = pats['valid_article_pattern_mult'].search(this_line).group(0).split('_')
             article_name = ' '.join([art for art in article_data if art])
             retrieved_data = pd.concat(
