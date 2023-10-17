@@ -674,6 +674,152 @@ def parse_receipt_general_fra(data, pats, pattern, ax=None):
     return retrieved_data, total_price
 
 
+def parse_receipt_rewe_delivery(data, pats, pattern, ax=None):
+    """TODO Rewe delivery"""
+    logger.debug(f'Parsing Rewe delivery')
+    retrieved_data = _retrieved_data_template.copy()
+
+    # First item is usually first price, if not let it 0 so get everything
+    first_item = 0
+    first_item = data['text'].str.extract(pats['simple_price_pattern']).first_valid_index()
+
+    # Find the last row, before so this can be better applied with different
+    # vendors. Extract final price. DM is very annoying with different discount
+    # types and totals.
+    total_price = 0
+
+    last_line = data['text'].str.extract(
+        pats['total_sum_pattern']).first_valid_index()
+
+    if last_line is None:
+        last_line = data.index[-1]
+
+    try:
+        total_price = float(
+            pats['total_sum_pattern'].match(
+            data.loc[last_line, 'text']).group(1).replace(',', '.').replace('_', ''))
+        logger.debug(f'Found total price @ line: {total_price:.2f} @ {last_line:d}')
+    except (ValueError, AttributeError):  # Either no match or no valid conversion
+        logger.warning('No total price detected')
+
+    # Parse line by line and see what can be classified
+    logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
+    for _, group in data[first_item:last_line].iterrows():
+        this_line = group['text']
+        draw = False
+        logger.debug(f'Analyzing: {this_line:s}')
+
+        if (re_res := pats['article_pattern'].search(this_line)) is not None:
+            try:
+                amount = float(re_res.group(1).replace(',', '.').replace('_', ' ').strip())
+            except ValueError:
+                 amount = 0.
+
+            try:
+                taxclass = re_res.group(2).replace('_', ' ').strip()
+                if taxclass == 'A/B':
+                    taxclass = 'A'
+                taxclass = int(taxclass.upper().replace('A', '1').replace('B', '2'))
+
+            except ValueError:
+                 taxclass = 0
+
+            try:
+                priceperunit = float(re_res.group(3).replace(',', '.').replace('_', ' ').strip())
+            except ValueError:
+                 priceperunit = 0.
+
+            price = np.round(amount * priceperunit, 2)
+
+            try:
+                art_name = this_line[:re_res.start()].replace('_', ' ').strip()
+                # Basic sanitation
+                _remove_from_name= ['rewe', 'Rewe', 'REWE']
+                for pt in _remove_from_name:
+                    art_name = art_name.replace(pt, '').strip()
+            except Exception:
+                logger.debug('Cant match article name')
+                art_name = 'none'
+
+            retrieved_data = pd.concat(
+            [retrieved_data, pd.DataFrame({
+                'ArtNr': -1,
+                'Name': art_name,
+                'Price': price,
+                'TaxClass': taxclass,
+                'Units': amount,
+                'PricePerUnit': priceperunit
+            }, index=[0])],
+            ignore_index=True)
+
+            if 'left' in group and ax is not None:
+                draw = True
+
+        elif (re_res := pats['weight_pattern'].search(this_line)) is not None:
+            try:
+                amount = re_res.group(1).replace(',', '.').replace('_', ' ').strip()
+                unit = ''.join([char for char in amount if not char.isdigit()])
+                amount = ''.join([char for char in amount if char.isdigit()])
+                if 'kg' not in unit:
+                    # We assume this must be gram since weights are only those two
+                    amount = float(amount) / 1000.
+                else:
+                    amount = float(amount)
+            except ValueError:
+                 amount = 0.
+
+            try:
+                taxclass = re_res.group(2).replace('_', ' ').strip()
+                if taxclass == 'A/B':
+                    taxclass = 'A'
+                taxclass = int(taxclass.upper().replace('A', '1').replace('B', '2'))
+
+            except ValueError:
+                 taxclass = 0
+
+            try:
+                # This assumes the price is stated per kg which standard here
+                priceperunit = float(re_res.group(3).replace(',', '.').replace('_', ' ').strip())
+            except ValueError:
+                 priceperunit = 0.
+
+            price = np.round(amount * priceperunit, 2)
+
+            try:
+                art_name = this_line[:re_res.start()].replace('_', ' ').strip()
+                # Basic sanitation
+                _remove_from_name= ['rewe', 'Rewe', 'REWE']
+                for pt in _remove_from_name:
+                    art_name = art_name.replace(pt, '').strip()
+            except Exception:
+                logger.debug('Cant match article name')
+                art_name = 'none'
+
+
+            retrieved_data = pd.concat(
+            [retrieved_data, pd.DataFrame({
+                'ArtNr': -1,
+                'Name': art_name,
+                'Price': price,
+                'TaxClass': taxclass,
+                'Units': amount,
+                'PricePerUnit': priceperunit
+            }, index=[0])],
+            ignore_index=True)
+
+            if 'left' in group and ax is not None:
+                draw = True
+
+        if draw:
+            if 'page' in group:
+                if group['page'] == 0:
+                    default_rect(group, ax)
+            else:
+                default_rect(group, ax)
+
+    return retrieved_data, total_price
+
+
 def parse_receipt_simple(data, pats, pattern, ax=None):
     """Most basic parser - this is a language unspecific fallback"""
     currency = config.options['currency'].strip()
@@ -749,7 +895,8 @@ _av_parser = {
     'raiff': parse_receipt_raiff,
     'gen_deu': parse_receipt_general_deu,
     'gen_fra': parse_receipt_general_fra,
-    'simple': parse_receipt_simple
+    'rewe_delivery': parse_receipt_rewe_delivery,
+    'simple': parse_receipt_simple,
 }
 
 

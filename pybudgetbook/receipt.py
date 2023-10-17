@@ -450,7 +450,7 @@ class PdfReceipt(_BaseReceipt):
 
                 data_all = pd.concat([data_all, data])
 
-        self._data = data_all
+        self._data = data_all.reset_index(drop=True)
         self._raw_text = raw_text
         self._gs_image = ref_img
         self._data_extracted = True
