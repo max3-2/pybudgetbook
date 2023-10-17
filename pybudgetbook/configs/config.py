@@ -37,7 +37,7 @@ ask_for_image: `bool`, defaults to `True`
 The following values should only be edited if you know what you are doing
 
 receipt_aliases: `dict`
-    Coontains aliases of `str` found in the specific receipts to identify
+    Contains aliases of `str` found in the specific receipts to identify
     the vendor.
 
 receipt_types: `dict`
@@ -67,11 +67,12 @@ options = {
 receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
     'Edeka': ['lieben[ _]lebensmittel'],
-    'Tankstelle': ['aral', 'shell', 'jet', 'eni', 'tank', 'tankstelle'],
+    'Tankstelle': ['aral', 'shell', 'jet', 'tank', 'tankstelle'],
     'Aldi': ['aldi', 'aldl', 'aidi'],
     'Real': ['real', 'rael'],
     'Raiffeisen': ['zg', 'raiff'],
-    'Rewe': ['rewe', 'rwe', 'r_e_w_e']
+    'ReweLieferung': ['lieferservice', 'lieferadresse', 'lieferung', 'rewe'],
+    'Rewe': ['rewe', 'rwe', 'r_e_w_e'],
 }
 
 # Maps receipt types to pattern types
@@ -85,6 +86,7 @@ receipt_types = {
     'Tankstelle': 'tank',
     'Raiffeisen': 'raiff',
     'Rewe': 'rewe',
+    'ReweLieferung': 'rewe_delivery',
     'General': 'gen',
     'Simple': 'simple'
 }

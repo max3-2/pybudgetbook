@@ -56,6 +56,10 @@ _patterns = {
     },
     'real_deu': {},  # inherits all, but the flag is needed for sorting
     'rewe_deu': {'mult_pattern': re.compile(r'((?<=[xX*]_)\d{1,3}[,.]\d{2})')},  # small catch due to sometimes bad mults
+    'rewe_delivery_deu': {'simple_price_pattern': re.compile(r'(\d{1,3}[,.]\d{2}[ _]*?€)'),
+                          'article_pattern': re.compile(r'_(\d)_([AB]|A\/B)_(\d{1,3}[,.]\d{1,2})[ _]*?€', re.IGNORECASE),
+                          'weight_pattern': re.compile(r'_(\d{1,4}g|kg)_([AB]|A\/B)_(\d{1,3}[,.]\d{1,2})[ _]*?€\/kg', re.IGNORECASE),
+                          'total_sum_pattern': re.compile(r'Summe[ _]*?(\d{1,3}[,.]\d{2})[ _]*?€', re.IGNORECASE)},
     'tank_deu': {'price_with_class_2': re.compile(r'(\d{1,3}[,.]\d{2,3}(?=_*?[EUR]{0,3}-[AB12]))')
                  },
     'raiff_deu': {'price_with_class': re.compile(r'(\d{1,3}[,.]\d{2,3}_*?)([AB12]|AW)(?:[x*]*?)$'),
@@ -84,8 +88,7 @@ _patterns = {
                 },
 }
 
-# Icons to use fro group display, currently only based on german group names -
-# this might need adaption if new language come in
+# Icons to use for group display
 _icon_root = Path(__file__).parent.parent / 'img' / 'groups'
 icons = {
     'Grundnahrungsmittel': str(_icon_root / 'general.png'),
