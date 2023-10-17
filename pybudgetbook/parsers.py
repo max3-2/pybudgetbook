@@ -66,21 +66,28 @@ def get_vendor(raw_text):
     Returns
     -------
     `tuple`
-        Tuple with literal vendor name and the best fiitin set of parsing
+        Tuple with literal vendor name and the best fitting set of parsing
         patterns.
     """
+    counter = []
     for rec_t in config.receipt_types.keys():
         check_strings = [rec_t] + config.receipt_aliases.get(rec_t, [])
-        this_check = any([re.search(rf'([\b_]*?{cs:s}|{cs:s}[_\b])', raw_text, re.IGNORECASE) is not None
-                          for cs in check_strings])
+        check_strings = list(np.unique([cs.lower() for cs in check_strings]))
+        counter.append([
+            rec_t, sum([raw_text.lower().count(cs.lower()) for cs in check_strings])
+        ])
 
-        if this_check:
-            patterns = config.receipt_types[rec_t]
-            logger.debug(f'Vendor found: {rec_t}')
-            return rec_t, patterns
+    # No match, e.g. second element 0 for all?
+    if all([cc[1] == 0 for cc in counter]):
+        logger.debug('No vendor found, using general')
+        return 'General', 'gen'
 
-    logger.debug('No vendor found, using general')
-    return 'General', 'gen'
+    # Sort and get best match
+    rec_t = sorted(counter, key=lambda v: v[1], reverse=True)[0][0]
+
+    patterns = config.receipt_types[rec_t]
+    logger.debug(f'Vendor found: {rec_t}')
+    return rec_t, patterns
 
 
 def get_date(raw_text, pattern):
