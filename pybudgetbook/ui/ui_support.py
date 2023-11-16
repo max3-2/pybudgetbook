@@ -508,17 +508,17 @@ class PandasTableModel(QtCore.QAbstractTableModel):
         col = index.column()
 
         if role == Qt.DisplayRole:
-            val = row[col]
+            val = row.iloc[col]
             if _check_float(val):
                 return f'{val:.2f}' if int(col) in (4, 5) else f'{val:.3g}'
             else:
                 return str(val)
 
         elif role == Qt.EditRole:
-            return str(row[col])
+            return str(row.iloc[col])
 
         elif role == Qt.TextAlignmentRole:
-            if _check_numeric(row[col]):
+            if _check_numeric(row.iloc[col]):
                 return Qt.AlignVCenter + Qt.AlignRight
             else:
                 return Qt.AlignVCenter + Qt.AlignLeft
@@ -555,9 +555,9 @@ class PandasTableModel(QtCore.QAbstractTableModel):
     def setData(self, index, value, role=Qt.EditRole):
         if index.isValid() and 0 <= index.row() < self.rowCount():
             try:
-                if np.issubdtype(self._dtypes[index.column()], float):
+                if np.issubdtype(self._dtypes.iloc[index.column()], float):
                     value = float(value)
-                elif np.issubdtype(self._dtypes[index.column()], int):
+                elif np.issubdtype(self._dtypes.iloc[index.column()], int):
                     value = int(value)
             except ValueError:
                 logger.debug("Wrong dtype in tableview column")
