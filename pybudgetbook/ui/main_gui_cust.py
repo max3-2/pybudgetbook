@@ -348,11 +348,50 @@ class main_window(Ui_pybb_MainWindow, QtWidgets.QMainWindow):
 
         self.raw_text_window.show()
         self.raw_text_window.raise_()
+
+        self.raw_text_window.pushButtonOk.clicked.connect(self.save_edited_raw_text)
+
         self.raw_text_window.closed.connect(self.on_text_window_closed)
 
     def on_text_window_closed(self):
         """Destroy reference"""
         self.raw_text_window = None
+
+    def save_edited_raw_text(self):
+        """
+        Break down text and feed back into dataframe string column line by
+        line. This breaks backwawrd traceability. Rescan to restore full
+        connection!
+        """
+        if self.receipt is not None:
+            if self.receipt.valid_data is not None:
+                feed_data = self.raw_text_window.text_edit.toPlainText().\
+                    replace(' ', '_').split('\n')
+
+                logger.info(
+                    'Saving edited text, scanned boxes might not match anymore. Rescan '
+                    'to regenerate default text.')
+                ...
+                if len(feed_data) == self.receipt._data.shape[0]:
+                    # Insert
+                    self.receipt._data['text'] = feed_data
+                elif len(feed_data) < self.receipt._data.shape[0]:
+                    # Truncate
+                    self.receipt._data = self.receipt._data.loc[:len(feed_data) - 1, :].copy()
+                    self.receipt._data['text'] = feed_data
+                else:
+                    # Pad with nan
+                    extra_rows = len(feed_data) - len(self.receipt._data)
+                    extra_data = pd.DataFrame(
+                        [[np.nan] * len(self.receipt._data.columns)] * extra_rows,
+                        columns=self.receipt._data.columns)
+                    extra_data['line_num'] = np.array(range(1, extra_rows + 1)) + self.receipt._data['line_num'].max()
+                    self.receipt._data = pd.concat([self.receipt._data, extra_data], ignore_index=True)
+                    self.receipt._data['text'] = feed_data
+
+                self.receipt.reset_raw_text()
+
+        self.raw_text_window.close()
 
     def load_receipt(self):
         """

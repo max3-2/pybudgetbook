@@ -851,18 +851,30 @@ class TextDisplayWindow(QtWidgets.QWidget):
         # self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
         self.text_edit = QtWidgets.QTextEdit(self)
-        self.text_edit.setReadOnly(True)
+        # self.text_edit.setReadOnly(True)
         self.text_edit.setLineWrapMode(QtWidgets.QTextEdit.NoWrap)
 
         scroll_bar_policy = Qt.ScrollBarAsNeeded
         self.text_edit.setVerticalScrollBarPolicy(scroll_bar_policy)
         self.text_edit.setHorizontalScrollBarPolicy(scroll_bar_policy)
 
+        # Buttons
+        self.pushButtonOk = QtWidgets.QPushButton(text='Save')
+        self.pushButtonCancel = QtWidgets.QPushButton(text='Cancel / Close')
+
+        buttonLayout = QtWidgets.QHBoxLayout()
+        buttonLayout.setContentsMargins(2, 10, 2, 5)
+        buttonLayout.addWidget(self.pushButtonOk)
+        buttonLayout.addWidget(self.pushButtonCancel)
+
         layout = QtWidgets.QVBoxLayout()
         layout.setContentsMargins(2, 2, 2, 2)
         layout.addWidget(self.text_edit)
+        layout.addLayout(buttonLayout)
 
         self.setLayout(layout)
+
+        self.pushButtonCancel.clicked.connect(self.close)
 
     def update_text(self, text, show=False):
         self.text_edit.setText(text)

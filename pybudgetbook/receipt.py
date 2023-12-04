@@ -86,6 +86,9 @@ class _BaseReceipt():
         """Returns vendor"""
         return self._vendor
 
+    def reset_raw_text(self):
+        self._raw_text = '\n'.join(self.valid_data.text) if self.valid_data is not None else ''
+
     # Template to allow chaining if receipt type not known beforehand
     def filter_image(self, **kwargs):
         """Template, dont use directly"""
