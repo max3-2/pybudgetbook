@@ -192,7 +192,7 @@ def create_stem(data, ax):
     # Set the x-axis labels to be the months and format with WoY
     _ = ax.set_xticks(
         grouped['Date'].unique(),
-        labels=grouped['Date'].unique().strftime('2023-%U'),
+        labels=grouped['Date'].unique().strftime('%Y-%U'),
         rotation=35)
 
     # Compute hline per tick

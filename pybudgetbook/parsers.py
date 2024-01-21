@@ -235,6 +235,7 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
     unused_lines = []
 
     # Parse line by line and see what can be classified
+    if last_line is None: last_line = -1  # Catch a reset bug
     logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
     for _, group in data[first_item:last_line].iterrows():
         has_price, has_weight, has_mult = False, False, False
@@ -329,8 +330,13 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
 
         # Found weight but no price with tax class: Lookbehind and assemble
         if has_weight and not has_price:
-            retrieved_data.loc[
-                retrieved_data.index[-1], ['Units', 'PricePerUnit']] = [amount, price_per_unit]
+            # Theres a chance this fails at line one if this is a parse error
+            try:
+                retrieved_data.loc[
+                    retrieved_data.index[-1], ['Units', 'PricePerUnit']] = [amount, price_per_unit]
+            except IndexError:
+                logger.debug('Initial Line lookback error, skipping')
+                continue
 
         # Found weight and price - this is a style where the name was in the row
         # before but not matched (get it from unused_lines). This is Rewe receipt
