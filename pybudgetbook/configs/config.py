@@ -66,7 +66,7 @@ options = {
 # Search aliases for receipts
 receipt_aliases = {
     'DM Drogerie': ['DM-Drogerie', 'dm.de', 'dm-'],
-    'Edeka': ['lieben[ _]lebensmittel'],
+    'Edeka': ['lieben[ _]lebensmittel', 'scheck in', 'scheck'],
     'Tankstelle': ['aral', 'shell', 'jet', 'tank', 'tankstelle'],
     'Aldi': ['aldi', 'aldl', 'aidi'],
     'Real': ['real', 'rael'],
