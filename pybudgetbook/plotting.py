@@ -249,7 +249,7 @@ def bar_fmt(values, fmt_type, label_cutoff):
 
     elif fmt_type == 'rel':
         values = values * 100 / total
-        return values, lambda val: f'{val:.2f} %' if val * 100 / total >= label_cutoff else ''
+        return values, lambda val: f'{val:.1f} %' if val * 100 / total >= label_cutoff else ''
 
     elif fmt_type == 'both':
         return values, lambda val: _dbl_fmt(val, np.nansum(values), label_cutoff)
@@ -441,7 +441,10 @@ class PieEventHandler:
                 self.bar_ax.bar_label(
                     self._barplot, fmt=fmt, label_type='center')
 
-            self.bar_ax.set_title(f'Details for {this_det:s}')
+            self.bar_ax.set_title(
+                f'Details for {this_det:s} '
+                f'(Total Sum: {np.nansum(values):.2f}{options["currency"]:s})'
+            )
             self.bar_ax.legend(loc='upper right')
             self.bar_ax.set_xlim(- 1.5 * width, 1.5 * width)
 
