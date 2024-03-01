@@ -235,7 +235,9 @@ def parse_receipt_general_deu(data, pats, pattern, ax=None):
     unused_lines = []
 
     # Parse line by line and see what can be classified
-    if last_line is None: last_line = -1  # Catch a reset bug
+    # Catch reset bugs
+    if first_item is None: first_item = 0
+    if last_line is None: last_line = -1
     logger.debug(f' Searching from line {first_item:d} to {last_line:d}')
     for _, group in data[first_item:last_line].iterrows():
         has_price, has_weight, has_mult = False, False, False
